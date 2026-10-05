@@ -45,8 +45,13 @@ try {
     await prisma.eventCategory.upsert({ where: { slug: c.slug }, update: {}, create: c });
   }
 
+  // Valeurs par défaut (modifiables dans Administration > Paramètres du site). Les images vides = images provisoires.
   const settings: Record<string, string> = {
     'site.name': 'Paroisse Sainte Lucie de Baguida',
+    'site.tagline': 'Communauté catholique',
+    'home.welcomeTitle': 'Bienvenue à la paroisse Sainte Lucie',
+    'home.welcomeText':
+      'Que vous soyez paroissien, visiteur de passage ou membre de la diaspora, nous sommes heureux de vous accueillir. Retrouvez ici les horaires des messes, les annonces, les bulletins et toute la vie de notre communauté.',
     'site.contactEmail': '',
     'site.phone': '',
     'site.address': '',

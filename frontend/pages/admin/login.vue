@@ -1,4 +1,5 @@
 <script setup lang="ts">
+definePageMeta({ layout: false });
 useHead({ title: 'Connexion – Administration', meta: [{ name: 'robots', content: 'noindex' }] });
 
 const { user, login } = useAuth();

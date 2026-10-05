@@ -43,6 +43,10 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       UPLOAD_DIR: /app/uploads
+      # E-mails de test : visibles sur http://localhost:8025 (Mailpit)
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      NOTIFY_EMAIL: ${NOTIFY_EMAIL:-secretariat@paroisse.test}
     command: sh -c "npx prisma generate && npx prisma migrate deploy && npx tsx watch src/server.ts"
     ports:
       - "${BACKEND_PORT:-4000}:4000"

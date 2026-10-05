@@ -33,6 +33,12 @@ services:
       CORS_ORIGIN: ${PUBLIC_URL}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
       UPLOAD_DIR: /app/uploads
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-Paroisse Sainte Lucie de Baguida <no-reply@paroissesaintelucie-baguida.org>}
+      NOTIFY_EMAIL: ${NOTIFY_EMAIL:-}
     volumes:
       - uploads_data:/app/uploads
     depends_on:

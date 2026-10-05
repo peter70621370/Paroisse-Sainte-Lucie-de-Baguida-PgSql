@@ -62,8 +62,8 @@ docker compose --env-file .env -f deploiement/docker-compose.yml exec backend np
 | 1 | Schéma de données complet, authentification (sessions), rôles | fait |
 | 2 | Back-office : utilisateurs, médiathèque, paramètres | fait |
 | 3 | Contenus : pages, annonces, bulletins, horaires, personnel, homélies | fait |
-| 4 | Site public (maquette) | à venir |
-| 5 | Calendrier et formulaires | à venir |
+| 4 | Site public (accueil, pages, horaires, bulletins, homélies…) | fait |
+| 5 | Calendrier et formulaires (contact, adhésion, catéchisme, sacrements, intentions de messe) | fait |
 | 6 | Dons en ligne | à venir |
 | 7 | SEO, multilingue, cookies, newsletter | à venir |
 | 8 | Qualité et sécurité | à venir |
@@ -78,6 +78,35 @@ docker compose --env-file .env -f deploiement/docker-compose.yml exec backend np
 ```
 
 Connexion : http://localhost:3000/admin/login. En production, changer ce mot de passe immédiatement (`node dist/scripts/seed.js` crée le compte s'il n'existe pas).
+
+## Formulaires et e-mails
+
+Les formulaires publics enregistrent la demande (Administration › **Demandes reçues**, export CSV) puis envoient un e-mail au secrétariat
+(adresse « E-mail de contact » des paramètres, sinon `NOTIFY_EMAIL`) et un accusé de réception au visiteur.
+En développement, les e-mails sont captés par **Mailpit** : http://localhost:8025.
+En production, renseigner `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` dans `.env` (sans SMTP, les demandes restent enregistrées mais aucun e-mail ne part).
+Anti-spam : champ piège invisible + 5 envois maximum par 10 minutes et par adresse IP.
+
+## Contenu de démonstration et images provisoires
+
+Pour voir le site avec du contenu d'exemple (pages, annonces, horaires, fiches), à ne lancer qu'en développement :
+
+```bash
+docker compose --env-file .env -f deploiement/docker-compose.yml exec backend npm run seed:demo
+```
+
+Tant qu'aucune image n'est choisie, le site affiche des **images provisoires** (`frontend/public/placeholders/`).
+Pour les remplacer : **Administration › Paramètres du site** (logo, grande photo d'accueil, textes de bienvenue, coordonnées).
+Les photos du personnel se changent dans **Personnel pastoral**.
+
+## Rechargement en développement (Windows)
+
+Le frontend se recharge automatiquement. Le **backend ne détecte pas** les modifications de fichiers Windows dans Docker :
+après une modification du code backend, relancer :
+
+```bash
+docker compose --env-file .env -f deploiement/docker-compose.yml restart backend
+```
 
 ## Tests
 

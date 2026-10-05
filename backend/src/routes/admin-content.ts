@@ -73,6 +73,23 @@ const homilySchema = z.object({
   publishedAt: dateTime.nullish(),
 });
 
+const eventSchema = z.object({
+  title: z.string().trim().min(1).max(255),
+  description: optText(5000),
+  location: optText(255),
+  startsAt: dateTime,
+  endsAt: dateTime.nullish(),
+  allDay: z.boolean().default(false),
+  categoryId: z.number().int().positive().nullish(),
+  status: status.default('DRAFT'),
+});
+
+const categorySchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Lettres minuscules, chiffres et tirets uniquement').max(100),
+  color: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Couleur au format #RRGGBB').nullish().transform((v) => v || null),
+});
+
 // ---------- Fabrique CRUD ----------
 type Row = Record<string, any>;
 type Delegate = {
@@ -95,7 +112,9 @@ type Resource = {
   searchField?: string;
   orderBy: object;
   include?: object;
-  prepare?: (data: Row) => Promise<void>;
+  /** La ressource a une colonne publishedAt (sinon : statut seul). */
+  publishDate?: boolean;
+  prepare?: (data: Row, existing: Row | null) => Promise<void>;
   present?: (row: Row) => Row;
 };
 
@@ -123,7 +142,7 @@ function register(app: FastifyInstance, r: Resource) {
 
   // Publication : une date de publication est posée automatiquement (une date future = publication programmée).
   const applyPublish = (data: Row, existing: Row | null) => {
-    if (data.status === 'PUBLISHED') {
+    if (r.publishDate !== false && data.status === 'PUBLISHED') {
       const at = data.publishedAt !== undefined ? data.publishedAt : existing?.publishedAt;
       if (!at) data.publishedAt = new Date();
     }
@@ -162,7 +181,7 @@ function register(app: FastifyInstance, r: Resource) {
   app.post(`/admin/${r.path}`, { preHandler: staff }, async (req, reply) => {
     const data: Row = r.schema.parse(req.body);
     assertCanWrite(req.user!.role, null, data, req.user!.id);
-    await r.prepare?.(data);
+    await r.prepare?.(data, null);
     applyPublish(data, null);
     if (r.author) data.authorId = req.user!.id;
     const item = await wrap(() => r.delegate.create({ data, include: r.include }));
@@ -175,7 +194,7 @@ function register(app: FastifyInstance, r: Resource) {
     const existing = await r.delegate.findUnique({ where: { id } });
     if (!existing) throw new HttpError(404, 'Introuvable');
     assertCanWrite(req.user!.role, existing, data, req.user!.id);
-    await r.prepare?.(data);
+    await r.prepare?.(data, existing);
     applyPublish(data, existing);
     const item = await wrap(() => r.delegate.update({ where: { id }, data, include: r.include }));
     return { item: present(item) };
@@ -217,6 +236,19 @@ const adminContent: FastifyPluginAsync = async (app) => {
     prepare: async (d) => requireMedia(d.photoId, 'image'),
     present: (s) => ({ ...s, photo: mediaOut(s.photo) }),
   });
+  register(app, {
+    path: 'events', delegate: asDelegate(db.event), schema: eventSchema, hasStatus: true, publishDate: false, searchField: 'title',
+    orderBy: { startsAt: 'desc' }, include: { category: true },
+    prepare: async (d, existing) => {
+      const start = d.startsAt ?? existing?.startsAt;
+      const end = d.endsAt !== undefined ? d.endsAt : existing?.endsAt;
+      if (start && end && end < start) throw new HttpError(400, 'La fin doit être après le début');
+      if (d.categoryId) {
+        if (!(await db.eventCategory.findUnique({ where: { id: d.categoryId } }))) throw new HttpError(400, 'Catégorie inconnue');
+      }
+    },
+  });
+  register(app, { path: 'event-categories', delegate: asDelegate(db.eventCategory), schema: categorySchema, hasStatus: false, searchField: 'name', orderBy: { name: 'asc' } });
   register(app, { path: 'homilies', delegate: asDelegate(db.homily), schema: homilySchema, hasStatus: true, author: true, searchField: 'title', orderBy: { date: 'desc' } });
 };
 

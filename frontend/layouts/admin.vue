@@ -3,14 +3,19 @@ const { user, logout } = useAuth();
 const route = useRoute();
 const open = ref(false);
 
+const canSeeRequests = computed(() => user.value?.role !== 'CONTRIBUTOR');
+const { data: summary } = useAdminFetch<{ new: number }>('/api/admin/submissions/summary', { key: 'submissions-summary', immediate: canSeeRequests.value, server: false });
+
 const links = computed(() => [
   { to: '/admin', label: 'Tableau de bord' },
+  ...(canSeeRequests.value ? [{ section: 'Demandes' }, { to: '/admin/submissions', label: 'Demandes reçues', badge: summary.value?.new }] : []),
   { section: 'Contenus' },
   { to: '/admin/pages', label: 'Pages' },
   { to: '/admin/announcements', label: 'Annonces' },
   { to: '/admin/bulletins', label: 'Bulletins' },
   { to: '/admin/schedules', label: 'Horaires des messes' },
   { to: '/admin/staff', label: 'Personnel pastoral' },
+  { to: '/admin/events', label: 'Agenda' },
   { to: '/admin/homilies', label: 'Homélies' },
   { to: '/admin/media', label: 'Médiathèque' },
   { section: 'Réglages' },
@@ -43,6 +48,7 @@ watch(() => route.path, () => (open.value = false));
             :class="['rounded px-3 py-2 text-sm', isActive(l.to) ? 'bg-white/15 font-medium' : 'hover:bg-white/10']"
           >
             {{ l.label }}
+            <span v-if="'badge' in l && l.badge" class="ml-2 rounded-full bg-gold px-2 py-0.5 text-xs font-semibold text-white">{{ l.badge }}</span>
           </NuxtLink>
         </template>
       </nav>

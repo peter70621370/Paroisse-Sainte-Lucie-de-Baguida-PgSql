@@ -65,6 +65,45 @@ const publicContent: FastifyPluginAsync = async (app) => {
     return { total, page, pageSize, items: items.map(({ id, title, preacher, date, audioUrl, videoUrl }) => ({ id, title, preacher, date, audioUrl, videoUrl })) };
   });
 
+  // ---- Agenda ----
+  const dayParam = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+  const eventOut = (e: { id: number; title: string; description: string | null; location: string | null; startsAt: Date; endsAt: Date | null; allDay: boolean; category: { name: string; slug: string; color: string | null } | null }) => ({
+    id: e.id, title: e.title, description: e.description, location: e.location, startsAt: e.startsAt, endsAt: e.endsAt, allDay: e.allDay,
+    category: e.category ? { name: e.category.name, slug: e.category.slug, color: e.category.color } : null,
+  });
+
+  app.get('/event-categories', async () => ({
+    items: (await db.eventCategory.findMany({ orderBy: { name: 'asc' } })).map(({ id, name, slug, color }) => ({ id, name, slug, color })),
+  }));
+
+  // Événements publiés d'une période (défaut : 90 jours à partir d'aujourd'hui). Inclut ceux qui ont commencé avant et se terminent dans la période.
+  app.get('/events', async (req) => {
+    const q = z.object({ from: dayParam.optional(), to: dayParam.optional(), category: z.string().max(100).optional() }).parse(req.query);
+    const from = new Date(`${q.from ?? new Date().toISOString().slice(0, 10)}T00:00:00Z`);
+    const to = q.to ? new Date(`${q.to}T00:00:00Z`) : new Date(from.getTime() + 90 * 86_400_000);
+    if (to < from || to.getTime() - from.getTime() > 400 * 86_400_000) throw new HttpError(400, 'Période invalide (400 jours maximum)');
+    const end = new Date(to.getTime() + 86_400_000); // fin de journée incluse
+    const items = await db.event.findMany({
+      where: {
+        status: 'PUBLISHED',
+        startsAt: { lt: end },
+        OR: [{ startsAt: { gte: from } }, { endsAt: { gte: from } }],
+        ...(q.category ? { category: { slug: q.category } } : {}),
+      },
+      include: { category: true },
+      orderBy: { startsAt: 'asc' },
+      take: 500,
+    });
+    return { items: items.map(eventOut) };
+  });
+
+  app.get('/events/:id', async (req) => {
+    const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
+    const e = await db.event.findFirst({ where: { id, status: 'PUBLISHED' }, include: { category: true } });
+    if (!e) throw new HttpError(404, 'Événement introuvable');
+    return { event: eventOut(e) };
+  });
+
   app.get('/homilies/:id', async (req) => {
     const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
     const h = await db.homily.findFirst({ where: { id, ...visible() } });

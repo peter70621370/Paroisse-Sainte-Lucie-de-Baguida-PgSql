@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 140" role="img" aria-label="Logo provisoire de la Paroisse Sainte Lucie de Baguida">
+  <rect width="560" height="140" fill="none"/>
+  <circle cx="70" cy="70" r="58" fill="#1F3A5F"/>
+  <circle cx="70" cy="70" r="50" fill="none" stroke="#B8860B" stroke-width="2"/>
+  <!-- croix -->
+  <rect x="64" y="34" width="12" height="52" rx="2" fill="#B8860B"/>
+  <rect x="48" y="50" width="44" height="12" rx="2" fill="#B8860B"/>
+  <!-- flamme / lumière (Sainte Lucie) -->
+  <path d="M70 100 C60 108 60 118 70 122 C80 118 80 108 70 100 Z" fill="#E9D8A6"/>
+  <text x="150" y="52" font-family="Georgia, 'Times New Roman', serif" font-size="20" letter-spacing="6" fill="#B8860B">PAROISSE</text>
+  <text x="148" y="90" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="bold" fill="#1F3A5F">SAINTE LUCIE</text>
+  <text x="150" y="118" font-family="Georgia, 'Times New Roman', serif" font-size="20" letter-spacing="5" fill="#1F3A5F">DE BAGUIDA</text>
+  <text x="556" y="136" text-anchor="end" font-family="Arial, sans-serif" font-size="9" fill="#9CA3AF">LOGO PROVISOIRE</text>
+</svg>

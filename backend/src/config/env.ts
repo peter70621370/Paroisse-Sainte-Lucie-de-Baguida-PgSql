@@ -11,6 +11,15 @@ const schema = z.object({
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
   UPLOAD_DIR: z.string().default('./uploads'),
   MAX_UPLOAD_MB: z.coerce.number().positive().default(10),
+  // E-mails (formulaires). Sans SMTP_HOST, aucun e-mail n'est envoyé (les demandes restent enregistrées).
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().default(587),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_SECURE: z.enum(['true', 'false']).optional(),
+  MAIL_FROM: z.string().default('Paroisse Sainte Lucie de Baguida <no-reply@paroissesaintelucie-baguida.org>'),
+  // Destinataire des notifications si « E-mail de contact » n'est pas renseigné dans les paramètres.
+  NOTIFY_EMAIL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof schema>;

@@ -17,6 +17,9 @@ import adminMedia from './routes/admin-media.js';
 import settingsRoutes from './routes/settings.js';
 import adminContent from './routes/admin-content.js';
 import publicContent from './routes/public-content.js';
+import forms from './routes/forms.js';
+import adminSubmissions from './routes/admin-submissions.js';
+import { createMailer } from './services/mail.js';
 
 export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}): Promise<FastifyInstance> {
   const { withDatabase = true } = opts;
@@ -31,6 +34,8 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}):
           : true,
     trustProxy: true,
   });
+
+  app.decorate('mailer', createMailer(env, app.log));
 
   // Réponses d'erreur homogènes : { error: "message" } (+ détails pour la validation).
   app.setErrorHandler((err, req, reply) => {
@@ -87,6 +92,8 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}):
         await api.register(settingsRoutes);
         await api.register(adminContent);
         await api.register(publicContent);
+        await api.register(forms, { env });
+        await api.register(adminSubmissions);
       }
     },
     { prefix: '/api' },

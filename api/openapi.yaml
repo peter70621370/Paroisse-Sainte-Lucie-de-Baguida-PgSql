@@ -106,14 +106,14 @@ paths:
         '409': { description: Fichier utilisé }
   /api/settings:
     get:
-      summary: Paramètres publics (coordonnées, réseaux sociaux)
+      summary: Paramètres publics (identité, logo, accueil, coordonnées, réseaux sociaux). Une image vide = image provisoire.
       responses:
         '200': { description: "{ settings }" }
   /api/admin/settings:
     get:
       summary: Paramètres modifiables (ADMIN, EDITOR)
       responses:
-        '200': { description: "{ settings, labels }" }
+        '200': { description: "{ settings, fields: [{ key, label, type, group }] }" }
     put:
       summary: Mettre à jour des paramètres (clés connues uniquement)
       responses:
@@ -189,3 +189,60 @@ paths:
       responses:
         '200': { description: "{ homily }" }
         '404': { description: Introuvable ou non publiée }
+  /api/forms/{slug}:
+    post:
+      summary: |
+        Formulaire public. slug = contact | membership | catechism | sacrament | mass-intention.
+        Consentement obligatoire (consent: true). Champ piège "website" : doit rester vide.
+        5 envois / 10 min / IP. Notifie le secrétariat par e-mail et accuse réception au visiteur.
+      responses:
+        '201': { description: "{ ok: true }" }
+        '400': { description: "Données invalides : { error, details: { champ: [messages] } }" }
+        '404': { description: Formulaire inconnu }
+        '429': { description: Trop d'envois }
+  /api/events:
+    get:
+      summary: Événements publiés d'une période (query from, to = AAAA-MM-JJ ; défaut 90 jours ; 400 jours max ; category = slug)
+      responses:
+        '200': { description: "{ items }" }
+        '400': { description: Période invalide }
+  /api/events/{id}:
+    get:
+      summary: Un événement publié
+      responses:
+        '200': { description: "{ event }" }
+        '404': { description: Introuvable ou brouillon }
+  /api/event-categories:
+    get:
+      summary: Catégories d'événements
+      responses:
+        '200': { description: "{ items }" }
+  /api/admin/submissions:
+    get:
+      summary: "Demandes reçues (ADMIN, EDITOR) — query type, status, q, page, pageSize"
+      responses:
+        '200': { description: "{ items, total }" }
+        '403': { description: Contributeur }
+  /api/admin/submissions/summary:
+    get:
+      summary: Nombre de nouvelles demandes (total et par type)
+      responses:
+        '200': { description: "{ new, byType }" }
+  /api/admin/submissions/export.csv:
+    get:
+      summary: Export CSV (séparateur « ; », UTF-8 avec BOM, formules neutralisées)
+      responses:
+        '200': { description: Fichier CSV }
+  /api/admin/submissions/{id}:
+    get:
+      summary: Détail d'une demande
+      responses:
+        '200': { description: "{ item }" }
+    patch:
+      summary: Changer le statut (NEW | PROCESSED | ARCHIVED)
+      responses:
+        '200': { description: OK }
+    delete:
+      summary: Supprimer (ADMIN uniquement)
+      responses:
+        '200': { description: OK }

@@ -182,6 +182,15 @@ describe.skipIf(!process.env.RUN_DB_TESTS)('back-office : utilisateurs, médiath
       await prisma.setting.update({ where: { key: 'site.phone' }, data: { value: before } });
     });
 
+    it('accepte pour une image uniquement un fichier de la médiathèque', async () => {
+      const bad = await app.inject({ method: 'PUT', url: '/api/admin/settings', headers: { cookie: cookies.admin! }, payload: { 'site.logo': 'https://evil.example/x.png' } });
+      expect(bad.statusCode).toBe(400);
+      const bad2 = await app.inject({ method: 'PUT', url: '/api/admin/settings', headers: { cookie: cookies.admin! }, payload: { 'site.logo': '/uploads/../../etc/passwd' } });
+      expect(bad2.statusCode).toBe(400);
+      const ok = await app.inject({ method: 'PUT', url: '/api/admin/settings', headers: { cookie: cookies.admin! }, payload: { 'site.logo': '' } });
+      expect(ok.statusCode).toBe(200);
+    });
+
     it('refuse une clé inconnue', async () => {
       const res = await app.inject({ method: 'PUT', url: '/api/admin/settings', headers: { cookie: cookies.admin! }, payload: { 'evil.key': 'x' } });
       expect(res.statusCode).toBe(400);
