@@ -301,12 +301,14 @@ model Donation {
   amount      Int
   currency    String         @default("XOF") @db.VarChar(3)
   status      DonationStatus @default(PENDING)
+  method      String?        @db.VarChar(20)
   provider    String         @db.VarChar(50)
   providerRef String?        @db.VarChar(191)
   donorName   String?        @db.VarChar(150)
   donorEmail  String?        @db.VarChar(191)
   donorPhone  String?        @db.VarChar(40)
   message     String?        @db.VarChar(500)
+  note        String?        @db.VarChar(255)
   campaignId  Int?
   paidAt      DateTime?
   createdAt   DateTime       @default(now())

@@ -90,6 +90,16 @@ const categorySchema = z.object({
   color: z.string().trim().regex(/^#[0-9a-fA-F]{6}$/, 'Couleur au format #RRGGBB').nullish().transform((v) => v || null),
 });
 
+const campaignSchema = z.object({
+  title: z.string().trim().min(1).max(255),
+  slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Lettres minuscules, chiffres et tirets uniquement').max(191),
+  description: optText(5000),
+  goalAmount: z.number().int().positive().max(1_000_000_000).nullish(),
+  startsAt: dateTime.nullish(),
+  endsAt: dateTime.nullish(),
+  status: status.default('DRAFT'),
+});
+
 // ---------- Fabrique CRUD ----------
 type Row = Record<string, any>;
 type Delegate = {
@@ -246,6 +256,14 @@ const adminContent: FastifyPluginAsync = async (app) => {
       if (d.categoryId) {
         if (!(await db.eventCategory.findUnique({ where: { id: d.categoryId } }))) throw new HttpError(400, 'Catégorie inconnue');
       }
+    },
+  });
+  register(app, {
+    path: 'campaigns', delegate: asDelegate(db.campaign), schema: campaignSchema, hasStatus: true, publishDate: false, searchField: 'title', orderBy: { createdAt: 'desc' },
+    prepare: async (d, existing) => {
+      const s = d.startsAt !== undefined ? d.startsAt : existing?.startsAt;
+      const e = d.endsAt !== undefined ? d.endsAt : existing?.endsAt;
+      if (s && e && e < s) throw new HttpError(400, 'La fin doit être après le début');
     },
   });
   register(app, { path: 'event-categories', delegate: asDelegate(db.eventCategory), schema: categorySchema, hasStatus: false, searchField: 'name', orderBy: { name: 'asc' } });

@@ -36,7 +36,7 @@ const year = new Date().getFullYear();
         <ul class="mt-2 space-y-1 text-sm">
           <li><NuxtLink to="/horaires" class="hover:underline">Horaires des messes</NuxtLink></li>
           <li><NuxtLink to="/bulletins" class="hover:underline">Bulletins</NuxtLink></li>
-          <li><NuxtLink to="/p/dons" class="hover:underline">Faire un don</NuxtLink></li>
+          <li><NuxtLink to="/dons" class="hover:underline">Faire un don</NuxtLink></li>
           <li><NuxtLink to="/contact" class="hover:underline">Nous contacter</NuxtLink></li>
         </ul>
       </div>

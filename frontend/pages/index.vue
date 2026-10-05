@@ -21,7 +21,7 @@ const tiles = [
   { to: '/p/catechese', title: 'Catéchèse', text: 'Formation des enfants et des adultes' },
   { to: '/p/jeunesse', title: 'Jeunesse', text: 'Mouvements, scouts et activités' },
   { to: '/p/sengager', title: 'S\'engager', text: 'Bénévolat et ministères' },
-  { to: '/p/dons', title: 'Faire un don', text: 'Soutenir la vie de la paroisse' },
+  { to: '/dons', title: 'Faire un don', text: 'Soutenir la vie de la paroisse' },
 ];
 
 usePageSeo('', s.value['home.welcomeText'] || `Site officiel de la ${name.value}`);
@@ -39,7 +39,7 @@ usePageSeo('', s.value['home.welcomeText'] || `Site officiel de la ${name.value}
         <p v-if="s['home.welcomeText']" class="mx-auto mt-4 max-w-2xl text-white/90 md:text-lg">{{ s['home.welcomeText'] }}</p>
         <div class="mt-8 flex flex-wrap justify-center gap-3">
           <NuxtLink to="/horaires" class="rounded bg-gold px-6 py-3 font-medium text-white hover:bg-gold/90">Horaires des messes</NuxtLink>
-          <NuxtLink to="/p/dons" class="rounded border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10">Faire un don</NuxtLink>
+          <NuxtLink to="/dons" class="rounded border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10">Faire un don</NuxtLink>
         </div>
       </div>
     </section>

@@ -20,6 +20,16 @@ const schema = z.object({
   MAIL_FROM: z.string().default('Paroisse Sainte Lucie de Baguida <no-reply@paroissesaintelucie-baguida.org>'),
   // Destinataire des notifications si « E-mail de contact » n'est pas renseigné dans les paramètres.
   NOTIFY_EMAIL: z.string().optional(),
+  // Adresse publique du site (liens de retour des paiements, webhooks).
+  PUBLIC_URL: z.string().default('http://localhost:3000'),
+  // Dons en ligne. mock = simulation locale (développement) ; live = vrais prestataires (clés ci-dessous).
+  PAYMENT_MODE: z.enum(['live', 'mock']).default('live'),
+  CINETPAY_API_KEY: z.string().optional(),
+  CINETPAY_SITE_ID: z.string().optional(),
+  CINETPAY_BASE_URL: z.string().default('https://api-checkout.cinetpay.com'),
+  PAYPAL_CLIENT_ID: z.string().optional(),
+  PAYPAL_CLIENT_SECRET: z.string().optional(),
+  PAYPAL_ENV: z.enum(['sandbox', 'live']).default('sandbox'),
 });
 
 export type Env = z.infer<typeof schema>;

@@ -246,3 +246,66 @@ paths:
       summary: Supprimer (ADMIN uniquement)
       responses:
         '200': { description: OK }
+  /api/donations/methods:
+    get:
+      summary: Moyens de paiement disponibles (selon la configuration) avec devise et limites
+      responses:
+        '200': { description: "{ mode: live|mock, methods: [{ method, label, currency, limits }] }" }
+  /api/donations:
+    post:
+      summary: |
+        Crée un don « en attente » et renvoie l'adresse de paiement du prestataire { reference, redirectUrl }.
+        method = MOBILE_MONEY | CARD (FCFA, multiples de 5, 500 à 2 000 000, nom et téléphone requis) ou PAYPAL (euros entiers, 1 à 5 000).
+        Consentement obligatoire. 10 créations / 10 min / IP.
+      responses:
+        '201': { description: "{ reference, redirectUrl }" }
+        '400': { description: Données invalides }
+        '502': { description: Prestataire injoignable }
+        '503': { description: Moyen de paiement non configuré }
+  /api/donations/{ref}/confirm:
+    post:
+      summary: Vérifie le paiement auprès du prestataire (page de retour). Idempotent. Ne renvoie aucune donnée personnelle.
+      responses:
+        '200': { description: "{ reference, status, amount, currency, method, campaign }" }
+        '404': { description: Don introuvable }
+  /api/donations/webhook/cinetpay:
+    post:
+      summary: Notification CinetPay (cpm_trans_id). Déclenche une vérification, jamais une validation directe. GET : test de disponibilité.
+      responses:
+        '200': { description: "{ ok: true }" }
+  /api/donations/webhook/paypal:
+    post:
+      summary: Notification PayPal. Retrouve la commande, vérifie auprès de PayPal (capture si approuvée).
+      responses:
+        '200': { description: "{ ok: true }" }
+  /api/campaigns:
+    get:
+      summary: Campagnes publiées en cours avec progression (dons réussis ; euros convertis à 655,957)
+      responses:
+        '200': { description: "{ items }" }
+  /api/campaigns/{slug}:
+    get:
+      summary: Une campagne
+      responses:
+        '200': { description: "{ campaign }" }
+        '404': { description: Introuvable }
+  /api/admin/donations:
+    get:
+      summary: Dons (ADMIN, EDITOR) — query status, method, from, to, q, page
+      responses:
+        '200': { description: "{ items, total }" }
+  /api/admin/donations/summary:
+    get:
+      summary: Totaux (par devise, équivalent FCFA), nombre de dons, en attente
+      responses:
+        '200': { description: "{ byCurrency, totalXof, count, pending, stalePending }" }
+  /api/admin/donations/export.csv:
+    get:
+      summary: Export CSV (formules neutralisées)
+      responses:
+        '200': { description: Fichier CSV }
+  /api/admin/donations/{id}/recheck:
+    post:
+      summary: Revérifie un don en attente auprès du prestataire
+      responses:
+        '200': { description: "{ item }" }

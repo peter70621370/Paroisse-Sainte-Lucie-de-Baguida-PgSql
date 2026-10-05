@@ -16,7 +16,7 @@ const pages = [
   { slug: 'catechese', title: 'Catéchèse et formation', excerpt: 'Inscriptions et préparation aux sacrements.', content: p(lorem) },
   { slug: 'jeunesse', title: 'Jeunesse', excerpt: 'Mouvements de jeunes, scouts, activités et camps.', content: p(lorem) },
   { slug: 'sengager', title: 'S\'engager', excerpt: 'Bénévolat et ministères.', content: p(lorem) },
-  { slug: 'dons', title: 'Dons et soutien', excerpt: 'Soutenir la vie et les projets de la paroisse.', content: p(lorem) + p('Le paiement en ligne sera disponible prochainement.') },
+  { slug: 'dons', title: 'Dons et soutien', excerpt: 'Soutenir la vie et les projets de la paroisse.', content: p('[Texte provisoire] Votre générosité permet à la paroisse de vivre et de mener ses projets. Merci de votre soutien.') },
   { slug: 'mentions-legales', title: 'Mentions légales', excerpt: null, content: p(lorem) },
   { slug: 'confidentialite', title: 'Politique de confidentialité', excerpt: null, content: p(lorem) },
 ];

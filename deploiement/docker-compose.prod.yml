@@ -39,6 +39,13 @@ services:
       SMTP_PASS: ${SMTP_PASS:-}
       MAIL_FROM: ${MAIL_FROM:-Paroisse Sainte Lucie de Baguida <no-reply@paroissesaintelucie-baguida.org>}
       NOTIFY_EMAIL: ${NOTIFY_EMAIL:-}
+      PUBLIC_URL: ${PUBLIC_URL}
+      PAYMENT_MODE: ${PAYMENT_MODE:-live}
+      CINETPAY_API_KEY: ${CINETPAY_API_KEY:-}
+      CINETPAY_SITE_ID: ${CINETPAY_SITE_ID:-}
+      PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID:-}
+      PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET:-}
+      PAYPAL_ENV: ${PAYPAL_ENV:-sandbox}
     volumes:
       - uploads_data:/app/uploads
     depends_on:

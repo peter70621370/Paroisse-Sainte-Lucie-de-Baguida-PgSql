@@ -8,6 +8,7 @@ import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import { ZodError } from 'zod';
 import type { Env } from './config/env.js';
+import { HttpError } from './utils/errors.js';
 import prismaPlugin from './plugins/prisma.js';
 import authPlugin from './plugins/auth.js';
 import health from './routes/health.js';
@@ -20,9 +21,15 @@ import publicContent from './routes/public-content.js';
 import forms from './routes/forms.js';
 import adminSubmissions from './routes/admin-submissions.js';
 import { createMailer } from './services/mail.js';
+import formbody from '@fastify/formbody';
+import donations from './routes/donations.js';
+import campaigns from './routes/campaigns.js';
+import adminDonations from './routes/admin-donations.js';
+import { createPayments } from './services/payments/index.js';
+import type { FetchLike } from './services/payments/types.js';
 
-export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}): Promise<FastifyInstance> {
-  const { withDatabase = true } = opts;
+export async function buildApp(env: Env, opts: { withDatabase?: boolean; fetchImpl?: FetchLike } = {}): Promise<FastifyInstance> {
+  const { withDatabase = true, fetchImpl } = opts;
   const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
 
   const app = Fastify({
@@ -36,6 +43,8 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}):
   });
 
   app.decorate('mailer', createMailer(env, app.log));
+  app.decorate('env', env);
+  app.decorate('payments', createPayments(env, fetchImpl));
 
   // Réponses d'erreur homogènes : { error: "message" } (+ détails pour la validation).
   app.setErrorHandler((err, req, reply) => {
@@ -43,6 +52,8 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}):
     if (e instanceof ZodError) {
       return reply.code(400).send({ error: 'Données invalides', details: e.flatten().fieldErrors });
     }
+    // Erreurs volontaires (400, 403, 409, 502, 503…) : message et code conservés tels quels.
+    if (e instanceof HttpError) return reply.code(e.statusCode).send({ error: e.message });
     const { statusCode = 500, message } = e as { statusCode?: number; message: string };
     if (statusCode >= 500) {
       req.log.error(e);
@@ -52,6 +63,7 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}):
   });
 
   await app.register(helmet);
+  await app.register(formbody); // notifications des prestataires de paiement (formulaire encodé)
   await app.register(cors, { origin: allowedOrigins, credentials: true });
   await app.register(rateLimit, { max: 200, timeWindow: '1 minute' });
 
@@ -94,6 +106,9 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean } = {}):
         await api.register(publicContent);
         await api.register(forms, { env });
         await api.register(adminSubmissions);
+        await api.register(donations, { env });
+        await api.register(campaigns);
+        await api.register(adminDonations);
       }
     },
     { prefix: '/api' },
