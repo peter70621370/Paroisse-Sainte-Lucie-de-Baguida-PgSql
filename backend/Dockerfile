@@ -26,6 +26,7 @@ RUN npm ci --omit=dev
 COPY prisma ./prisma
 RUN npx prisma generate
 COPY --from=build /app/dist ./dist
+RUN mkdir -p /app/uploads && chown node:node /app/uploads
 USER node
 EXPOSE 4000
 CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/server.js"]

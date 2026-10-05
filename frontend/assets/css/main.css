@@ -5,3 +5,16 @@
 body {
   @apply bg-stone-50 text-slate-800 antialiased;
 }
+
+/* Mise en forme du contenu riche (éditeur et site public) */
+.rich { @apply leading-relaxed text-slate-800; }
+.rich > * + * { @apply mt-3; }
+.rich h2 { @apply text-2xl font-bold text-[#1F3A5F]; }
+.rich h3 { @apply text-xl font-semibold text-[#1F3A5F]; }
+.rich h4 { @apply text-lg font-semibold; }
+.rich ul { @apply list-disc pl-6; }
+.rich ol { @apply list-decimal pl-6; }
+.rich blockquote { @apply border-l-4 border-amber-400 pl-4 italic text-slate-600; }
+.rich a { @apply text-[#1F3A5F] underline; }
+.rich img { @apply h-auto max-w-full rounded; }
+.rich hr { @apply my-4 border-slate-300; }

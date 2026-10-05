@@ -31,6 +31,10 @@ services:
       PORT: 4000
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
       CORS_ORIGIN: ${PUBLIC_URL}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
       mysql:
         condition: service_healthy
@@ -57,7 +61,7 @@ services:
       - backend
     networks: [internal]
 
-  # Sauvegarde quotidienne de la base (conservée 14 jours dans le volume backups)
+  # Sauvegarde quotidienne de la base et des fichiers (conservée 14 jours dans le volume backups)
   backup:
     image: mysql:8.4
     restart: always
@@ -69,11 +73,13 @@ services:
       - |
         while true; do
           mysqldump -h mysql -u root --single-transaction "$$MYSQL_DATABASE" | gzip > /backups/db_$$(date +%F_%H%M).sql.gz
-          find /backups -name 'db_*.sql.gz' -mtime +14 -delete
+          tar -czf /backups/uploads_$$(date +%F_%H%M).tar.gz -C /uploads . 2>/dev/null
+          find /backups -type f -mtime +14 -name "*.gz" -delete
           sleep 86400
         done
     volumes:
       - backups:/backups
+      - uploads_data:/uploads:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -84,4 +90,5 @@ networks:
 
 volumes:
   mysql_data:
+  uploads_data:
   backups:

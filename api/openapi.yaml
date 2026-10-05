@@ -34,3 +34,158 @@ paths:
                   database: { type: string, example: up }
         '503':
           description: Base de données indisponible
+  /api/auth/login:
+    post:
+      summary: Connexion (cookie de session httpOnly). Limité à 5 tentatives par minute.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200': { description: Connecté, cookie "sid" posé, renvoie { user } }
+        '400': { description: Données invalides }
+        '401': { description: E-mail ou mot de passe incorrect }
+        '429': { description: Trop de tentatives }
+  /api/auth/logout:
+    post:
+      summary: Déconnexion (supprime la session)
+      responses:
+        '200': { description: OK }
+  /api/auth/me:
+    get:
+      summary: Utilisateur connecté
+      responses:
+        '200': { description: "{ user: { id, email, firstName, lastName, role } }" }
+        '401': { description: Non connecté }
+  /api/admin/users:
+    get:
+      summary: Liste des utilisateurs (rôle ADMIN uniquement)
+      responses:
+        '200': { description: "{ users: [...] }" }
+        '401': { description: Non connecté }
+        '403': { description: Rôle insuffisant }
+  /api/auth/password:
+    post:
+      summary: Changer son propre mot de passe (ferme les autres sessions)
+      responses:
+        '200': { description: OK }
+        '400': { description: Mot de passe actuel incorrect ou nouveau trop court }
+  /api/admin/users/{id}:
+    patch:
+      summary: Modifier un utilisateur (ADMIN). Impossible de modifier son propre rôle ou de laisser 0 administrateur actif.
+      responses:
+        '200': { description: "{ user }" }
+        '400': { description: Règle métier violée }
+        '404': { description: Introuvable }
+  /api/admin/media:
+    get:
+      summary: Liste paginée des fichiers (query page, pageSize, type=image|pdf, q)
+      responses:
+        '200': { description: "{ total, page, pageSize, items }" }
+    post:
+      summary: Envoi d'un fichier (multipart, champ "file"). Images converties en WebP (2000 px max) + miniature ; PDF acceptés. 10 Mo max.
+      responses:
+        '201': { description: "{ media }" }
+        '413': { description: Fichier trop volumineux }
+        '415': { description: Type non autorisé (vérifié sur le contenu réel) }
+  /api/admin/media/{id}:
+    patch:
+      summary: Modifier le texte alternatif (ADMIN, EDITOR)
+      responses:
+        '200': { description: "{ media }" }
+    delete:
+      summary: Supprimer un fichier (ADMIN, EDITOR). 409 s'il est utilisé (ex. bulletin).
+      responses:
+        '200': { description: OK }
+        '409': { description: Fichier utilisé }
+  /api/settings:
+    get:
+      summary: Paramètres publics (coordonnées, réseaux sociaux)
+      responses:
+        '200': { description: "{ settings }" }
+  /api/admin/settings:
+    get:
+      summary: Paramètres modifiables (ADMIN, EDITOR)
+      responses:
+        '200': { description: "{ settings, labels }" }
+    put:
+      summary: Mettre à jour des paramètres (clés connues uniquement)
+      responses:
+        '200': { description: "{ settings }" }
+        '400': { description: Clé inconnue ou valeur invalide }
+  /uploads/{path}:
+    get:
+      summary: Fichier public de la médiathèque (cache long, noms aléatoires)
+      responses:
+        '200': { description: Fichier }
+        '404': { description: Introuvable }
+  /api/admin/{resource}:
+    get:
+      summary: "Liste paginée (page, pageSize, status, q). resource = pages | announcements | bulletins | mass-schedules | staff | homilies"
+      responses:
+        '200': { description: "{ items, total, page, pageSize }" }
+    post:
+      summary: |
+        Création. Le HTML (content) est nettoyé côté serveur. status=PUBLISHED pose publishedAt (date future = publication programmée).
+        Contributeur : brouillons uniquement (403 sinon) ; horaires et personnel : ADMIN/EDITOR.
+      responses:
+        '201': { description: "{ item }" }
+        '400': { description: Données invalides }
+        '403': { description: Droits insuffisants }
+        '409': { description: Doublon (ex. même slug et même langue) }
+  /api/admin/{resource}/{id}:
+    get:
+      summary: Détail
+      responses:
+        '200': { description: "{ item }" }
+    patch:
+      summary: Modification partielle (mêmes règles que la création)
+      responses:
+        '200': { description: "{ item }" }
+    delete:
+      summary: Suppression (ADMIN, EDITOR)
+      responses:
+        '200': { description: OK }
+  /api/pages/{slug}:
+    get:
+      summary: Page publiée (query locale, défaut fr)
+      responses:
+        '200': { description: "{ page }" }
+        '404': { description: Brouillon, programmée dans le futur, ou inexistante }
+  /api/announcements:
+    get:
+      summary: Annonces publiées et non expirées, épinglées en premier
+      responses:
+        '200': { description: "{ items }" }
+  /api/bulletins:
+    get:
+      summary: Bulletins publiés (PDF), du plus récent au plus ancien (page, pageSize)
+      responses:
+        '200': { description: "{ items, total }" }
+  /api/mass-schedules:
+    get:
+      summary: Horaires actifs, du lundi au dimanche
+      responses:
+        '200': { description: "{ items }" }
+  /api/staff:
+    get:
+      summary: Personnel pastoral actif
+      responses:
+        '200': { description: "{ items }" }
+  /api/homilies:
+    get:
+      summary: Homélies publiées (page, pageSize)
+      responses:
+        '200': { description: "{ items, total }" }
+  /api/homilies/{id}:
+    get:
+      summary: Une homélie publiée (avec texte)
+      responses:
+        '200': { description: "{ homily }" }
+        '404': { description: Introuvable ou non publiée }

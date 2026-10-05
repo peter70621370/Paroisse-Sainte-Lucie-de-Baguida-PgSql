@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   routeRules: {
     '/api/**': { proxy: `${apiInternal}/api/**` },
+    '/uploads/**': { proxy: `${apiInternal}/uploads/**` },
   },
   app: {
     head: {

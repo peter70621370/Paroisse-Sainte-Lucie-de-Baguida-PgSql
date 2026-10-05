@@ -58,13 +58,30 @@ docker compose --env-file .env -f deploiement/docker-compose.yml exec backend np
 
 | Sprint | Contenu | État |
 |---|---|---|
-| 0 | Fondations : structure, Docker, CI, health check | fait |
-| 1 | Schéma de données complet, authentification, rôles | à venir |
-| 2 | Back-office : utilisateurs, médiathèque, paramètres | à venir |
-| 3 | Contenus : pages, annonces, bulletins, horaires, personnel, homélies | à venir |
+| 0 | Fondations : structure, Docker, health check | fait |
+| 1 | Schéma de données complet, authentification (sessions), rôles | fait |
+| 2 | Back-office : utilisateurs, médiathèque, paramètres | fait |
+| 3 | Contenus : pages, annonces, bulletins, horaires, personnel, homélies | fait |
 | 4 | Site public (maquette) | à venir |
 | 5 | Calendrier et formulaires | à venir |
 | 6 | Dons en ligne | à venir |
 | 7 | SEO, multilingue, cookies, newsletter | à venir |
 | 8 | Qualité et sécurité | à venir |
 | 9 | Mise en production | à venir |
+
+## Compte administrateur (développement)
+
+Créé par le seed à partir de `ADMIN_EMAIL` / `ADMIN_PASSWORD` du fichier `.env` :
+
+```bash
+docker compose --env-file .env -f deploiement/docker-compose.yml exec backend npm run seed
+```
+
+Connexion : http://localhost:3000/admin/login. En production, changer ce mot de passe immédiatement (`node dist/scripts/seed.js` crée le compte s'il n'existe pas).
+
+## Tests
+
+```bash
+# Unitaires + intégration (nécessite la base : à lancer dans le conteneur)
+docker compose --env-file .env -f deploiement/docker-compose.yml exec -e RUN_DB_TESTS=1 backend npm test
+```
