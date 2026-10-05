@@ -24,7 +24,22 @@ const tiles = [
   { to: '/dons', title: 'Faire un don', text: 'Soutenir la vie de la paroisse' },
 ];
 
-usePageSeo('', s.value['home.welcomeText'] || `Site officiel de la ${name.value}`);
+usePageSeo('', s.value['home.welcomeText'] || `Site officiel de la ${name.value}`, () => ({ image: s.value['home.heroImage'] || null }));
+
+// Données structurées pour Google : la paroisse comme lieu de culte.
+const { siteUrl } = useRuntimeConfig().public;
+const abs = (u: string) => (/^https?:\/\//.test(u) ? u : siteUrl + u);
+useJsonLd(() => ({
+  '@type': 'CatholicChurch',
+  name: name.value,
+  url: siteUrl,
+  logo: abs(s.value['site.logo'] || PLACEHOLDERS.logo),
+  image: abs(s.value['home.heroImage'] || PLACEHOLDERS.og),
+  telephone: s.value['site.phone'] || undefined,
+  email: s.value['site.contactEmail'] || undefined,
+  address: s.value['site.address'] ? { '@type': 'PostalAddress', streetAddress: s.value['site.address'], addressCountry: 'TG' } : undefined,
+  sameAs: [s.value['social.facebook'], s.value['social.youtube']].filter(Boolean),
+}));
 </script>
 
 <template>
@@ -41,6 +56,14 @@ usePageSeo('', s.value['home.welcomeText'] || `Site officiel de la ${name.value}
           <NuxtLink to="/horaires" class="rounded bg-gold px-6 py-3 font-medium text-white hover:bg-gold/90">Horaires des messes</NuxtLink>
           <NuxtLink to="/dons" class="rounded border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10">Faire un don</NuxtLink>
         </div>
+      </div>
+    </section>
+
+    <!-- Messe en direct : visible seulement si un lien est renseigné dans Administration › Paramètres du site -->
+    <section v-if="s['live.url']" class="bg-navy text-white">
+      <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
+        <p class="flex items-center gap-3"><span class="inline-block h-3 w-3 animate-pulse rounded-full bg-red-500" aria-hidden="true" /><span class="font-serif text-lg font-semibold">Messe en direct</span><span v-if="s['live.label']" class="text-white/80">{{ s['live.label'] }}</span></p>
+        <NuxtLink to="/direct" class="rounded bg-gold px-5 py-2 font-medium text-white hover:bg-gold/90">Suivre la messe</NuxtLink>
       </div>
     </section>
 

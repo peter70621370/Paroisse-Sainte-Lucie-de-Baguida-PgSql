@@ -8,7 +8,7 @@ const { data: summary } = useAdminFetch<{ new: number }>('/api/admin/submissions
 
 const links = computed(() => [
   { to: '/admin', label: 'Tableau de bord' },
-  ...(canSeeRequests.value ? [{ section: 'Demandes' }, { to: '/admin/submissions', label: 'Demandes reçues', badge: summary.value?.new }, { to: '/admin/donations', label: 'Dons reçus' }] : []),
+  ...(canSeeRequests.value ? [{ section: 'Demandes' }, { to: '/admin/submissions', label: 'Demandes reçues', badge: summary.value?.new }, { to: '/admin/donations', label: 'Dons reçus' }, { to: '/admin/newsletter', label: 'Newsletter' }, { to: '/admin/stats', label: 'Statistiques' }] : []),
   { section: 'Contenus' },
   { to: '/admin/pages', label: 'Pages' },
   { to: '/admin/announcements', label: 'Annonces' },
@@ -16,6 +16,7 @@ const links = computed(() => [
   { to: '/admin/schedules', label: 'Horaires des messes' },
   { to: '/admin/staff', label: 'Personnel pastoral' },
   { to: '/admin/events', label: 'Agenda' },
+  { to: '/admin/albums', label: 'Galerie' },
   { to: '/admin/campaigns', label: 'Campagnes de dons' },
   { to: '/admin/homilies', label: 'Homélies' },
   { to: '/admin/media', label: 'Médiathèque' },

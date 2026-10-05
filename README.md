@@ -65,7 +65,7 @@ docker compose --env-file .env -f deploiement/docker-compose.yml exec backend np
 | 4 | Site public (accueil, pages, horaires, bulletins, homélies…) | fait |
 | 5 | Calendrier et formulaires (contact, adhésion, catéchisme, sacrements, intentions de messe) | fait |
 | 6 | Dons en ligne (Mobile Money, carte, PayPal) | fait (à valider avec vos comptes marchands) |
-| 7 | SEO, multilingue, cookies, newsletter | à venir |
+| 7 | SEO, vie privée, statistiques, newsletter, galerie, messe en direct, éwé (pages) | fait |
 | 8 | Qualité et sécurité | à venir |
 | 9 | Mise en production | à venir |
 
@@ -103,6 +103,27 @@ Anti-spam : champ piège invisible + 5 envois maximum par 10 minutes et par adre
 - **Important :** les intégrations CinetPay et PayPal sont écrites d'après leur documentation et testées contre des serveurs simulés, **pas encore contre leurs vrais environnements** : à valider en bac à sable avec vos clés avant d'ouvrir au public.
 - Les dons ne sont pas supprimables depuis l'administration (traçabilité). Les « en attente » se revérifient d'un clic (Administration › Dons reçus).
 - L'accusé de réception par e-mail **n'est pas un reçu fiscal**.
+
+## Référencement, vie privée et statistiques
+
+- **SEO :** `/sitemap.xml` (pages, homélies, événements, albums publiés) et `/robots.txt` générés automatiquement, balises Open Graph / Twitter, lien canonique, données structurées schema.org (paroisse, événements).
+  En production, définir `PUBLIC_URL` : il sert aux liens du sitemap et aux liens de partage.
+- **Vie privée :** aucun cookie publicitaire. Bandeau de choix ; vidéos YouTube/Facebook chargées **seulement au clic**.
+- **Statistiques maison** (Administration › Statistiques) : seulement si le visiteur accepte, sans cookie ; le serveur ne stocke que des compteurs (jamais d'IP). Respecte « Ne pas me suivre ».
+- **Pages légales :** `npm run seed` crée des **textes types** (mentions légales, confidentialité) à faire relire et compléter (entre crochets) par la paroisse.
+
+## Newsletter
+
+Inscription depuis le pied de page, avec **double confirmation** par e-mail et désinscription en un clic (lien dans chaque message + en-tête `List-Unsubscribe`).
+Envoi depuis Administration › Newsletter (test sur une adresse, puis envoi à tous les abonnés confirmés). Export CSV des abonnés ; un administrateur peut effacer un abonné (droit à l'effacement).
+Un hébergeur limite souvent les envois en masse par SMTP : pour de gros volumes, utiliser un service d'envoi dédié (`SMTP_*`).
+
+## Galerie, messe en direct, langue éwé
+
+- **Galerie :** albums de photos (optimisées automatiquement) et de vidéos YouTube/Facebook, avec visionneuse plein écran.
+- **Messe en direct :** renseigner le lien dans Administration › Paramètres du site › « Messe en direct ». Un bandeau apparaît sur l'accueil et la page `/direct` ; vider le champ pour le retirer.
+- **Éwé :** chaque **page** peut exister en éwé (Administration › Pages › Langue). Un sélecteur « Français | Éwé » apparaît automatiquement quand les deux versions existent.
+  Le menu et les textes du site restent en français : la traduction de l'interface demande des textes éwé fournis par la paroisse.
 
 ## Contenu de démonstration et images provisoires
 

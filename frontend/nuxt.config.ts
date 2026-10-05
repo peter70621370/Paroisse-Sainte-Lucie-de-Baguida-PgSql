@@ -1,15 +1,16 @@
-// Appels /api/** : proxifiés vers le backend en développement.
-// En production, c'est Nginx qui route /api vers le backend (voir deploiement/nginx).
-const apiInternal = process.env.API_INTERNAL_URL || 'http://localhost:4000';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: false },
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
-  routeRules: {
-    '/api/**': { proxy: `${apiInternal}/api/**` },
-    '/uploads/**': { proxy: `${apiInternal}/uploads/**` },
+  runtimeConfig: {
+    // Adresse INTERNE du backend (réseau Docker). Surchargeable à l'exécution : NUXT_API_INTERNAL.
+    apiInternal: process.env.API_INTERNAL_URL || 'http://localhost:4000',
+    public: {
+      // Adresse publique du site (liens canoniques, sitemap). Surchargeable : NUXT_PUBLIC_SITE_URL.
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    },
   },
   app: {
     head: {

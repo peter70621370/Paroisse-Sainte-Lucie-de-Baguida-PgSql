@@ -16,6 +16,7 @@ export const NAV: NavItem[] = [
     label: 'Vie spirituelle',
     children: [
       { label: 'Horaires des messes', to: '/horaires' },
+      { label: 'Messe en direct', to: '/direct' },
       { label: 'Agenda', to: '/agenda' },
       { label: 'Les sacrements', to: '/p/sacrements' },
       { label: 'Demande de sacrement', to: '/demarches/sacrement' },
@@ -44,6 +45,7 @@ export const NAV: NavItem[] = [
     children: [
       { label: 'Annonces', to: '/actualites' },
       { label: 'Bulletins', to: '/bulletins' },
+      { label: 'Galerie', to: '/galerie' },
     ],
   },
   { label: 'Dons', to: '/dons' },

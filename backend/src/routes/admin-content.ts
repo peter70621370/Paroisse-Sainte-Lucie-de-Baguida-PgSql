@@ -100,6 +100,15 @@ const campaignSchema = z.object({
   status: status.default('DRAFT'),
 });
 
+const albumSchema = z.object({
+  title: z.string().trim().min(1).max(255),
+  slug: z.string().trim().toLowerCase().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Lettres minuscules, chiffres et tirets uniquement').max(191),
+  description: optText(5000),
+  date: dateOnly.nullish(),
+  coverId: z.number().int().positive().nullish(),
+  status: status.default('DRAFT'),
+});
+
 // ---------- Fabrique CRUD ----------
 type Row = Record<string, any>;
 type Delegate = {
@@ -265,6 +274,16 @@ const adminContent: FastifyPluginAsync = async (app) => {
       const e = d.endsAt !== undefined ? d.endsAt : existing?.endsAt;
       if (s && e && e < s) throw new HttpError(400, 'La fin doit être après le début');
     },
+  });
+  register(app, {
+    path: 'albums', delegate: asDelegate(db.album), schema: albumSchema, hasStatus: true, publishDate: false, searchField: 'title', orderBy: { createdAt: 'desc' },
+    include: { cover: true, items: { orderBy: { sortOrder: 'asc' }, include: { media: true } } },
+    prepare: async (d) => requireMedia(d.coverId, 'image'),
+    present: (a) => ({
+      ...a,
+      cover: mediaOut(a.cover),
+      items: (a.items as Row[]).map((i) => ({ id: i.id, type: i.videoUrl ? 'video' : 'image', caption: i.caption, sortOrder: i.sortOrder, videoUrl: i.videoUrl, ...(i.media ? { url: `/uploads/${i.media.storagePath}`, thumbUrl: thumbPathOf(i.media.storagePath) ? `/uploads/${thumbPathOf(i.media.storagePath)}` : null } : { url: null, thumbUrl: null }) })),
+    }),
   });
   register(app, { path: 'event-categories', delegate: asDelegate(db.eventCategory), schema: categorySchema, hasStatus: false, searchField: 'name', orderBy: { name: 'asc' } });
   register(app, { path: 'homilies', delegate: asDelegate(db.homily), schema: homilySchema, hasStatus: true, author: true, searchField: 'title', orderBy: { date: 'desc' } });

@@ -8,10 +8,14 @@ const social = computed(() =>
   ].filter(([, url]) => url) as [string, string][],
 );
 const year = new Date().getFullYear();
+const { set } = useConsent();
 </script>
 
 <template>
   <footer class="mt-16 bg-navy-dark text-white/90">
+    <div class="border-b border-white/10">
+      <div class="mx-auto max-w-6xl px-4 py-6"><div class="max-w-xl"><NewsletterForm /></div></div>
+    </div>
     <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
       <div>
         <img :src="logo" :alt="`Logo ${name}`" class="mb-3 h-12 w-auto max-w-[240px] rounded bg-cream p-1 object-contain" />
@@ -44,7 +48,8 @@ const year = new Date().getFullYear();
     <div class="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60">
       © {{ year }} {{ name }} ·
       <NuxtLink to="/p/mentions-legales" class="hover:underline">Mentions légales</NuxtLink> ·
-      <NuxtLink to="/p/confidentialite" class="hover:underline">Confidentialité</NuxtLink>
+      <NuxtLink to="/p/confidentialite" class="hover:underline">Confidentialité</NuxtLink> ·
+      <button class="hover:underline" @click="set('unset')">Gérer mes choix</button>
     </div>
   </footer>
 </template>

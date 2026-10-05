@@ -12,6 +12,17 @@ const when = computed(() => {
   return `Du ${dayLong(start)} à ${timeLabel(e.value.startsAt)} au ${dayLong(end)} à ${timeLabel(e.value.endsAt!)}`;
 });
 usePageSeo(() => e.value.title, () => `${when.value}${e.value.location ? ' – ' + e.value.location : ''}`);
+useJsonLd(() => ({
+  '@type': 'Event',
+  name: e.value.title,
+  description: e.value.description || undefined,
+  startDate: e.value.startsAt,
+  endDate: e.value.endsAt || undefined,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: e.value.location ? { '@type': 'Place', name: e.value.location } : undefined,
+  organizer: { '@type': 'Organization', name: 'Paroisse Sainte Lucie de Baguida' },
+}));
 </script>
 
 <template>

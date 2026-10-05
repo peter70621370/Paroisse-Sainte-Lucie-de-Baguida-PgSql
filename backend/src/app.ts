@@ -25,6 +25,10 @@ import formbody from '@fastify/formbody';
 import donations from './routes/donations.js';
 import campaigns from './routes/campaigns.js';
 import adminDonations from './routes/admin-donations.js';
+import seo from './routes/seo.js';
+import analytics from './routes/analytics.js';
+import newsletter from './routes/newsletter.js';
+import albums from './routes/albums.js';
 import { createPayments } from './services/payments/index.js';
 import type { FetchLike } from './services/payments/types.js';
 
@@ -109,6 +113,10 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean; fetchIm
         await api.register(donations, { env });
         await api.register(campaigns);
         await api.register(adminDonations);
+        await api.register(seo);
+        await api.register(analytics);
+        await api.register(newsletter, { env });
+        await api.register(albums);
       }
     },
     { prefix: '/api' },

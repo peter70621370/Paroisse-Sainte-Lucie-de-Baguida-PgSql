@@ -58,6 +58,9 @@ services:
       context: ../frontend
       target: prod
     restart: always
+    environment:
+      NUXT_API_INTERNAL: http://backend:4000
+      NUXT_PUBLIC_SITE_URL: ${PUBLIC_URL}
     depends_on:
       - backend
     networks: [internal]

@@ -12,8 +12,10 @@ async function readSettings(prisma: PrismaClient) {
 // Une image de paramètre pointe forcément vers un fichier de la médiathèque (/uploads/…) ou est vide
 // (= image provisoire par défaut).
 const imageValue = z.string().trim().max(500).refine((v) => v === '' || (/^\/uploads\/[\w./-]+$/.test(v) && !v.includes('..')), 'Image de la médiathèque attendue');
+// Lien externe : http(s) uniquement (ou vide).
+const urlValue = z.string().trim().max(500).refine((v) => v === '' || /^https?:\/\/\S+$/i.test(v), 'Adresse http(s) attendue');
 const validators = Object.fromEntries(
-  SETTING_KEYS.map((k) => [k, settingType(k) === 'image' ? imageValue : z.string().trim().max(settingType(k) === 'textarea' ? 1000 : 500)]),
+  SETTING_KEYS.map((k) => [k, settingType(k) === 'image' ? imageValue : settingType(k) === 'url' ? urlValue : z.string().trim().max(settingType(k) === 'textarea' ? 1000 : 500)]),
 ) as Record<SettingKey, z.ZodString>;
 const putBody = z.object(validators).partial().strict();
 

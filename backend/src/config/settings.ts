@@ -1,6 +1,6 @@
 // Paramètres modifiables depuis le back-office (Paramètres du site).
 // Tous sont publics : ils servent à construire le site (logo, accueil, pied de page).
-export type SettingType = 'text' | 'textarea' | 'image';
+export type SettingType = 'text' | 'textarea' | 'image' | 'url';
 
 export const SETTINGS = {
   'site.name': { label: 'Nom du site', type: 'text', group: 'Identité' },
@@ -9,6 +9,8 @@ export const SETTINGS = {
   'home.heroImage': { label: 'Grande photo de la page d\'accueil', type: 'image', group: 'Page d\'accueil' },
   'home.welcomeTitle': { label: 'Titre de bienvenue', type: 'text', group: 'Page d\'accueil' },
   'home.welcomeText': { label: 'Texte de bienvenue', type: 'textarea', group: 'Page d\'accueil' },
+  'live.url': { label: 'Lien de la messe en direct (YouTube ou Facebook)', type: 'url', group: 'Messe en direct' },
+  'live.label': { label: 'Intitulé et horaire de la diffusion', type: 'text', group: 'Messe en direct' },
   'site.contactEmail': { label: 'E-mail de contact', type: 'text', group: 'Contact' },
   'site.phone': { label: 'Téléphone', type: 'text', group: 'Contact' },
   'site.address': { label: 'Adresse', type: 'text', group: 'Contact' },

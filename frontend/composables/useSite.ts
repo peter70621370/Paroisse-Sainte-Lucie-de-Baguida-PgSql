@@ -6,6 +6,7 @@ export const PLACEHOLDERS = {
   hero: '/placeholders/hero.svg',
   photo: '/placeholders/photo.svg',
   avatar: '/placeholders/avatar.svg',
+  og: '/placeholders/og-default.png',
 } as const;
 
 export const useSite = async () => {
@@ -20,15 +21,47 @@ export const useSite = async () => {
   };
 };
 
-/** Titre de page + balises de partage, dans le style « Titre – Nom du site ». */
-export const usePageSeo = (title: MaybeRefOrGetter<string>, description?: MaybeRefOrGetter<string | null | undefined>) => {
+type SeoOpts = { image?: string | null; noindex?: boolean; lang?: string; canonical?: string };
+
+/**
+ * Titre de page + description + balises de partage (Open Graph / Twitter) + lien canonique.
+ * Les adresses sont rendues absolues avec l'adresse publique du site (NUXT_PUBLIC_SITE_URL).
+ */
+export const usePageSeo = (title: MaybeRefOrGetter<string>, description?: MaybeRefOrGetter<string | null | undefined>, opts: MaybeRefOrGetter<SeoOpts> = {}) => {
   const siteName = 'Paroisse Sainte Lucie de Baguida';
+  const { siteUrl } = useRuntimeConfig().public;
+  const route = useRoute();
+  const abs = (u: string) => (/^https?:\/\//.test(u) ? u : siteUrl + u);
+
   const full = computed(() => (toValue(title) ? `${toValue(title)} – ${siteName}` : siteName));
+  const canonical = computed(() => abs(toValue(opts).canonical ?? route.path));
+  const image = computed(() => abs(toValue(opts).image || PLACEHOLDERS.og));
+
   useSeoMeta({
     title: full,
     ogTitle: full,
+    twitterTitle: full,
     description: () => toValue(description) || undefined,
     ogDescription: () => toValue(description) || undefined,
+    twitterDescription: () => toValue(description) || undefined,
     ogType: 'website',
+    ogSiteName: siteName,
+    ogUrl: canonical,
+    ogImage: image,
+    twitterImage: image,
+    twitterCard: 'summary_large_image',
+    ogLocale: () => (toValue(opts).lang === 'ee' ? 'ee_TG' : 'fr_FR'),
+    robots: () => (toValue(opts).noindex ? 'noindex, nofollow' : undefined),
+  });
+  useHead({
+    link: [{ rel: 'canonical', href: canonical }],
+    htmlAttrs: { lang: () => toValue(opts).lang || 'fr' },
+  });
+};
+
+/** Données structurées schema.org (JSON-LD) pour les moteurs de recherche. */
+export const useJsonLd = (data: MaybeRefOrGetter<Record<string, unknown>>) => {
+  useHead({
+    script: [{ type: 'application/ld+json', innerHTML: () => JSON.stringify({ '@context': 'https://schema.org', ...toValue(data) }).replace(/</g, '\\u003c') }],
   });
 };

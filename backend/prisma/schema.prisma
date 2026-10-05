@@ -151,9 +151,11 @@ model Media {
   uploadedById Int?
   createdAt    DateTime @default(now())
 
-  uploadedBy User?         @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
-  bulletins  Bulletin[]
-  staff      StaffMember[]
+  uploadedBy  User?         @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  bulletins   Bulletin[]
+  staff       StaffMember[]
+  albumItems  AlbumItem[]
+  albumCovers Album[]
 
   @@map("media")
 }
@@ -329,6 +331,7 @@ model Subscriber {
   locale         String    @default("fr") @db.VarChar(5)
   confirmed      Boolean   @default(false)
   unsubscribedAt DateTime?
+  token          String?   @unique @db.VarChar(64)
   createdAt      DateTime  @default(now())
 
   @@map("subscribers")
@@ -340,4 +343,77 @@ model Setting {
   updatedAt DateTime @updatedAt
 
   @@map("settings")
+}
+
+// ---------- Newsletter ----------
+
+model Newsletter {
+  id          Int       @id @default(autoincrement())
+  subject     String    @db.VarChar(255)
+  content     String    @db.LongText
+  status      String    @default("SENDING") @db.VarChar(10)
+  recipients  Int       @default(0)
+  sentCount   Int       @default(0)
+  createdById Int?
+  createdAt   DateTime  @default(now())
+  sentAt      DateTime?
+
+  @@map("newsletters")
+}
+
+// ---------- Statistiques (anonymes : aucune donnée personnelle, aucun cookie) ----------
+
+model PageView {
+  id       Int      @id @default(autoincrement())
+  day      DateTime @db.Date
+  path     String   @db.VarChar(255)
+  referrer String   @default("") @db.VarChar(191)
+  device   String   @db.VarChar(10)
+  views    Int      @default(0)
+
+  @@unique([day, path, referrer, device])
+  @@index([day])
+  @@map("page_views")
+}
+
+model DailyVisitors {
+  day      DateTime @id @db.Date
+  visitors Int      @default(0)
+  views    Int      @default(0)
+
+  @@map("daily_visitors")
+}
+
+// ---------- Galerie ----------
+
+model Album {
+  id          Int           @id @default(autoincrement())
+  title       String        @db.VarChar(255)
+  slug        String        @unique @db.VarChar(191)
+  description String?       @db.Text
+  date        DateTime?     @db.Date
+  coverId     Int?
+  status      PublishStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  cover Media?      @relation(fields: [coverId], references: [id], onDelete: SetNull)
+  items AlbumItem[]
+
+  @@map("albums")
+}
+
+model AlbumItem {
+  id        Int     @id @default(autoincrement())
+  albumId   Int
+  mediaId   Int?
+  videoUrl  String? @db.VarChar(500)
+  caption   String? @db.VarChar(255)
+  sortOrder Int     @default(0)
+
+  album Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  media Media? @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@index([albumId, sortOrder])
+  @@map("album_items")
 }

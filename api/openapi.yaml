@@ -309,3 +309,70 @@ paths:
       summary: Revérifie un don en attente auprès du prestataire
       responses:
         '200': { description: "{ item }" }
+  /api/sitemap:
+    get:
+      summary: Contenus publiés pour le sitemap (pages, homélies, événements, albums)
+      responses:
+        '200': { description: "{ pages, homilies, events, albums }" }
+  /api/pages/{slug}/locales:
+    get:
+      summary: Langues dans lesquelles une page publiée existe
+      responses:
+        '200': { description: "{ locales: [fr, ee] }" }
+  /api/analytics/hit:
+    post:
+      summary: Compte une page vue, de façon anonyme (envoyé seulement si le visiteur a accepté). Ignore robots, « Ne pas me suivre » et pages privées.
+      responses:
+        '204': { description: Toujours 204 }
+  /api/admin/analytics:
+    get:
+      summary: Statistiques (ADMIN, EDITOR) — query days (1 à 365)
+      responses:
+        '200': { description: "{ totals, series, topPages, referrers, devices }" }
+  /api/newsletter/subscribe:
+    post:
+      summary: Inscription (double confirmation par e-mail). Réponse identique que l'adresse soit déjà inscrite ou non. 5 / 10 min / IP.
+      responses:
+        '201': { description: "{ ok: true }" }
+  /api/newsletter/confirm:
+    post:
+      summary: Confirme l'inscription (jeton reçu par e-mail)
+      responses:
+        '200': { description: "{ ok: true }" }
+        '404': { description: Lien invalide }
+  /api/newsletter/unsubscribe:
+    post:
+      summary: Désinscription (jeton dans le corps JSON ou dans l'adresse ?token=, pour le « un clic » des messageries)
+      responses:
+        '200': { description: "{ ok: true }" }
+  /api/admin/subscribers:
+    get:
+      summary: Abonnés (ADMIN, EDITOR) — query status, q, page ; export.csv ; summary ; DELETE /{id} réservé aux ADMIN
+      responses:
+        '200': { description: "{ items, total }" }
+  /api/admin/newsletters:
+    get:
+      summary: Historique des envois
+      responses:
+        '200': { description: "{ items }" }
+    post:
+      summary: Envoie une lettre à tous les abonnés confirmés (en arrière-plan, 202). HTML nettoyé ; /test envoie à une seule adresse.
+      responses:
+        '202': { description: "{ item: { id, status } }" }
+  /api/albums:
+    get:
+      summary: Albums publiés (couverture = image choisie, sinon première photo)
+      responses:
+        '200': { description: "{ items }" }
+  /api/albums/{slug}:
+    get:
+      summary: Un album publié avec ses photos et vidéos
+      responses:
+        '200': { description: "{ album }" }
+        '404': { description: Introuvable }
+  /api/admin/albums/{id}/items:
+    post:
+      summary: Ajoute une photo (mediaId, image de la médiathèque) OU une vidéo (videoUrl http/https), avec légende. Réordonner : POST .../items/reorder { ids }.
+      responses:
+        '201': { description: "{ item }" }
+        '400': { description: Données invalides }

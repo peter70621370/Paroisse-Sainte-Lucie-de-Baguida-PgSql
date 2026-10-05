@@ -8,7 +8,7 @@ declare module 'fastify' {
   }
 }
 
-export type Mail = { to: string; subject: string; text: string; replyTo?: string };
+export type Mail = { to: string; subject: string; text: string; html?: string; replyTo?: string; headers?: Record<string, string> };
 export type Mailer = {
   /** Envoie un e-mail sans jamais lever d'erreur : un échec d'envoi ne doit pas faire perdre une demande déjà enregistrée. */
   send(mail: Mail): Promise<void>;
@@ -41,7 +41,7 @@ export function createMailer(env: Env, log: FastifyBaseLogger): Mailer {
     outbox,
     async send(mail) {
       try {
-        await transport.sendMail({ from: env.MAIL_FROM, to: mail.to, subject: oneLine(mail.subject), text: mail.text, replyTo: mail.replyTo });
+        await transport.sendMail({ from: env.MAIL_FROM, to: mail.to, subject: oneLine(mail.subject), text: mail.text, html: mail.html, replyTo: mail.replyTo, headers: mail.headers });
       } catch (err) {
         log.error({ err, to: mail.to }, 'Échec d\'envoi d\'e-mail');
       }
