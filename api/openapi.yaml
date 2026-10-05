@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  title: API - Paroisse Sainte Lucie de Baguida
+  version: 0.1.0
+  description: Contrat de l'API REST (source de référence entre frontend et backend).
+servers:
+  - url: http://localhost:4000
+    description: Développement
+paths:
+  /api/health:
+    get:
+      summary: Liveness - le serveur répond
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+  /api/health/ready:
+    get:
+      summary: Readiness - le serveur et la base de données répondent
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+                  database: { type: string, example: up }
+        '503':
+          description: Base de données indisponible

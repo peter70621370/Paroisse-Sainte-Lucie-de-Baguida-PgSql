@@ -1,0 +1,87 @@
+# Environnement de PRODUCTION / préproduction (VPS Contabo ou test local)
+#   docker compose --env-file .env -f deploiement/docker-compose.prod.yml up -d --build
+name: sainte-lucie-prod
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+
+  backend:
+    build:
+      context: ../backend
+      target: prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
+      CORS_ORIGIN: ${PUBLIC_URL}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [internal]
+
+  frontend:
+    build:
+      context: ../frontend
+      target: prod
+    restart: always
+    depends_on:
+      - backend
+    networks: [internal]
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: always
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks: [internal]
+
+  # Sauvegarde quotidienne de la base (conservée 14 jours dans le volume backups)
+  backup:
+    image: mysql:8.4
+    restart: always
+    environment:
+      MYSQL_PWD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          mysqldump -h mysql -u root --single-transaction "$$MYSQL_DATABASE" | gzip > /backups/db_$$(date +%F_%H%M).sql.gz
+          find /backups -name 'db_*.sql.gz' -mtime +14 -delete
+          sleep 86400
+        done
+    volumes:
+      - backups:/backups
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [internal]
+
+networks:
+  internal:
+
+volumes:
+  mysql_data:
+  backups:
