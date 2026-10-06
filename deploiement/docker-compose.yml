@@ -30,6 +30,21 @@ services:
       - "${MAILPIT_UI_PORT:-8025}:8025"   # interface web des e-mails de test
       - "1025:1025"                        # SMTP
 
+  # Administration de la base (développement uniquement) : http://localhost:1030
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "${PHPMYADMIN_PORT:-1030}:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
   backend:
     build:
       context: ../backend
