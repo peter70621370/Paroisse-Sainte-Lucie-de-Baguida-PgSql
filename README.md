@@ -149,7 +149,7 @@ docker compose --env-file .env -f deploiement/docker-compose.yml restart backend
 ## Qualité, sécurité et performance
 
 - **Tests :** 109 tests backend (unitaires + intégration sur MySQL) et 43 tests de bout en bout dans un vrai navigateur (voir `e2e/README.md`).
-- **Sécurité :** voir `docs/SECURITE.md` (protections, risques acceptés, liste de contrôle avant la mise en ligne).
+- **Sécurité :** voir `docs/SECURITE.md`. Plusieurs mesures de durcissement sont **volontairement retirées pour l'instant** (verrouillage par compte, garde-fous de production, mises à jour de dépendances, en-têtes HTTP) : la liste et la marche à suivre pour les réactiver y figurent.
 - **Performance / accessibilité (Lighthouse, production, mobile émulé) :** accueil **86 à 90** en performance, **100** en accessibilité, bonnes pratiques et SEO ; les autres pages 87 à 93.
   Les grandes photos sont servies en versions adaptées à l'écran (`/api/image`) : un téléphone télécharge quelques dizaines de Ko au lieu de centaines.
 
@@ -160,7 +160,7 @@ Pour tester la vraie pile (Nginx + images de production + base séparée) avant 
 ```bash
 MYSQL_ROOT_PASSWORD=<aléatoire>   MYSQL_DATABASE=sainte_lucie   MYSQL_USER=sainte_lucie   MYSQL_PASSWORD=<aléatoire>
 PUBLIC_URL=http://localhost:8080  HTTP_PORT=8080  COOKIE_SECURE=false
-PAYMENT_MODE=mock                 ALLOW_INSECURE_PROD=true      # ⚠ répétition locale UNIQUEMENT
+PAYMENT_MODE=mock                 # ⚠ paiements simulés : répétition locale UNIQUEMENT
 ADMIN_EMAIL=...                   ADMIN_PASSWORD=<fort>
 ```
 
@@ -170,7 +170,7 @@ docker compose --env-file .env.prod-local -f deploiement/docker-compose.prod.yml
 # site : http://localhost:8080
 ```
 
-Sans `ALLOW_INSECURE_PROD`, le serveur **refuse de démarrer** avec une configuration dangereuse (mot de passe d'exemple, paiements simulés, site sans HTTPS…).
+⚠ Aucun garde-fou n'empêche pour l'instant de démarrer la production avec des paiements simulés ou un mot de passe d'exemple : à vérifier à la main avant la mise en ligne.
 
 ## Tests
 

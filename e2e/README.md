@@ -15,7 +15,7 @@ Résultats détaillés (captures, traces) : dossier `e2e/test-results/` en cas d
 
 | Fichier | Contenu |
 |---|---|
-| `public.spec.ts` | accueil sans erreur JS, bandeau de vie privée, refus = aucune visite comptée, menu, 404, agenda/galerie/direct, sitemap, en-têtes de sécurité |
+| `public.spec.ts` | accueil sans erreur JS, bandeau de vie privée, refus = aucune visite comptée, menu, 404, agenda/galerie/direct, sitemap (le test des en-têtes de sécurité est en pause) |
 | `forms.spec.ts` | formulaire de contact (erreurs puis envoi + accusé de réception), adhésion |
 | `donation.spec.ts` | don complet en simulation (réussi, échoué, montant invalide) et visible côté administration |
 | `newsletter.spec.ts` | inscription, e-mail de confirmation (Mailpit), confirmation, désinscription |

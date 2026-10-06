@@ -14,25 +14,6 @@ const passwordBody = z.object({
   newPassword: z.string().min(10, 'Au moins 10 caractères').max(200),
 });
 
-// Verrouillage par COMPTE : même si l'attaquant change d'adresse IP, 10 échecs en 15 minutes bloquent les essais sur cet e-mail.
-// (Les e-mails inconnus sont comptés de la même façon : on ne révèle pas quels comptes existent.)
-const MAX_FAILURES = 10;
-const LOCK_WINDOW_MS = 15 * 60 * 1000;
-const failures = new Map<string, { count: number; resetAt: number }>();
-const isLocked = (key: string) => {
-  const f = failures.get(key);
-  if (!f) return false;
-  if (f.resetAt < Date.now()) { failures.delete(key); return false; }
-  return f.count >= MAX_FAILURES;
-};
-const recordFailure = (key: string) => {
-  const now = Date.now();
-  if (failures.size > 10_000) for (const [k, v] of failures) if (v.resetAt < now) failures.delete(k);
-  const f = failures.get(key);
-  if (!f || f.resetAt < now) failures.set(key, { count: 1, resetAt: now + LOCK_WINDOW_MS });
-  else f.count++;
-};
-
 // Hash factice : on vérifie toujours un mot de passe, même si l'e-mail est inconnu,
 // pour que le temps de réponse ne révèle pas l'existence d'un compte.
 let dummyHash: string | undefined;
@@ -47,17 +28,14 @@ const authRoutes: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
       const parsed = loginBody.safeParse(req.body);
       if (!parsed.success) return reply.code(400).send({ error: 'Identifiants invalides' });
       const { email, password } = parsed.data;
-      if (isLocked(email)) return reply.code(429).send({ error: 'Trop de tentatives pour ce compte. Réessayez dans 15 minutes.' });
 
       const user = await app.prisma.user.findUnique({ where: { email } });
       dummyHash ??= await hashPassword('dummy-password');
       const ok = await verifyPassword(password, user?.passwordHash ?? dummyHash);
       if (!user || !user.active || !ok) {
-        recordFailure(email);
         return reply.code(401).send({ error: 'E-mail ou mot de passe incorrect' });
       }
 
-      failures.delete(email);
       const { token, expiresAt } = await createSession(app.prisma, user.id, env.SESSION_TTL_DAYS, {
         userAgent: req.headers['user-agent'],
         ip: req.ip,

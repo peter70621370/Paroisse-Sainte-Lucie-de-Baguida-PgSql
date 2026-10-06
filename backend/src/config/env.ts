@@ -12,8 +12,6 @@ const schema = z.object({
   // L'adresse du client est la première NON fiable en remontant X-Forwarded-For depuis la droite : ce que le client y écrit lui-même est ignoré.
   // Vide = aucun proxy (X-Forwarded-For ignoré).
   TRUST_PROXY: z.string().default('loopback,linklocal,uniquelocal'),
-  // Répétition LOCALE de la production uniquement (HTTP, paiements simulés). Ne JAMAIS activer sur le vrai serveur.
-  ALLOW_INSECURE_PROD: z.enum(['true', 'false']).optional(),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
   UPLOAD_DIR: z.string().default('./uploads'),
   MAX_UPLOAD_MB: z.coerce.number().positive().default(10),
@@ -49,17 +47,3 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   return parsed.data;
 }
 
-/**
- * Refuse de démarrer en production avec une configuration dangereuse :
- * mots de passe d'exemple, paiements simulés, cookie de session non sécurisé, site sans HTTPS.
- */
-export function assertProductionSafe(env: Env): void {
-  if (env.NODE_ENV !== 'production' || env.ALLOW_INSECURE_PROD === 'true') return;
-  const problems: string[] = [];
-  if (/change-?me/i.test(env.DATABASE_URL)) problems.push("mot de passe de base de données d'exemple (change-me) : choisissez-en un fort");
-  if (env.PAYMENT_MODE === 'mock') problems.push('PAYMENT_MODE=mock : la simulation de paiement ne doit jamais tourner en production (un clic suffirait à « payer »)');
-  if (env.COOKIE_SECURE === 'false') problems.push('COOKIE_SECURE=false : le cookie de session doit être sécurisé (HTTPS) en production');
-  const origins = [env.PUBLIC_URL, ...env.CORS_ORIGIN.split(',')].map((o) => o.trim());
-  if (origins.some((o) => o.startsWith('http://'))) problems.push('PUBLIC_URL / CORS_ORIGIN doivent être en https:// en production');
-  if (problems.length) throw new Error(`Configuration de production refusée :\n - ${problems.join('\n - ')}`);
-}

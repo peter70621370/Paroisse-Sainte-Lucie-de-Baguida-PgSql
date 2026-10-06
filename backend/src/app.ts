@@ -96,7 +96,7 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean; fetchIm
       prefix: '/uploads/',
       index: false,
       list: false,
-      setHeaders: (reply) => void reply.header('Cache-Control', 'public, max-age=31536000, immutable'),
+      setHeaders: (res) => res.setHeader('Cache-Control', 'public, max-age=31536000, immutable'),
     });
   }
 
