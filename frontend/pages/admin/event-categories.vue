@@ -66,7 +66,7 @@ async function remove(c: C) {
           <button class="text-red-700 underline" @click="remove(c)">Supprimer</button>
         </span>
       </li>
-      <li v-if="!data?.items.length" class="px-4 py-6 text-center text-slate-500">Aucune catégorie.</li>
+      <li v-if="!data?.items.length" class="px-4 py-6 text-center text-slate-600">Aucune catégorie.</li>
     </ul>
   </div>
 </template>

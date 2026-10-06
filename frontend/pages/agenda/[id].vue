@@ -31,15 +31,15 @@ useJsonLd(() => ({
     <article class="mx-auto max-w-2xl px-4 py-10">
       <dl class="space-y-4 rounded-lg border border-gold/30 bg-white p-6 shadow-sm">
         <div>
-          <dt class="text-xs font-semibold uppercase tracking-wide text-gold">Quand</dt>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Quand</dt>
           <dd class="mt-1">{{ when }}</dd>
         </div>
         <div v-if="e.location">
-          <dt class="text-xs font-semibold uppercase tracking-wide text-gold">Où</dt>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Où</dt>
           <dd class="mt-1">{{ e.location }}</dd>
         </div>
         <div v-if="e.description">
-          <dt class="text-xs font-semibold uppercase tracking-wide text-gold">Détails</dt>
+          <dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Détails</dt>
           <dd class="mt-1 whitespace-pre-line">{{ e.description }}</dd>
         </div>
       </dl>

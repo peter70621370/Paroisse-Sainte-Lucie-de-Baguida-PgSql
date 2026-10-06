@@ -46,14 +46,14 @@ useJsonLd(() => ({
   <div>
     <!-- Grande photo d'accueil -->
     <section class="relative isolate flex min-h-[420px] items-center justify-center overflow-hidden bg-navy-dark md:min-h-[520px]">
-      <img :src="hero" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" fetchpriority="high" />
+      <img :src="hero" :srcset="responsiveSrcset(s['home.heroImage'])" sizes="100vw" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" fetchpriority="high" decoding="async" />
       <div class="absolute inset-0 -z-10 bg-gradient-to-b from-navy-dark/70 via-navy-dark/50 to-navy-dark/80" />
       <div class="mx-auto max-w-3xl px-4 py-12 text-center text-white">
         <p class="font-serif text-lg italic text-gold-light">{{ name }}</p>
         <h1 class="mt-2 font-serif text-4xl font-bold leading-tight md:text-5xl">{{ s['home.welcomeTitle'] || 'Bienvenue' }}</h1>
         <p v-if="s['home.welcomeText']" class="mx-auto mt-4 max-w-2xl text-white/90 md:text-lg">{{ s['home.welcomeText'] }}</p>
         <div class="mt-8 flex flex-wrap justify-center gap-3">
-          <NuxtLink to="/horaires" class="rounded bg-gold px-6 py-3 font-medium text-white hover:bg-gold/90">Horaires des messes</NuxtLink>
+          <NuxtLink to="/horaires" class="rounded bg-gold-dark px-6 py-3 font-medium text-white hover:bg-gold-dark/90">Horaires des messes</NuxtLink>
           <NuxtLink to="/dons" class="rounded border border-white/70 px-6 py-3 font-medium text-white hover:bg-white/10">Faire un don</NuxtLink>
         </div>
       </div>
@@ -63,14 +63,14 @@ useJsonLd(() => ({
     <section v-if="s['live.url']" class="bg-navy text-white">
       <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4">
         <p class="flex items-center gap-3"><span class="inline-block h-3 w-3 animate-pulse rounded-full bg-red-500" aria-hidden="true" /><span class="font-serif text-lg font-semibold">Messe en direct</span><span v-if="s['live.label']" class="text-white/80">{{ s['live.label'] }}</span></p>
-        <NuxtLink to="/direct" class="rounded bg-gold px-5 py-2 font-medium text-white hover:bg-gold/90">Suivre la messe</NuxtLink>
+        <NuxtLink to="/direct" class="rounded bg-gold-dark px-5 py-2 font-medium text-white hover:bg-gold-dark/90">Suivre la messe</NuxtLink>
       </div>
     </section>
 
     <!-- Cette semaine -->
     <section class="mx-auto max-w-6xl px-4 py-12">
       <h2 class="text-center font-serif text-3xl font-bold text-navy">Cette semaine à la paroisse</h2>
-      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold" />
+      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold-dark" />
 
       <div class="mt-8 grid gap-6 md:grid-cols-3">
         <article class="rounded-lg border border-gold/30 bg-white p-5 shadow-sm">
@@ -81,7 +81,7 @@ useJsonLd(() => ({
               <dd class="text-slate-700">{{ d.entries.map((e) => e.time.replace(':', 'h') + (e.kind === 'CONFESSION' ? ' (confessions)' : '')).join(' · ') }}</dd>
             </div>
           </dl>
-          <p v-else class="mt-3 text-sm text-slate-500">Horaires bientôt disponibles.</p>
+          <p v-else class="mt-3 text-sm text-slate-600">Horaires bientôt disponibles.</p>
           <NuxtLink to="/horaires" class="mt-4 inline-block text-sm font-medium text-navy underline">Tous les horaires</NuxtLink>
         </article>
 
@@ -93,7 +93,7 @@ useJsonLd(() => ({
               <p class="text-slate-600">{{ excerptOf(a.content, 90) }}</p>
             </li>
           </ul>
-          <p v-else class="mt-3 text-sm text-slate-500">Aucune annonce pour le moment.</p>
+          <p v-else class="mt-3 text-sm text-slate-600">Aucune annonce pour le moment.</p>
           <NuxtLink to="/actualites" class="mt-4 inline-block text-sm font-medium text-navy underline">Toutes les annonces</NuxtLink>
         </article>
 
@@ -104,7 +104,7 @@ useJsonLd(() => ({
             <p class="text-sm text-slate-600">{{ longDate(buls.items[0].date) }}</p>
             <a v-if="buls.items[0].file" :href="buls.items[0].file.url" target="_blank" rel="noopener" class="mt-4 inline-block rounded bg-navy px-4 py-2 text-sm text-white hover:bg-navy-dark">Télécharger (PDF)</a>
           </template>
-          <p v-else class="mt-3 text-sm text-slate-500">Aucun bulletin publié pour le moment.</p>
+          <p v-else class="mt-3 text-sm text-slate-600">Aucun bulletin publié pour le moment.</p>
           <div><NuxtLink to="/bulletins" class="mt-4 inline-block text-sm font-medium text-navy underline">Bulletins précédents</NuxtLink></div>
         </article>
       </div>
@@ -113,11 +113,11 @@ useJsonLd(() => ({
     <!-- Prochains événements -->
     <section v-if="evs?.items.length" class="mx-auto max-w-6xl px-4 pb-12">
       <h2 class="text-center font-serif text-3xl font-bold text-navy">Prochains événements</h2>
-      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold" />
+      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold-dark" />
       <ul class="mt-8 grid gap-4 md:grid-cols-3">
         <li v-for="e in evs.items.slice(0, 3)" :key="e.id">
           <NuxtLink :to="`/agenda/${e.id}`" class="block h-full rounded-lg border border-gold/30 bg-white p-5 shadow-sm hover:shadow-md">
-            <p class="text-xs font-semibold uppercase tracking-wide text-gold">{{ dayLong(dayKey(e.startsAt)) }}<span v-if="!e.allDay"> · {{ timeLabel(e.startsAt) }}</span></p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-gold-dark">{{ dayLong(dayKey(e.startsAt)) }}<span v-if="!e.allDay"> · {{ timeLabel(e.startsAt) }}</span></p>
             <p class="mt-1 font-serif text-lg font-semibold text-navy">{{ e.title }}</p>
             <p v-if="e.location" class="text-sm text-slate-600">{{ e.location }}</p>
           </NuxtLink>
@@ -130,7 +130,7 @@ useJsonLd(() => ({
     <section class="bg-cream-dark py-12">
       <div class="mx-auto max-w-6xl px-4">
         <h2 class="text-center font-serif text-3xl font-bold text-navy">Vivre sa foi, s'impliquer</h2>
-        <div class="mx-auto mt-2 h-0.5 w-16 bg-gold" />
+        <div class="mx-auto mt-2 h-0.5 w-16 bg-gold-dark" />
         <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <li v-for="t in tiles" :key="t.to">
             <NuxtLink :to="t.to" class="block h-full rounded-lg border-l-4 border-gold bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
@@ -145,7 +145,7 @@ useJsonLd(() => ({
     <!-- Mot du curé -->
     <section v-if="cure?.page" class="mx-auto max-w-3xl px-4 py-12 text-center">
       <h2 class="font-serif text-3xl font-bold text-navy">{{ cure.page.title }}</h2>
-      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold" />
+      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold-dark" />
       <p v-if="cure.page.excerpt" class="mt-5 font-serif text-lg italic text-slate-700">« {{ cure.page.excerpt }} »</p>
       <NuxtLink to="/p/mot-du-cure" class="mt-5 inline-block font-medium text-navy underline">Lire le message</NuxtLink>
     </section>
@@ -153,11 +153,11 @@ useJsonLd(() => ({
     <!-- Homélies récentes -->
     <section v-if="homs?.items.length" class="mx-auto max-w-6xl px-4 pb-4">
       <h2 class="text-center font-serif text-3xl font-bold text-navy">Dernières homélies</h2>
-      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold" />
+      <div class="mx-auto mt-2 h-0.5 w-16 bg-gold-dark" />
       <ul class="mt-8 grid gap-4 md:grid-cols-3">
         <li v-for="h in homs.items" :key="h.id">
           <NuxtLink :to="`/homelies/${h.id}`" class="block h-full rounded-lg border border-gold/30 bg-white p-5 shadow-sm hover:shadow-md">
-            <p class="text-xs uppercase tracking-wide text-gold">{{ longDate(h.date) }}</p>
+            <p class="text-xs uppercase tracking-wide text-gold-dark">{{ longDate(h.date) }}</p>
             <p class="mt-1 font-serif text-lg font-semibold text-navy">{{ h.title }}</p>
             <p v-if="h.preacher" class="text-sm text-slate-600">{{ h.preacher }}</p>
           </NuxtLink>

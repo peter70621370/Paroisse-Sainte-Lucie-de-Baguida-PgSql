@@ -66,7 +66,7 @@ docker compose --env-file .env -f deploiement/docker-compose.yml exec backend np
 | 5 | Calendrier et formulaires (contact, adhésion, catéchisme, sacrements, intentions de messe) | fait |
 | 6 | Dons en ligne (Mobile Money, carte, PayPal) | fait (à valider avec vos comptes marchands) |
 | 7 | SEO, vie privée, statistiques, newsletter, galerie, messe en direct, éwé (pages) | fait |
-| 8 | Qualité et sécurité | à venir |
+| 8 | Qualité et sécurité : durcissement, audit, performance, accessibilité, tests de bout en bout | fait |
 | 9 | Mise en production | à venir |
 
 ## Compte administrateur (développement)
@@ -145,6 +145,32 @@ après une modification du code backend, relancer :
 ```bash
 docker compose --env-file .env -f deploiement/docker-compose.yml restart backend
 ```
+
+## Qualité, sécurité et performance
+
+- **Tests :** 109 tests backend (unitaires + intégration sur MySQL) et 43 tests de bout en bout dans un vrai navigateur (voir `e2e/README.md`).
+- **Sécurité :** voir `docs/SECURITE.md` (protections, risques acceptés, liste de contrôle avant la mise en ligne).
+- **Performance / accessibilité (Lighthouse, production, mobile émulé) :** accueil **86 à 90** en performance, **100** en accessibilité, bonnes pratiques et SEO ; les autres pages 87 à 93.
+  Les grandes photos sont servies en versions adaptées à l'écran (`/api/image`) : un téléphone télécharge quelques dizaines de Ko au lieu de centaines.
+
+### Répéter la production en local
+
+Pour tester la vraie pile (Nginx + images de production + base séparée) avant de toucher au serveur, créer un fichier `.env.prod-local` (ignoré par git) :
+
+```bash
+MYSQL_ROOT_PASSWORD=<aléatoire>   MYSQL_DATABASE=sainte_lucie   MYSQL_USER=sainte_lucie   MYSQL_PASSWORD=<aléatoire>
+PUBLIC_URL=http://localhost:8080  HTTP_PORT=8080  COOKIE_SECURE=false
+PAYMENT_MODE=mock                 ALLOW_INSECURE_PROD=true      # ⚠ répétition locale UNIQUEMENT
+ADMIN_EMAIL=...                   ADMIN_PASSWORD=<fort>
+```
+
+```bash
+docker compose --env-file .env.prod-local -f deploiement/docker-compose.prod.yml up -d --build
+docker compose --env-file .env.prod-local -f deploiement/docker-compose.prod.yml exec backend node dist/scripts/seed.js
+# site : http://localhost:8080
+```
+
+Sans `ALLOW_INSECURE_PROD`, le serveur **refuse de démarrer** avec une configuration dangereuse (mot de passe d'exemple, paiements simulés, site sans HTTPS…).
 
 ## Tests
 

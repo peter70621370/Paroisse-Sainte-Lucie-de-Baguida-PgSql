@@ -9,7 +9,7 @@ const { data } = await useFetch<{ items: Album[] }>('/api/albums');
   <div>
     <PageTitle title="Galerie" subtitle="Photos et vidéos de la vie de la paroisse" />
     <div class="mx-auto max-w-6xl px-4 py-10">
-      <p v-if="!data?.items.length" class="text-center text-slate-500">Les albums seront bientôt publiés.</p>
+      <p v-if="!data?.items.length" class="text-center text-slate-600">Les albums seront bientôt publiés.</p>
       <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <li v-for="a in data?.items" :key="a.slug">
           <NuxtLink :to="`/galerie/${a.slug}`" class="group block overflow-hidden rounded-lg border border-gold/30 bg-white shadow-sm transition hover:shadow-md">

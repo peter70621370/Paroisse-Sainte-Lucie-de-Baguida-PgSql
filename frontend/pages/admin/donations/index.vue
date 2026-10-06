@@ -43,15 +43,15 @@ async function recheck(d: D) {
     </div>
 
     <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-500">Total encaissé (équivalent FCFA)</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ formatAmount(summary?.totalXof ?? 0, 'XOF') }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-500">Dons réussis</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ summary?.count ?? 0 }}</p></div>
+      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Total encaissé (équivalent FCFA)</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ formatAmount(summary?.totalXof ?? 0, 'XOF') }}</p></div>
+      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Dons réussis</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ summary?.count ?? 0 }}</p></div>
       <div class="rounded-xl bg-white p-4 shadow">
-        <p class="text-xs text-slate-500">Détail par devise</p>
+        <p class="text-xs text-slate-600">Détail par devise</p>
         <p class="mt-1 text-sm">FCFA : <strong>{{ formatAmount(summary?.byCurrency?.XOF?.total ?? 0, 'XOF') }}</strong></p>
         <p class="text-sm">Euros (PayPal) : <strong>{{ formatAmount(summary?.byCurrency?.EUR?.total ?? 0, 'EUR') }}</strong></p>
       </div>
       <div :class="['rounded-xl p-4 shadow', summary?.stalePending ? 'bg-amber-50' : 'bg-white']">
-        <p class="text-xs text-slate-500">En attente</p>
+        <p class="text-xs text-slate-600">En attente</p>
         <p class="mt-1 font-serif text-2xl font-bold text-navy">{{ summary?.pending ?? 0 }}</p>
         <p v-if="summary?.stalePending" class="text-xs text-amber-800">dont {{ summary.stalePending }} depuis plus d'1 h : à revérifier</p>
       </div>
@@ -81,7 +81,7 @@ async function recheck(d: D) {
             <td class="whitespace-nowrap px-4 py-3">{{ fmt(d.createdAt) }}</td>
             <td class="whitespace-nowrap px-4 py-3 font-semibold">{{ formatAmount(d.amount, d.currency) }}</td>
             <td class="px-4 py-3">{{ d.methodLabel }}</td>
-            <td class="px-4 py-3">{{ d.donorName || '—' }}<span v-if="d.donorEmail" class="block text-xs text-slate-500">{{ d.donorEmail }}</span></td>
+            <td class="px-4 py-3">{{ d.donorName || '—' }}<span v-if="d.donorEmail" class="block text-xs text-slate-600">{{ d.donorEmail }}</span></td>
             <td class="px-4 py-3 text-slate-600">{{ d.campaign }}</td>
             <td class="px-4 py-3">
               <span :class="['rounded-full px-2 py-0.5 text-xs', DONATION_STATUS[d.status]?.cls]">{{ DONATION_STATUS[d.status]?.label }}</span>
@@ -92,7 +92,7 @@ async function recheck(d: D) {
               <NuxtLink :to="`/admin/donations/${d.id}`" class="text-navy underline">Détail</NuxtLink>
             </td>
           </tr>
-          <tr v-if="!data?.items.length"><td colspan="7" class="px-4 py-6 text-center text-slate-500">Aucun don.</td></tr>
+          <tr v-if="!data?.items.length"><td colspan="7" class="px-4 py-6 text-center text-slate-600">Aucun don.</td></tr>
         </tbody>
       </table>
     </div>

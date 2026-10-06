@@ -18,7 +18,7 @@ const { set } = useConsent();
     </div>
     <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
       <div>
-        <img :src="logo" :alt="`Logo ${name}`" class="mb-3 h-12 w-auto max-w-[240px] rounded bg-cream p-1 object-contain" />
+        <img :src="logo" width="192" height="48" :alt="`Logo ${name}`" class="mb-3 h-12 w-auto max-w-[240px] rounded bg-cream p-1 object-contain" />
         <p class="font-serif text-lg font-semibold text-gold-light">{{ name }}</p>
       </div>
 

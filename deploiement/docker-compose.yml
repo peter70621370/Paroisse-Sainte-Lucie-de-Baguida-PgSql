@@ -39,7 +39,8 @@ services:
       NODE_ENV: development
       PORT: 4000
       DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
-      CORS_ORIGIN: http://localhost:${FRONTEND_PORT:-3000}
+      # Origines autorisées pour les requêtes qui modifient des données (le 2e nom sert aux tests de bout en bout dans Docker).
+      CORS_ORIGIN: http://localhost:${FRONTEND_PORT:-3000},http://frontend:3000
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       UPLOAD_DIR: /app/uploads
@@ -79,7 +80,28 @@ services:
     depends_on:
       - backend
 
+  # Tests de bout en bout (vrai navigateur) : docker compose --env-file .env -f deploiement/docker-compose.yml --profile e2e run --rm e2e
+  e2e:
+    profiles: ["e2e"]
+    image: mcr.microsoft.com/playwright:v1.63.0-noble
+    working_dir: /e2e
+    ipc: host
+    environment:
+      CI: "true"
+      BASE_URL: http://frontend:3000
+      MAILPIT_URL: http://mailpit:8025
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    volumes:
+      - ../e2e:/e2e
+      - e2e_node_modules:/e2e/node_modules
+    depends_on:
+      - frontend
+      - backend
+    command: sh -c "npm install --no-audit --no-fund && npx playwright test"
+
 volumes:
+  e2e_node_modules:
   mysql_data:
   uploads_data:
   backend_node_modules:

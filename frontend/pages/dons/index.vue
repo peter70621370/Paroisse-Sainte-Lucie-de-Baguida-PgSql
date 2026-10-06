@@ -85,7 +85,7 @@ const methodHelp: Record<string, string> = { MOBILE_MONEY: 'Flooz, T-Money… en
             </div>
             <div v-if="c.goalAmount" class="mt-3">
               <div class="h-3 overflow-hidden rounded-full bg-cream-dark" role="progressbar" :aria-valuenow="c.percent ?? 0" aria-valuemin="0" aria-valuemax="100">
-                <div class="h-full rounded-full bg-gold" :style="{ width: `${c.percent ?? 0}%` }" />
+                <div class="h-full rounded-full bg-gold-dark" :style="{ width: `${c.percent ?? 0}%` }" />
               </div>
               <p class="mt-1 text-sm text-slate-600"><strong>{{ formatAmount(c.raised, 'XOF') }}</strong> récoltés sur {{ formatAmount(c.goalAmount, 'XOF') }} ({{ c.percent }} %) · {{ c.donors }} don(s)</p>
             </div>
@@ -115,10 +115,10 @@ const methodHelp: Record<string, string> = { MOBILE_MONEY: 'Flooz, T-Money… en
         <fieldset>
           <legend class="font-serif text-xl font-semibold text-navy">2. Montant ({{ currency === 'EUR' ? '€' : 'FCFA' }})</legend>
           <div class="mt-3 flex flex-wrap gap-2">
-            <button v-for="p in presets" :key="p" type="button" :class="['rounded border-2 px-4 py-2 font-medium', amount === p && !custom ? 'border-gold bg-gold text-white' : 'border-navy/30 text-navy hover:border-gold']" @click="pickPreset(p)">{{ formatAmount(p, currency) }}</button>
+            <button v-for="p in presets" :key="p" type="button" :class="['rounded border-2 px-4 py-2 font-medium', amount === p && !custom ? 'border-gold bg-gold-dark text-white' : 'border-navy/30 text-navy hover:border-gold']" @click="pickPreset(p)">{{ formatAmount(p, currency) }}</button>
           </div>
           <label class="mt-3 block text-sm">
-            <span class="mb-1 block font-medium">Autre montant <span v-if="current" class="font-normal text-slate-500">(min. {{ formatAmount(current.limits.min, currency) }})</span></span>
+            <span class="mb-1 block font-medium">Autre montant <span v-if="current" class="font-normal text-slate-600">(min. {{ formatAmount(current.limits.min, currency) }})</span></span>
             <input v-model="custom" inputmode="numeric" :placeholder="currency === 'EUR' ? 'Ex. : 25' : 'Ex. : 7500'" :class="[inputCls, 'max-w-xs']" />
           </label>
           <p v-if="amount" class="mt-2 text-sm text-slate-600">Votre don : <strong>{{ formatAmount(amount, currency) }}</strong></p>
@@ -171,10 +171,10 @@ const methodHelp: Record<string, string> = { MOBILE_MONEY: 'Flooz, T-Money… en
         </div>
 
         <p v-if="generalError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ generalError }}</p>
-        <button :disabled="loading" class="w-full rounded bg-gold px-6 py-3 text-lg font-medium text-white hover:bg-gold/90 disabled:opacity-60 sm:w-auto">
+        <button :disabled="loading" class="w-full rounded bg-gold-dark px-6 py-3 text-lg font-medium text-white hover:bg-gold-dark/90 disabled:opacity-60 sm:w-auto">
           {{ loading ? 'Redirection vers le paiement…' : amount ? `Donner ${formatAmount(amount, currency)}` : 'Donner' }}
         </button>
-        <p class="text-xs text-slate-500">Paiement sécurisé : vous serez redirigé vers la page de paiement de notre prestataire. La paroisse ne conserve aucune donnée de carte ni de compte Mobile Money.</p>
+        <p class="text-xs text-slate-600">Paiement sécurisé : vous serez redirigé vers la page de paiement de notre prestataire. La paroisse ne conserve aucune donnée de carte ni de compte Mobile Money.</p>
       </form>
     </div>
   </div>

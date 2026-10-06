@@ -31,7 +31,7 @@ async function submit() {
       <label for="nl-email" class="text-sm">Recevez les nouvelles de la paroisse par e-mail</label>
       <div class="mt-2 flex flex-wrap gap-2">
         <input id="nl-email" v-model="email" type="email" required autocomplete="email" placeholder="Votre adresse e-mail" class="min-w-0 flex-1 rounded border border-white/30 bg-white/10 px-3 py-2 text-white placeholder-white/50 focus:border-gold-light focus:outline-none" />
-        <button :disabled="loading" class="rounded bg-gold px-4 py-2 font-medium text-white hover:bg-gold/90 disabled:opacity-60">{{ loading ? '…' : 'S\'inscrire' }}</button>
+        <button :disabled="loading" class="rounded bg-gold-dark px-4 py-2 font-medium text-white hover:bg-gold-dark/90 disabled:opacity-60">{{ loading ? '…' : 'S\'inscrire' }}</button>
       </div>
       <div class="absolute left-[-9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
         <label>Ne pas remplir <input v-model="trap" type="text" name="website" tabindex="-1" autocomplete="off" /></label>

@@ -28,15 +28,15 @@ async function recheck() {
     <p class="mt-1"><span :class="['rounded-full px-2 py-0.5 text-xs', DONATION_STATUS[d.status]?.cls]">{{ DONATION_STATUS[d.status]?.label }}</span></p>
 
     <dl class="mt-5 grid gap-4 rounded-xl bg-white p-6 shadow sm:grid-cols-2">
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Référence</dt><dd class="mt-0.5 break-all font-mono text-sm">{{ d.reference }}</dd></div>
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Moyen de paiement</dt><dd class="mt-0.5">{{ d.methodLabel }} <span class="text-xs text-slate-500">({{ d.provider }})</span></dd></div>
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Créé le</dt><dd class="mt-0.5">{{ fmt(d.createdAt) }}</dd></div>
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Payé le</dt><dd class="mt-0.5">{{ fmt(d.paidAt) }}</dd></div>
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Donateur</dt><dd class="mt-0.5">{{ d.donorName || '—' }}</dd></div>
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Campagne</dt><dd class="mt-0.5">{{ d.campaign || 'Don libre' }}</dd></div>
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">E-mail</dt><dd class="mt-0.5"><a v-if="d.donorEmail" :href="`mailto:${d.donorEmail}`" class="text-navy underline">{{ d.donorEmail }}</a><span v-else>—</span></dd></div>
-      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Téléphone</dt><dd class="mt-0.5">{{ d.donorPhone || '—' }}</dd></div>
-      <div v-if="d.message" class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-gold">Message</dt><dd class="mt-0.5 whitespace-pre-line">{{ d.message }}</dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Référence</dt><dd class="mt-0.5 break-all font-mono text-sm">{{ d.reference }}</dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Moyen de paiement</dt><dd class="mt-0.5">{{ d.methodLabel }} <span class="text-xs text-slate-600">({{ d.provider }})</span></dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Créé le</dt><dd class="mt-0.5">{{ fmt(d.createdAt) }}</dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Payé le</dt><dd class="mt-0.5">{{ fmt(d.paidAt) }}</dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Donateur</dt><dd class="mt-0.5">{{ d.donorName || '—' }}</dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Campagne</dt><dd class="mt-0.5">{{ d.campaign || 'Don libre' }}</dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">E-mail</dt><dd class="mt-0.5"><a v-if="d.donorEmail" :href="`mailto:${d.donorEmail}`" class="text-navy underline">{{ d.donorEmail }}</a><span v-else>—</span></dd></div>
+      <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Téléphone</dt><dd class="mt-0.5">{{ d.donorPhone || '—' }}</dd></div>
+      <div v-if="d.message" class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Message</dt><dd class="mt-0.5 whitespace-pre-line">{{ d.message }}</dd></div>
       <div v-if="d.note" class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-red-700">Note / anomalie</dt><dd class="mt-0.5 text-red-800">{{ d.note }}</dd></div>
     </dl>
 

@@ -19,10 +19,10 @@ const fields: FormField[] = [
         <div class="rounded-lg border border-gold/30 bg-white p-5 shadow-sm">
           <h2 class="font-serif text-xl font-semibold text-navy">Coordonnées</h2>
           <address class="mt-3 space-y-3 text-sm not-italic">
-            <p v-if="s['site.address']"><span class="block text-xs font-semibold uppercase tracking-wide text-gold">Adresse</span>{{ s['site.address'] }}</p>
-            <p v-if="s['site.phone']"><span class="block text-xs font-semibold uppercase tracking-wide text-gold">Téléphone</span><a :href="`tel:${s['site.phone'].replace(/\s/g, '')}`" class="text-navy underline">{{ s['site.phone'] }}</a></p>
-            <p v-if="s['site.contactEmail']"><span class="block text-xs font-semibold uppercase tracking-wide text-gold">E-mail</span><a :href="`mailto:${s['site.contactEmail']}`" class="text-navy underline">{{ s['site.contactEmail'] }}</a></p>
-            <p v-if="!s['site.address'] && !s['site.phone'] && !s['site.contactEmail']" class="text-slate-500">Les coordonnées seront bientôt publiées.</p>
+            <p v-if="s['site.address']"><span class="block text-xs font-semibold uppercase tracking-wide text-gold-dark">Adresse</span>{{ s['site.address'] }}</p>
+            <p v-if="s['site.phone']"><span class="block text-xs font-semibold uppercase tracking-wide text-gold-dark">Téléphone</span><a :href="`tel:${s['site.phone'].replace(/\s/g, '')}`" class="text-navy underline">{{ s['site.phone'] }}</a></p>
+            <p v-if="s['site.contactEmail']"><span class="block text-xs font-semibold uppercase tracking-wide text-gold-dark">E-mail</span><a :href="`mailto:${s['site.contactEmail']}`" class="text-navy underline">{{ s['site.contactEmail'] }}</a></p>
+            <p v-if="!s['site.address'] && !s['site.phone'] && !s['site.contactEmail']" class="text-slate-600">Les coordonnées seront bientôt publiées.</p>
           </address>
         </div>
       </aside>

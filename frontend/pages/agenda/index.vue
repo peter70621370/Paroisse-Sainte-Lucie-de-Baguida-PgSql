@@ -44,7 +44,7 @@ const byDay = computed(() => {
         for (const m of (sched.value?.items ?? []).filter((x) => x.weekday === WEEKDAY_KEYS[weekdayIndex(key)])) {
           push(key, {
             key: `m${m.id}-${key}`, kind: 'mass', title: kindLabel[m.kind] || m.notes || 'Célébration', time: m.time.replace(':', 'h'), sort: m.time,
-            color: '#B8860B', place: m.location, category: 'Messes et confessions',
+            color: '#86610A', place: m.location, category: 'Messes et confessions',
           });
         }
       }
@@ -82,7 +82,7 @@ const weekNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
       <div class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filtrer par catégorie">
         <button :class="['rounded-full border px-3 py-1 text-sm', category === 'all' ? 'border-navy bg-navy text-white' : 'border-navy/40 text-navy']" @click="category = 'all'">Tout</button>
-        <button :class="['rounded-full border px-3 py-1 text-sm', category === 'masses' ? 'border-gold bg-gold text-white' : 'border-gold/60 text-gold']" @click="category = 'masses'">Messes et confessions</button>
+        <button :class="['rounded-full border px-3 py-1 text-sm', category === 'masses' ? 'border-gold bg-gold-dark text-white' : 'border-gold/60 text-gold-dark']" @click="category = 'masses'">Messes et confessions</button>
         <button v-for="c in cats?.items" :key="c.id" :class="['rounded-full border px-3 py-1 text-sm', category === c.slug ? 'bg-navy text-white' : 'border-navy/40 text-navy']" @click="category = c.slug">{{ c.name }}</button>
       </div>
 
@@ -92,17 +92,17 @@ const weekNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
           <div v-for="w in weekNames" :key="w" class="py-2">{{ w }}</div>
         </div>
         <div v-for="(week, wi) in grid.weeks" :key="wi" class="grid grid-cols-7 border-t border-slate-100">
-          <div v-for="d in week" :key="d.key" :class="['min-h-28 border-l border-slate-100 p-1.5 first:border-l-0', d.inMonth ? '' : 'bg-slate-50 text-slate-400']">
+          <div v-for="d in week" :key="d.key" :class="['min-h-28 border-l border-slate-100 p-1.5 first:border-l-0', d.inMonth ? '' : 'bg-cream-dark text-slate-600']">
             <p :class="['mb-1 text-right text-xs', d.key === today ? 'font-bold text-white' : '']">
-              <span :class="d.key === today ? 'inline-block rounded-full bg-gold px-1.5' : ''">{{ Number(d.key.slice(8)) }}</span>
+              <span :class="d.key === today ? 'inline-block rounded-full bg-gold-dark px-1.5' : ''">{{ Number(d.key.slice(8)) }}</span>
             </p>
             <ul class="space-y-1">
               <li v-for="it in (byDay.get(d.key) ?? []).slice(0, 4)" :key="it.key">
-                <component :is="it.to ? 'NuxtLink' : 'div'" :to="it.to" class="block truncate rounded px-1.5 py-0.5 text-xs text-white" :style="{ backgroundColor: it.color }" :title="`${it.time} ${it.title}`">
+                <component :is="it.to ? 'NuxtLink' : 'div'" :to="it.to" class="block truncate rounded px-1.5 py-0.5 text-xs text-white" :style="{ backgroundColor: it.color, color: textOn(it.color) }" :title="`${it.time} ${it.title}`">
                   <span v-if="it.time" class="font-semibold">{{ it.time }}</span> {{ it.title }}
                 </component>
               </li>
-              <li v-if="(byDay.get(d.key) ?? []).length > 4" class="px-1 text-xs text-slate-500">+ {{ (byDay.get(d.key) ?? []).length - 4 }} autres</li>
+              <li v-if="(byDay.get(d.key) ?? []).length > 4" class="px-1 text-xs text-slate-600">+ {{ (byDay.get(d.key) ?? []).length - 4 }} autres</li>
             </ul>
           </div>
         </div>
@@ -110,16 +110,16 @@ const weekNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
       <!-- Liste (mobile, ou choix « Liste ») -->
       <div :class="['mt-6 space-y-3', view === 'month' ? 'md:hidden' : '']">
-        <p v-if="!listDays.length" class="text-center text-slate-500">Rien de prévu ce mois-ci.</p>
+        <p v-if="!listDays.length" class="text-center text-slate-600">Rien de prévu ce mois-ci.</p>
         <section v-for="[day, items] in listDays" :key="day" class="overflow-hidden rounded-lg border border-gold/30 bg-white shadow-sm">
-          <h3 :class="['px-4 py-2 font-serif text-lg font-semibold capitalize', day === today ? 'bg-gold text-white' : 'bg-cream-dark text-navy']">{{ dayLong(day) }}</h3>
+          <h3 :class="['px-4 py-2 font-serif text-lg font-semibold capitalize', day === today ? 'bg-gold-dark text-white' : 'bg-cream-dark text-navy']">{{ dayLong(day) }}</h3>
           <ul class="divide-y divide-slate-100">
             <li v-for="it in items" :key="it.key" class="flex items-baseline gap-3 px-4 py-2.5">
-              <span class="w-14 shrink-0 font-serif font-bold" :style="{ color: it.color }">{{ it.time }}</span>
+              <span class="w-14 shrink-0 font-serif font-bold" :style="{ color: readableOnWhite(it.color) }">{{ it.time }}</span>
               <div class="min-w-0">
                 <NuxtLink v-if="it.to" :to="it.to" class="font-medium text-navy hover:underline">{{ it.title }}</NuxtLink>
                 <span v-else class="font-medium">{{ it.title }}</span>
-                <p class="text-xs text-slate-500">{{ it.category }}<span v-if="it.place"> · {{ it.place }}</span></p>
+                <p class="text-xs text-slate-600">{{ it.category }}<span v-if="it.place"> · {{ it.place }}</span></p>
               </div>
             </li>
           </ul>

@@ -51,7 +51,7 @@ async function save() {
 <template>
   <div class="max-w-3xl">
     <h1 class="text-2xl font-bold text-navy">Paramètres du site</h1>
-    <p class="mt-1 text-sm text-slate-500">Identité, page d'accueil, coordonnées et réseaux sociaux affichés sur le site public.</p>
+    <p class="mt-1 text-sm text-slate-600">Identité, page d'accueil, coordonnées et réseaux sociaux affichés sur le site public.</p>
 
     <p v-if="loadError" class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700">Impossible de charger les paramètres (droits insuffisants ?).</p>
 

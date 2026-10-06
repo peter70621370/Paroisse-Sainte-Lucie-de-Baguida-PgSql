@@ -68,7 +68,7 @@ const inputCls = 'w-full rounded border border-slate-300 bg-white px-3 py-2 focu
         <option v-for="o in f.options" :key="o.value" :value="o.value">{{ o.label }}</option>
       </select>
       <input v-else :id="`f-${f.key}`" v-model="values[f.key]" :type="f.type" :required="f.required" :placeholder="f.placeholder" :class="inputCls" :aria-invalid="!!fieldErrors[f.key]" />
-      <p v-if="f.help" class="mt-1 text-xs text-slate-500">{{ f.help }}</p>
+      <p v-if="f.help" class="mt-1 text-xs text-slate-600">{{ f.help }}</p>
       <p v-if="fieldErrors[f.key]" class="mt-1 text-sm text-red-700" role="alert">{{ fieldErrors[f.key]?.join(', ') }}</p>
     </div>
 

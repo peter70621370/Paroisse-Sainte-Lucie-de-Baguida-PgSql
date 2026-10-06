@@ -2,8 +2,20 @@
 const { name, tagline, logo } = await useSite();
 const route = useRoute();
 const mobileOpen = ref(false);
+const hoverOpened = ref(false);
 const openMenu = ref<string | null>(null);
 watch(() => route.fullPath, () => { mobileOpen.value = false; openMenu.value = null; });
+
+// Souris : le menu s'ouvre au survol. Un clic juste après ne doit PAS le refermer (sinon le menu « clignote »).
+// Tactile / clavier : le clic ouvre et ferme.
+function onEnter(label: string) {
+  if (window.matchMedia('(hover: hover)').matches) { openMenu.value = label; hoverOpened.value = true; }
+}
+function onLeave() { openMenu.value = null; hoverOpened.value = false; }
+function onClick(label: string) {
+  if (hoverOpened.value && openMenu.value === label) { hoverOpened.value = false; return; }
+  openMenu.value = openMenu.value === label ? null : label;
+}
 
 const isActive = (item: NavItem) =>
   item.to ? (item.to === '/' ? route.path === '/' : route.path.startsWith(item.to)) : item.children?.some((c) => route.path.startsWith(c.to));
@@ -13,7 +25,7 @@ const isActive = (item: NavItem) =>
   <header class="border-b border-gold/30 bg-cream">
     <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
       <NuxtLink to="/" class="flex items-center gap-3" :aria-label="`${name} – accueil`">
-        <img :src="logo" :alt="`Logo ${name}`" class="h-14 w-auto max-w-[260px] object-contain md:h-16" />
+        <img :src="logo" width="224" height="56" :alt="`Logo ${name}`" class="h-14 w-auto max-w-[260px] object-contain md:h-16" />
       </NuxtLink>
       <p v-if="tagline" class="hidden font-serif text-sm italic text-navy/70 lg:block">{{ tagline }}</p>
       <button
@@ -32,7 +44,7 @@ const isActive = (item: NavItem) =>
           v-for="item in NAV"
           :key="item.label"
           class="group relative"
-          @mouseleave="openMenu = null"
+          @mouseleave="onLeave"
         >
           <NuxtLink
             v-if="item.to"
@@ -45,8 +57,8 @@ const isActive = (item: NavItem) =>
             <button
               :class="['flex w-full items-center gap-1 px-4 py-3 text-left text-sm font-medium tracking-wide text-white hover:text-gold-light', isActive(item) ? 'text-gold-light lg:border-b-2 lg:border-gold' : '']"
               :aria-expanded="openMenu === item.label"
-              @click="openMenu = openMenu === item.label ? null : item.label"
-              @mouseenter="openMenu = item.label"
+              @click="onClick(item.label)"
+              @mouseenter="onEnter(item.label)"
             >
               {{ item.label }} <span aria-hidden="true" class="text-xs">▾</span>
             </button>

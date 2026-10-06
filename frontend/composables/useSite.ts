@@ -3,7 +3,7 @@ export type SiteSettings = Record<string, string>;
 
 export const PLACEHOLDERS = {
   logo: '/placeholders/logo.svg',
-  hero: '/placeholders/hero.svg',
+  hero: '/placeholders/hero.webp',
   photo: '/placeholders/photo.svg',
   avatar: '/placeholders/avatar.svg',
   og: '/placeholders/og-default.png',

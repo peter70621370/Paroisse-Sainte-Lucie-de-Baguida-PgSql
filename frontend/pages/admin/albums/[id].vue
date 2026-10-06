@@ -127,7 +127,7 @@ async function move(i: number, d: number) {
 
     <section v-if="id" class="mt-10">
       <h2 class="text-xl font-bold text-navy">Photos et vidéos ({{ items.length }})</h2>
-      <p v-if="!canEditItems" class="mt-1 text-sm text-slate-500">Seuls les éditeurs et administrateurs peuvent modifier le contenu de l'album.</p>
+      <p v-if="!canEditItems" class="mt-1 text-sm text-slate-600">Seuls les éditeurs et administrateurs peuvent modifier le contenu de l'album.</p>
       <template v-else>
         <div class="mt-3 flex flex-wrap items-end gap-4 rounded-xl bg-white p-4 shadow">
           <button type="button" class="rounded bg-navy px-4 py-2 text-sm text-white" @click="picker = 'item'">+ Ajouter une photo</button>
@@ -153,7 +153,7 @@ async function move(i: number, d: number) {
         </ul>
       </template>
     </section>
-    <p v-else class="mt-8 text-sm text-slate-500">Enregistrez l'album pour pouvoir y ajouter des photos et des vidéos.</p>
+    <p v-else class="mt-8 text-sm text-slate-600">Enregistrez l'album pour pouvoir y ajouter des photos et des vidéos.</p>
 
     <MediaPicker v-if="picker" type="image" @select="pick" @close="picker = null" />
   </div>

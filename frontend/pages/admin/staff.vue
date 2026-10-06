@@ -59,7 +59,7 @@ async function remove(p: P) {
 <template>
   <div>
     <h1 class="text-2xl font-bold text-[#1F3A5F]">Personnel pastoral</h1>
-    <p v-if="!canWrite" class="mt-2 text-sm text-slate-500">Lecture seule : seuls les éditeurs et administrateurs peuvent modifier les fiches.</p>
+    <p v-if="!canWrite" class="mt-2 text-sm text-slate-600">Lecture seule : seuls les éditeurs et administrateurs peuvent modifier les fiches.</p>
 
     <form v-if="canWrite" class="mt-4 grid max-w-3xl gap-3 rounded-xl bg-white p-5 shadow sm:grid-cols-2" @submit.prevent="save">
       <h2 class="font-semibold sm:col-span-2">{{ editingId ? 'Modifier la fiche' : 'Nouvelle fiche' }}</h2>
@@ -101,7 +101,7 @@ async function remove(p: P) {
     <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <li v-for="p in data?.items" :key="p.id" class="flex gap-3 rounded-xl bg-white p-4 shadow">
         <img v-if="p.photo?.thumbUrl" :src="p.photo.thumbUrl" alt="" class="h-16 w-16 shrink-0 rounded-full object-cover" />
-        <div v-else class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xl text-slate-500">{{ p.fullName.charAt(0) }}</div>
+        <div v-else class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xl text-slate-600">{{ p.fullName.charAt(0) }}</div>
         <div class="min-w-0 text-sm">
           <p class="truncate font-semibold">{{ p.fullName }}</p>
           <p class="text-slate-600">{{ p.function }}<span v-if="!p.active" class="ml-1 text-xs text-amber-700">(masqué)</span></p>
@@ -112,7 +112,7 @@ async function remove(p: P) {
         </div>
       </li>
     </ul>
-    <p v-if="!data?.items.length" class="mt-6 text-slate-500">Aucune fiche.</p>
+    <p v-if="!data?.items.length" class="mt-6 text-slate-600">Aucune fiche.</p>
 
     <MediaPicker v-if="showPicker" type="image" @select="pick" @close="showPicker = false" />
   </div>

@@ -15,12 +15,12 @@ const open = ref<number | null>(null);
   <div>
     <PageTitle :title="album.title" :subtitle="[album.date ? longDate(album.date) : '', album.description].filter(Boolean).join(' · ')" />
     <div class="mx-auto max-w-6xl px-4 py-10">
-      <p v-if="!album.items.length" class="text-center text-slate-500">Cet album est vide pour le moment.</p>
+      <p v-if="!album.items.length" class="text-center text-slate-600">Cet album est vide pour le moment.</p>
       <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <li v-for="(it, i) in album.items" :key="it.id">
           <button class="group relative block aspect-square w-full overflow-hidden rounded-lg bg-navy-dark" :aria-label="it.caption || (it.type === 'video' ? 'Ouvrir la vidéo' : 'Agrandir la photo')" @click="open = i">
             <img v-if="it.type === 'image'" :src="it.thumbUrl || it.url!" :alt="it.alt || it.caption || ''" class="h-full w-full object-cover transition group-hover:scale-105" loading="lazy" />
-            <span v-else class="flex h-full w-full flex-col items-center justify-center gap-2 text-white"><span class="flex h-14 w-14 items-center justify-center rounded-full bg-gold text-2xl" aria-hidden="true">▶</span><span class="px-2 text-center text-xs">{{ it.caption || 'Vidéo' }}</span></span>
+            <span v-else class="flex h-full w-full flex-col items-center justify-center gap-2 text-white"><span class="flex h-14 w-14 items-center justify-center rounded-full bg-gold-dark text-2xl" aria-hidden="true">▶</span><span class="px-2 text-center text-xs">{{ it.caption || 'Vidéo' }}</span></span>
           </button>
         </li>
       </ul>

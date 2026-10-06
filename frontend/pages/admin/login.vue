@@ -31,7 +31,7 @@ async function submit() {
   <main class="flex min-h-screen items-center justify-center px-4">
     <form class="w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow" @submit.prevent="submit">
       <h1 class="text-xl font-bold text-[#1F3A5F]">Administration</h1>
-      <p class="text-sm text-slate-500">Paroisse Sainte Lucie de Baguida</p>
+      <p class="text-sm text-slate-600">Paroisse Sainte Lucie de Baguida</p>
 
       <label class="block text-sm">
         <span class="mb-1 block font-medium">E-mail</span>

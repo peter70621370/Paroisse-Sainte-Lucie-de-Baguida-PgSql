@@ -74,7 +74,7 @@ async function remove() {
           <option v-if="canPublish" value="PUBLISHED">Publiée</option>
         </select>
       </label>
-      <p class="text-xs text-slate-500">La progression est calculée à partir des dons réussis. Les dons PayPal (euros) sont convertis à la parité fixe 1 € = 655,957 FCFA.</p>
+      <p class="text-xs text-slate-600">La progression est calculée à partir des dons réussis. Les dons PayPal (euros) sont convertis à la parité fixe 1 € = 655,957 FCFA.</p>
 
       <p v-if="err" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
       <p v-if="msg" class="rounded bg-green-50 px-3 py-2 text-sm text-green-800" role="status">{{ msg }}</p>

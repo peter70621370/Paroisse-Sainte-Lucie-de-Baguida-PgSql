@@ -82,7 +82,7 @@ function state(r: Row) {
               <button v-if="canDelete" class="text-red-700 underline" @click="remove(r)">Supprimer</button>
             </td>
           </tr>
-          <tr v-if="!data?.items.length"><td colspan="5" class="px-4 py-6 text-center text-slate-500">Aucun élément.</td></tr>
+          <tr v-if="!data?.items.length"><td colspan="5" class="px-4 py-6 text-center text-slate-600">Aucun élément.</td></tr>
         </tbody>
       </table>
     </div>

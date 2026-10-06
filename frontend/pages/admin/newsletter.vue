@@ -65,9 +65,9 @@ async function removeSub(s: Sub) {
     <h1 class="text-2xl font-bold text-navy">Lettre d'information</h1>
 
     <div class="mt-4 grid gap-3 sm:grid-cols-3">
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-500">Abonnés confirmés</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.confirmed ?? 0 }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-500">En attente de confirmation</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.pending ?? 0 }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-500">Désinscrits</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.unsubscribed ?? 0 }}</p></div>
+      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Abonnés confirmés</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.confirmed ?? 0 }}</p></div>
+      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">En attente de confirmation</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.pending ?? 0 }}</p></div>
+      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Désinscrits</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.unsubscribed ?? 0 }}</p></div>
     </div>
 
     <section class="mt-6 rounded-xl bg-white p-5 shadow">
@@ -75,7 +75,7 @@ async function removeSub(s: Sub) {
       <form class="mt-3 space-y-4" @submit.prevent="sendAll">
         <label class="block text-sm"><span class="mb-1 block font-medium">Objet</span><input v-model="subject" required maxlength="255" placeholder="Les nouvelles de la paroisse – octobre" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
         <div class="text-sm"><span class="mb-1 block font-medium">Message</span><RichEditor v-model="content" /></div>
-        <p class="text-xs text-slate-500">Chaque message contient automatiquement le lien de désinscription. Faites d'abord un test sur votre propre adresse.</p>
+        <p class="text-xs text-slate-600">Chaque message contient automatiquement le lien de désinscription. Faites d'abord un test sur votre propre adresse.</p>
         <div class="flex flex-wrap items-end gap-3">
           <label class="text-sm"><span class="mb-1 block font-medium">Envoyer un test à</span><input v-model="testTo" type="email" placeholder="vous@exemple.org" class="rounded border border-slate-300 px-3 py-2" /></label>
           <button type="button" :disabled="!subject || !content || !testTo" class="rounded border border-navy px-4 py-2 text-sm text-navy hover:bg-navy hover:text-white disabled:opacity-50" @click="sendTest">Envoyer le test</button>
@@ -95,7 +95,7 @@ async function removeSub(s: Sub) {
             <td class="py-2 pr-3 font-medium">{{ i.subject }}</td><td class="py-2 pr-3">{{ fmt(i.createdAt) }}</td><td class="py-2 pr-3">{{ i.sentCount }} / {{ i.recipients }}</td>
             <td class="py-2"><span :class="['rounded-full px-2 py-0.5 text-xs', i.status === 'SENT' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800']">{{ i.status === 'SENT' ? 'Envoyé' : 'En cours' }}</span></td>
           </tr>
-          <tr v-if="!issues?.items.length"><td colspan="4" class="py-4 text-center text-slate-500">Aucun message envoyé.</td></tr>
+          <tr v-if="!issues?.items.length"><td colspan="4" class="py-4 text-center text-slate-600">Aucun message envoyé.</td></tr>
         </tbody>
       </table>
     </section>
@@ -113,7 +113,7 @@ async function removeSub(s: Sub) {
         <table class="mt-3 w-full text-left text-sm">
           <tbody>
             <tr v-for="s in subs?.items" :key="s.id" class="border-b last:border-0">
-              <td class="py-2 pr-3">{{ s.email }}</td><td class="py-2 pr-3">{{ stateOf(s) }}</td><td class="py-2 pr-3 text-slate-500">{{ fmt(s.createdAt) }}</td>
+              <td class="py-2 pr-3">{{ s.email }}</td><td class="py-2 pr-3">{{ stateOf(s) }}</td><td class="py-2 pr-3 text-slate-600">{{ fmt(s.createdAt) }}</td>
               <td class="py-2 text-right"><button v-if="user?.role === 'ADMIN'" class="text-red-700 underline" @click="removeSub(s)">Effacer</button></td>
             </tr>
           </tbody>

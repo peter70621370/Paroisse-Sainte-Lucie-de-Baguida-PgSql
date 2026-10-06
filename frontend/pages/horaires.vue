@@ -8,7 +8,7 @@ usePageSeo('Horaires des messes', 'Horaires des messes, confessions et célébra
   <div>
     <PageTitle title="Horaires des messes" subtitle="Messes, confessions et célébrations" />
     <div class="mx-auto max-w-3xl px-4 py-10">
-      <p v-if="!days.length" class="text-center text-slate-500">Les horaires seront bientôt publiés.</p>
+      <p v-if="!days.length" class="text-center text-slate-600">Les horaires seront bientôt publiés.</p>
       <div v-for="d in days" :key="d.weekday" class="mb-4 overflow-hidden rounded-lg border border-gold/30 bg-white shadow-sm">
         <h2 class="bg-navy px-4 py-2 font-serif text-lg font-semibold text-white">{{ d.label }}</h2>
         <ul class="divide-y divide-slate-100">

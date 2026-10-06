@@ -72,7 +72,7 @@ async function remove() {
         <label class="text-sm sm:col-span-2">
           <span class="mb-1 block font-medium">Adresse (slug)</span>
           <input v-model="form.slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="w-full rounded border border-slate-300 px-3 py-2" @input="slugTouched = true" />
-          <span class="mt-1 block text-xs text-slate-500">Lettres minuscules, chiffres et tirets. Ex. : histoire-de-la-paroisse</span>
+          <span class="mt-1 block text-xs text-slate-600">Lettres minuscules, chiffres et tirets. Ex. : histoire-de-la-paroisse</span>
         </label>
         <label class="text-sm">
           <span class="mb-1 block font-medium">Langue</span>

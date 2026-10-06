@@ -54,8 +54,8 @@ onBeforeUnmount(() => clearTimeout(timer));
           {{ cancelled ? 'Vous avez quitté la page de paiement.' : 'Cela peut prendre quelques instants (par exemple, le temps de valider sur votre téléphone).' }}
         </p>
         <button v-if="!checking" class="mt-5 rounded border border-navy px-4 py-2 text-navy hover:bg-navy hover:text-white" @click="tries = 0; check()">Vérifier à nouveau</button>
-        <p v-else class="mt-5 text-sm text-slate-500">Vérification en cours…</p>
-        <p class="mt-5 text-xs text-slate-500">Si vous avez bien payé, votre don sera pris en compte automatiquement : vous pouvez fermer cette page.</p>
+        <p v-else class="mt-5 text-sm text-slate-600">Vérification en cours…</p>
+        <p class="mt-5 text-xs text-slate-600">Si vous avez bien payé, votre don sera pris en compte automatiquement : vous pouvez fermer cette page.</p>
       </div>
 
       <NuxtLink to="/" class="mt-8 inline-block text-sm text-navy underline">Retour à l'accueil</NuxtLink>

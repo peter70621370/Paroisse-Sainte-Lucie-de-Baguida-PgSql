@@ -51,7 +51,7 @@ async function remove(s: S) {
 <template>
   <div>
     <h1 class="text-2xl font-bold text-[#1F3A5F]">Horaires des messes et confessions</h1>
-    <p v-if="!canWrite" class="mt-2 text-sm text-slate-500">Lecture seule : seuls les éditeurs et administrateurs peuvent modifier les horaires.</p>
+    <p v-if="!canWrite" class="mt-2 text-sm text-slate-600">Lecture seule : seuls les éditeurs et administrateurs peuvent modifier les horaires.</p>
 
     <form v-if="canWrite" class="mt-4 grid max-w-3xl gap-3 rounded-xl bg-white p-5 shadow sm:grid-cols-3" @submit.prevent="save">
       <h2 class="font-semibold sm:col-span-3">{{ editingId ? 'Modifier l\'horaire' : 'Nouvel horaire' }}</h2>
@@ -113,7 +113,7 @@ async function remove(s: S) {
               </template>
             </td>
           </tr>
-          <tr v-if="!data?.items.length"><td colspan="6" class="px-4 py-6 text-center text-slate-500">Aucun horaire.</td></tr>
+          <tr v-if="!data?.items.length"><td colspan="6" class="px-4 py-6 text-center text-slate-600">Aucun horaire.</td></tr>
         </tbody>
       </table>
     </div>

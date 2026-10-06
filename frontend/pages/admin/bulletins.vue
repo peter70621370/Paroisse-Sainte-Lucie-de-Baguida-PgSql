@@ -120,7 +120,7 @@ async function remove(b: B) {
               <button v-if="canDelete" class="text-red-700 underline" @click="remove(b)">Supprimer</button>
             </td>
           </tr>
-          <tr v-if="!data?.items.length"><td colspan="5" class="px-4 py-6 text-center text-slate-500">Aucun bulletin.</td></tr>
+          <tr v-if="!data?.items.length"><td colspan="5" class="px-4 py-6 text-center text-slate-600">Aucun bulletin.</td></tr>
         </tbody>
       </table>
     </div>

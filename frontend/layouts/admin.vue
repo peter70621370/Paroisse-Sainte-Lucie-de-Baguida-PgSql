@@ -50,7 +50,7 @@ watch(() => route.path, () => (open.value = false));
             :class="['rounded px-3 py-2 text-sm', isActive(l.to) ? 'bg-white/15 font-medium' : 'hover:bg-white/10']"
           >
             {{ l.label }}
-            <span v-if="'badge' in l && l.badge" class="ml-2 rounded-full bg-gold px-2 py-0.5 text-xs font-semibold text-white">{{ l.badge }}</span>
+            <span v-if="'badge' in l && l.badge" class="ml-2 rounded-full bg-gold-dark px-2 py-0.5 text-xs font-semibold text-white">{{ l.badge }}</span>
           </NuxtLink>
         </template>
       </nav>

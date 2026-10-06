@@ -376,3 +376,12 @@ paths:
       responses:
         '201': { description: "{ item }" }
         '400': { description: Données invalides }
+  /api/image:
+    get:
+      summary: |
+        Version réduite d'une image de la médiathèque (src = /uploads/AAAA/MM/<uuid>.webp, w = 320|480|640|800|1024|1280|1600).
+        Créée à la demande puis mise en cache (1 an). Refuse tout autre chemin ou largeur (400), 404 si absente.
+      responses:
+        '200': { description: Image WebP }
+        '400': { description: Chemin ou largeur non autorisés }
+        '404': { description: Image introuvable }

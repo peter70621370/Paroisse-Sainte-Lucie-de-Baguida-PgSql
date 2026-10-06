@@ -19,7 +19,7 @@ const media = computed(() => {
       <iframe :src="media.src" :title="title || 'Vidéo'" class="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" />
     </div>
     <button v-else type="button" class="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg bg-navy-dark p-6 text-center text-white hover:bg-navy" @click="loaded = true">
-      <span class="flex h-16 w-16 items-center justify-center rounded-full bg-gold text-3xl" aria-hidden="true">▶</span>
+      <span class="flex h-16 w-16 items-center justify-center rounded-full bg-gold-dark text-3xl" aria-hidden="true">▶</span>
       <span class="font-serif text-xl font-semibold">Regarder la vidéo</span>
       <span class="max-w-md text-xs text-white/70">Au clic, la vidéo est chargée depuis {{ media.provider }}, qui peut déposer ses propres cookies.</span>
     </button>

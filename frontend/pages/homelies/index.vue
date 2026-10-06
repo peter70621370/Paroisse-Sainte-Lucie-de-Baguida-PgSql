@@ -11,11 +11,11 @@ usePageSeo('Homélies', 'Les homélies de la paroisse : texte, audio et vidéo.'
   <div>
     <PageTitle title="Homélies" subtitle="Textes, audios et vidéos" />
     <div class="mx-auto max-w-3xl px-4 py-10">
-      <p v-if="!data?.items.length" class="text-center text-slate-500">Aucune homélie publiée pour le moment.</p>
+      <p v-if="!data?.items.length" class="text-center text-slate-600">Aucune homélie publiée pour le moment.</p>
       <ul class="space-y-3">
         <li v-for="h in data?.items" :key="h.id">
           <NuxtLink :to="`/homelies/${h.id}`" class="block rounded-lg border border-gold/30 bg-white p-4 shadow-sm hover:shadow-md">
-            <p class="text-xs uppercase tracking-wide text-gold">{{ longDate(h.date) }}</p>
+            <p class="text-xs uppercase tracking-wide text-gold-dark">{{ longDate(h.date) }}</p>
             <p class="font-serif text-xl font-semibold text-navy">{{ h.title }}</p>
             <p class="text-sm text-slate-600">
               {{ h.preacher }}<span v-if="h.videoUrl"> · Vidéo</span><span v-if="h.audioUrl"> · Audio</span>

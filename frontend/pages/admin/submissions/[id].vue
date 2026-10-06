@@ -45,11 +45,11 @@ async function remove() {
   <div class="max-w-2xl">
     <NuxtLink to="/admin/submissions" class="text-sm text-navy underline">← Demandes reçues</NuxtLink>
     <h1 class="mt-1 text-2xl font-bold text-navy">{{ s.typeLabel }}</h1>
-    <p class="text-sm text-slate-500">Reçue le {{ fmt(s.createdAt) }} · {{ statusLabel[s.status] }}<span v-if="s.handledBy"> par {{ s.handledBy }} ({{ s.handledAt && fmt(s.handledAt) }})</span></p>
+    <p class="text-sm text-slate-600">Reçue le {{ fmt(s.createdAt) }} · {{ statusLabel[s.status] }}<span v-if="s.handledBy"> par {{ s.handledBy }} ({{ s.handledAt && fmt(s.handledAt) }})</span></p>
 
     <dl class="mt-5 space-y-4 rounded-xl bg-white p-6 shadow">
       <div v-for="d in s.details" :key="d.key">
-        <dt class="text-xs font-semibold uppercase tracking-wide text-gold">{{ d.label }}</dt>
+        <dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">{{ d.label }}</dt>
         <dd class="mt-0.5 whitespace-pre-line">
           <a v-if="d.key === 'email'" :href="`mailto:${d.value}`" class="text-navy underline">{{ d.value }}</a>
           <a v-else-if="d.key === 'phone'" :href="`tel:${d.value.replace(/\s/g, '')}`" class="text-navy underline">{{ d.value }}</a>

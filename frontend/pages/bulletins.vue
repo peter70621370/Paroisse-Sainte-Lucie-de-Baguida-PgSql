@@ -11,7 +11,7 @@ usePageSeo('Bulletins paroissiaux', 'Téléchargez les bulletins hebdomadaires d
   <div>
     <PageTitle title="Bulletins paroissiaux" subtitle="Téléchargez le bulletin de la semaine" />
     <div class="mx-auto max-w-3xl px-4 py-10">
-      <p v-if="!data?.items.length" class="text-center text-slate-500">Aucun bulletin publié pour le moment.</p>
+      <p v-if="!data?.items.length" class="text-center text-slate-600">Aucun bulletin publié pour le moment.</p>
       <ul class="space-y-3">
         <li v-for="b in data?.items" :key="b.id" class="flex items-center justify-between gap-4 rounded-lg border border-gold/30 bg-white p-4 shadow-sm">
           <div>

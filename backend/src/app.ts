@@ -29,6 +29,7 @@ import seo from './routes/seo.js';
 import analytics from './routes/analytics.js';
 import newsletter from './routes/newsletter.js';
 import albums from './routes/albums.js';
+import image from './routes/image.js';
 import { createPayments } from './services/payments/index.js';
 import type { FetchLike } from './services/payments/types.js';
 
@@ -43,7 +44,8 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean; fetchIm
         : env.NODE_ENV === 'development'
           ? { transport: { target: 'pino-pretty' } }
           : true,
-    trustProxy: true,
+    // Plages d'adresses des proxys de confiance (pas « true » : sinon un client falsifie son adresse et contourne les limites).
+    trustProxy: env.TRUST_PROXY.trim() || false,
   });
 
   app.decorate('mailer', createMailer(env, app.log));
@@ -94,7 +96,7 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean; fetchIm
       prefix: '/uploads/',
       index: false,
       list: false,
-      setHeaders: (res) => res.setHeader('Cache-Control', 'public, max-age=31536000, immutable'),
+      setHeaders: (reply) => void reply.header('Cache-Control', 'public, max-age=31536000, immutable'),
     });
   }
 
@@ -117,6 +119,7 @@ export async function buildApp(env: Env, opts: { withDatabase?: boolean; fetchIm
         await api.register(analytics);
         await api.register(newsletter, { env });
         await api.register(albums);
+        await api.register(image, { env });
       }
     },
     { prefix: '/api' },

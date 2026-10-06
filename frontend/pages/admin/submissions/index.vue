@@ -44,7 +44,7 @@ async function mark(s: S, to: S['status']) {
       <h1 class="text-2xl font-bold text-navy">Demandes reçues</h1>
       <a :href="exportUrl" class="rounded border border-navy px-4 py-2 text-sm text-navy hover:bg-navy hover:text-white" download>Exporter en CSV</a>
     </div>
-    <p class="mt-1 text-sm text-slate-500">Messages, adhésions, inscriptions, demandes de sacrements et intentions de messe envoyés depuis le site. Données personnelles : à traiter avec discrétion.</p>
+    <p class="mt-1 text-sm text-slate-600">Messages, adhésions, inscriptions, demandes de sacrements et intentions de messe envoyés depuis le site. Données personnelles : à traiter avec discrétion.</p>
 
     <div class="mt-4 flex flex-wrap gap-3">
       <select v-model="status" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1">
@@ -79,7 +79,7 @@ async function mark(s: S, to: S['status']) {
               <button v-if="s.status === 'NEW'" class="text-green-800 underline" @click="mark(s, 'PROCESSED')">Marquer traitée</button>
             </td>
           </tr>
-          <tr v-if="!data?.items.length"><td colspan="6" class="px-4 py-6 text-center text-slate-500">Aucune demande.</td></tr>
+          <tr v-if="!data?.items.length"><td colspan="6" class="px-4 py-6 text-center text-slate-600">Aucune demande.</td></tr>
         </tbody>
       </table>
     </div>
