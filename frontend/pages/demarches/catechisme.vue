@@ -11,11 +11,15 @@ const fields: FormField[] = [
   { key: 'email', label: 'E-mail (facultatif)', type: 'email', half: true },
   { key: 'message', label: 'Précisions (facultatif)', type: 'textarea' },
 ];
+const steps = ['Remplissez une demande par enfant (ou par adulte).', 'Le responsable de la catéchèse vous confirme le groupe et l’horaire.', 'Apportez un extrait d’acte de naissance et, pour les baptisés, la carte de baptême lors de la première rencontre.'];
 </script>
 
 <template>
   <div>
     <PageTitle title="Inscription au catéchisme" subtitle="Préparation aux sacrements pour enfants et adultes" />
-    <div class="mx-auto max-w-2xl px-4 py-10"><PublicForm slug="catechism" :fields="fields" submit-label="Envoyer l'inscription" /></div>
+    <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-3">
+      <div class="lg:col-span-2"><PublicForm slug="catechism" :fields="fields" submit-label="Envoyer l'inscription" /></div>
+      <SideHelp :steps="steps" />
+    </div>
   </div>
 </template>

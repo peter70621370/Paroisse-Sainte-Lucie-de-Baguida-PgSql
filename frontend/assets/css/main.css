@@ -2,19 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+html { scroll-behavior: smooth; }
 body {
-  @apply bg-cream text-slate-800 antialiased;
+  @apply bg-cream font-sans text-[17px] text-slate-800 antialiased;
+}
+:focus-visible { @apply outline-2 outline-offset-2 outline-gold; }
+
+@layer components {
+  /* Boutons */
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold leading-tight transition duration-200; }
+  .btn-sm { @apply px-4 py-2 text-sm; }
+  .btn-gold { @apply bg-gold-dark text-white shadow-sm hover:bg-gold-deep; }
+  .btn-navy { @apply bg-navy text-white shadow-sm hover:bg-navy-dark; }
+  .btn-outline { @apply border border-navy/50 text-navy hover:border-navy hover:bg-navy hover:text-white; }
+  .btn-light { @apply border border-white/60 text-white hover:bg-white hover:text-navy; }
+
+  /* Cartes */
+  .card { @apply rounded-2xl border border-gold/20 bg-white shadow-card; }
+  .card-hover { @apply transition duration-200 hover:-translate-y-1 hover:border-gold/50 hover:shadow-lift; }
+
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.22em] text-gold-dark; }
+  .link-arrow { @apply inline-flex items-center gap-1.5 font-semibold text-navy underline-offset-4 hover:text-gold-dark hover:underline; }
+  .field { @apply w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 transition focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/20; }
+
+  /* Fond décoratif discret (croix en filigrane) pour les bandeaux bleu marine */
+  .bg-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M36 22v28M27 31h18' stroke='%23E9D8A6' stroke-opacity='.09' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  }
 }
 
 /* Mise en forme du contenu riche (éditeur et site public) */
 .rich { @apply leading-relaxed text-slate-800; }
-.rich > * + * { @apply mt-3; }
-.rich h2 { @apply font-serif text-2xl font-bold text-navy; }
-.rich h3 { @apply font-serif text-xl font-semibold text-navy; }
+.rich > * + * { @apply mt-4; }
+.rich h2 { @apply mt-10 font-serif text-2xl font-bold text-navy md:text-[1.7rem]; }
+.rich h2::after { content: ''; @apply mt-2 block h-0.5 w-12 bg-gold; }
+.rich h3 { @apply mt-7 font-serif text-xl font-semibold text-navy; }
 .rich h4 { @apply text-lg font-semibold; }
-.rich ul { @apply list-disc pl-6; }
-.rich ol { @apply list-decimal pl-6; }
-.rich blockquote { @apply border-l-4 border-amber-400 pl-4 italic text-slate-600; }
-.rich a { @apply text-navy underline; }
-.rich img { @apply h-auto max-w-full rounded; }
-.rich hr { @apply my-4 border-slate-300; }
+.rich > :first-child { @apply mt-0; }
+.rich ul { @apply list-none space-y-2 pl-0; }
+.rich ul > li { @apply relative pl-6; }
+.rich ul > li::before { content: ''; @apply absolute left-1 top-[0.65em] h-1.5 w-1.5 rotate-45 bg-gold; }
+.rich ol { @apply list-decimal space-y-2 pl-6; }
+.rich blockquote { @apply my-8 rounded-r-xl border-l-4 border-gold bg-cream-dark/70 px-6 py-5 font-serif text-lg italic text-navy; }
+.rich a { @apply font-medium text-navy underline decoration-gold decoration-2 underline-offset-4 hover:text-gold-dark; }
+.rich img { @apply h-auto max-w-full rounded-xl; }
+.rich hr { @apply my-8 border-gold/30; }
+/* Dans l'éditeur du back-office : puces classiques (plus simples à manipuler) */
+.ProseMirror.rich ul { @apply list-disc pl-6; }
+.ProseMirror.rich ul > li { @apply pl-0; }
+.ProseMirror.rich ul > li::before { content: none; }

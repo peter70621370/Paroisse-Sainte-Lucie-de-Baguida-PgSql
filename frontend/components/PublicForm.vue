@@ -47,19 +47,19 @@ function again() {
   sent.value = false;
 }
 
-const inputCls = 'w-full rounded border border-slate-300 bg-white px-3 py-2 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy';
+const inputCls = 'field';
 </script>
 
 <template>
-  <div v-if="sent" class="rounded-lg border border-green-200 bg-green-50 p-6 text-center" role="status">
+  <div v-if="sent" class="rounded-2xl border border-green-200 bg-green-50 p-8 text-center" role="status">
     <p class="font-serif text-2xl font-semibold text-green-900">{{ successTitle || 'Merci, votre demande est envoyée' }}</p>
     <p class="mt-2 text-green-900/80">{{ successText || 'Le secrétariat paroissial vous répondra dès que possible.' }}</p>
     <button class="mt-5 rounded border border-green-800 px-4 py-2 text-green-900 hover:bg-green-100" @click="again">Envoyer une autre demande</button>
   </div>
 
-  <form v-else class="grid gap-4 rounded-lg border border-gold/30 bg-white p-5 shadow-sm sm:grid-cols-2" novalidate @submit.prevent="submit">
+  <form v-else class="card grid gap-5 p-6 sm:grid-cols-2 md:p-8" novalidate @submit.prevent="submit">
     <div v-for="f in fields" :key="f.key" :class="f.half ? '' : 'sm:col-span-2'">
-      <label :for="`f-${f.key}`" class="mb-1 block text-sm font-medium">
+      <label :for="`f-${f.key}`" class="mb-1.5 block text-sm font-semibold text-navy">
         {{ f.label }}<span v-if="f.required" class="text-red-700" aria-hidden="true"> *</span>
       </label>
       <textarea v-if="f.type === 'textarea'" :id="`f-${f.key}`" v-model="values[f.key]" rows="5" :required="f.required" :placeholder="f.placeholder" :class="inputCls" :aria-invalid="!!fieldErrors[f.key]" />
@@ -87,7 +87,7 @@ const inputCls = 'w-full rounded border border-slate-300 bg-white px-3 py-2 focu
 
     <p v-if="generalError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700 sm:col-span-2" role="alert">{{ generalError }}</p>
     <div class="sm:col-span-2">
-      <button :disabled="loading" class="rounded bg-navy px-6 py-3 font-medium text-white hover:bg-navy-dark disabled:opacity-60">{{ loading ? 'Envoi…' : submitLabel || 'Envoyer' }}</button>
+      <button :disabled="loading" class="btn btn-navy disabled:opacity-60">{{ loading ? 'Envoi…' : submitLabel || 'Envoyer' }}</button>
     </div>
   </form>
 </template>

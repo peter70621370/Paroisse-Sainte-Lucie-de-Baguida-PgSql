@@ -98,7 +98,10 @@ describe.skipIf(!process.env.RUN_DB_TESTS)('sprint 7 : statistiques, newsletter,
       const j = res.json();
       expect(j.series).toHaveLength(7);
       expect(j.series.at(-1).day).toBe(today.toISOString().slice(0, 10));
-      expect(j.topPages.some((p: { path: string }) => p.path.startsWith(`/${tag}`))).toBe(true);
+      // (les 10 pages les plus vues dépendent du contenu de la base : on vérifie la forme, et l'enregistrement en base)
+      expect(j.topPages.length).toBeGreaterThan(0);
+      expect(j.topPages[0]).toEqual({ path: expect.any(String), views: expect.any(Number) });
+      expect(await prisma.pageView.count({ where: { path: { startsWith: `/${tag}` } } })).toBeGreaterThan(0);
       expect(j.totals.views).toBeGreaterThan(0);
       expect((await call('GET', '/api/admin/analytics?days=9999', undefined, { who: 'editor' })).statusCode).toBe(400);
     });

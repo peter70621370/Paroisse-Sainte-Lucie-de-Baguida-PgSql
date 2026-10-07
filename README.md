@@ -127,10 +127,26 @@ Un hébergeur limite souvent les envois en masse par SMTP : pour de gros volumes
 
 ## Contenu de démonstration et images provisoires
 
-Pour voir le site avec du contenu d'exemple (pages, annonces, horaires, fiches), à ne lancer qu'en développement :
+Pour présenter un site complet avant la saisie des vrais contenus (à ne lancer qu'en développement / démonstration) :
 
 ```bash
 docker compose --env-file .env -f deploiement/docker-compose.yml exec backend npm run seed:demo
+```
+
+Le script crée : textes des pages, annonces, horaires, équipe pastorale, événements de l'agenda (dates calculées à partir d'aujourd'hui),
+homélies, bulletins (PDF d'exemple), albums photo (illustrations générées), campagnes de dons avec des dons fictifs, demandes reçues, coordonnées.
+**Tout est fictif** (noms, numéros, montants). Il peut être relancé sans créer de doublons et ne touche pas à ce que vous avez saisi vous-même.
+
+Pour retirer tout ce contenu d'exemple avant de saisir les vraies données (les pages restent, à réécrire) :
+
+```bash
+docker compose --env-file .env -f deploiement/docker-compose.yml exec backend npm run seed:demo -- --clear
+```
+
+Captures d'écran pleine page pour relire le site (résultat dans `e2e/test-results/shots/`) :
+
+```bash
+MSYS_NO_PATHCONV=1 docker compose --env-file .env -f deploiement/docker-compose.yml --profile e2e run --rm e2e node shots.mjs / /horaires
 ```
 
 Tant qu'aucune image n'est choisie, le site affiche des **images provisoires** (`frontend/public/placeholders/`).

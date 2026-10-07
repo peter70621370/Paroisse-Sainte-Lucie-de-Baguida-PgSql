@@ -51,7 +51,12 @@ describe.skipIf(!process.env.RUN_DB_TESTS)('dons en ligne', () => {
 
   const baseEnv = { ...process.env, NODE_ENV: 'test', PUBLIC_URL: PUBLIC, NOTIFY_EMAIL: 'secretariat@example.test' };
 
+  let savedContact: string | null = null;
+
   beforeAll(async () => {
+    // Les notifications partent vers « E-mail de contact » s'il est renseigné : on le vide le temps des tests (indépendance vis-à-vis du contenu de la base).
+    savedContact = (await prisma.setting.findUnique({ where: { key: 'site.contactEmail' } }))?.value ?? null;
+    if (savedContact) await prisma.setting.update({ where: { key: 'site.contactEmail' }, data: { value: '' } });
     live = await buildApp(loadEnv({ ...baseEnv, PAYMENT_MODE: 'live', CINETPAY_API_KEY: 'KEY', CINETPAY_SITE_ID: 'SITE', PAYPAL_CLIENT_ID: 'PID', PAYPAL_CLIENT_SECRET: 'PSECRET', PAYPAL_ENV: 'sandbox' }), { fetchImpl: fakeFetch });
     mock = await buildApp(loadEnv({ ...baseEnv, PAYMENT_MODE: 'mock' }));
     const hash = await hashPassword(pw);
@@ -63,6 +68,7 @@ describe.skipIf(!process.env.RUN_DB_TESTS)('dons en ligne', () => {
   });
 
   afterAll(async () => {
+    if (savedContact) await prisma.setting.update({ where: { key: 'site.contactEmail' }, data: { value: savedContact } });
     await prisma.donation.deleteMany({ where: { OR: [{ donorName: { contains: tag } }, { donorEmail: { startsWith: tag } }] } });
     await prisma.campaign.deleteMany({ where: { slug: { startsWith: tag } } });
     await prisma.user.deleteMany({ where: { email: { contains: tag } } });

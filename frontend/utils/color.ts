@@ -9,6 +9,6 @@ export const contrast = (a: string, b: string) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 /** Couleur de texte lisible (blanc ou foncé) sur le fond donné. */
-export const textOn = (bg: string) => (contrast(bg, '#ffffff') >= 4.5 ? '#ffffff' : '#1e293b');
+export const textOn = (bg: string) => (contrast(bg, '#ffffff') >= 4.5 ? '#ffffff' : '#0f172a');
 /** La couleur elle-même si elle est lisible sur fond blanc, sinon le bleu marine. */
 export const readableOnWhite = (c: string) => (contrast(c, '#ffffff') >= 4.5 ? c : '#1F3A5F');

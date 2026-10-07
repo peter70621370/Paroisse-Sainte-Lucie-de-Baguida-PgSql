@@ -10,13 +10,15 @@ const fields: FormField[] = [
   { key: 'preferredDate', label: 'Date souhaitée (facultatif)', type: 'date', half: true },
   { key: 'intention', label: 'Intention', type: 'textarea', required: true, placeholder: 'Ex. : Pour le repos de l\'âme de …' },
 ];
+const steps = ['Rédigez votre intention et indiquez, si vous le souhaitez, une date.', 'Le secrétariat vous confirme la date et l’heure de la messe.', 'L’offrande de messe, libre, peut être remise au secrétariat ou faite en ligne sur la page « Faire un don ».'];
 </script>
 
 <template>
   <div>
     <PageTitle title="Intention de messe" subtitle="Confiez vos intentions à la prière de la communauté" />
-    <div class="mx-auto max-w-2xl px-4 py-10">
-      <PublicForm slug="mass-intention" :fields="fields" submit-label="Envoyer l'intention" success-text="Votre intention a bien été transmise. Le secrétariat vous confirmera la date de la messe." />
+    <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-3">
+      <div class="lg:col-span-2"><PublicForm slug="mass-intention" :fields="fields" submit-label="Envoyer l'intention" success-text="Votre intention a bien été transmise. Le secrétariat vous confirmera la date de la messe." /></div>
+      <SideHelp :steps="steps" />
     </div>
   </div>
 </template>

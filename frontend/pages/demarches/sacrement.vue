@@ -13,11 +13,15 @@ const fields: FormField[] = [
   { key: 'preferredDate', label: 'Date souhaitée (facultatif)', type: 'text', placeholder: 'Ex. : fin décembre' },
   { key: 'message', label: 'Précisions (facultatif)', type: 'textarea' },
 ];
+const steps = ['Indiquez le sacrement souhaité et vos coordonnées.', 'Le secrétariat vous recontacte pour fixer un premier rendez-vous avec un prêtre.', 'La préparation commence : rencontres, pièces à fournir et choix de la date.'];
 </script>
 
 <template>
   <div>
     <PageTitle title="Demande de sacrement" subtitle="Le secrétariat vous recontactera pour la préparation" />
-    <div class="mx-auto max-w-2xl px-4 py-10"><PublicForm slug="sacrament" :fields="fields" submit-label="Envoyer la demande" /></div>
+    <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-3">
+      <div class="lg:col-span-2"><PublicForm slug="sacrament" :fields="fields" submit-label="Envoyer la demande" /></div>
+      <SideHelp :steps="steps" />
+    </div>
   </div>
 </template>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Emblème provisoire de la paroisse">
+  <circle cx="60" cy="60" r="58" fill="#1F3A5F"/>
+  <circle cx="60" cy="60" r="50" fill="none" stroke="#B8860B" stroke-width="2"/>
+  <circle cx="60" cy="60" r="45" fill="none" stroke="#B8860B" stroke-width="0.75" stroke-dasharray="1.5 4"/>
+  <!-- croix -->
+  <rect x="55" y="24" width="10" height="50" rx="2" fill="#D9A933"/>
+  <rect x="40" y="38" width="40" height="10" rx="2" fill="#D9A933"/>
+  <!-- flamme (Lucie : « lumière ») -->
+  <path d="M60 80 C50 89 51 100 60 104 C69 100 70 89 60 80 Z" fill="#F6E7B4"/>
+  <path d="M60 89 C56 93 56 99 60 101 C64 99 64 93 60 89 Z" fill="#D9A933"/>
+</svg>

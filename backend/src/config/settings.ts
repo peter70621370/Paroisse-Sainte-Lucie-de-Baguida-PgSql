@@ -14,6 +14,7 @@ export const SETTINGS = {
   'site.contactEmail': { label: 'E-mail de contact', type: 'text', group: 'Contact' },
   'site.phone': { label: 'Téléphone', type: 'text', group: 'Contact' },
   'site.address': { label: 'Adresse', type: 'text', group: 'Contact' },
+  'site.hours': { label: 'Horaires du secrétariat (une ligne par plage)', type: 'textarea', group: 'Contact' },
   'social.facebook': { label: 'Page Facebook (URL)', type: 'text', group: 'Réseaux sociaux' },
   'social.youtube': { label: 'Chaîne YouTube (URL)', type: 'text', group: 'Réseaux sociaux' },
   'social.whatsapp': { label: 'WhatsApp (URL)', type: 'text', group: 'Réseaux sociaux' },

@@ -19,6 +19,9 @@ const page = computed(() => data.value!.page);
 const languages = [['fr', 'Français'], ['ee', 'Éwé']] as const;
 const available = computed(() => languages.filter(([code]) => locs.value?.locales.includes(code)));
 
+// Rubrique du menu à laquelle appartient la page (pour proposer les pages voisines).
+const section = computed(() => NAV.find((n) => n.children?.some((c) => c.to === route.path)));
+
 usePageSeo(() => page.value.seoTitle || page.value.title, () => page.value.seoDescription || page.value.excerpt, () => ({
   lang: lang.value,
   canonical: lang.value === 'fr' ? route.path : `${route.path}?lang=${lang.value}`,
@@ -28,13 +31,32 @@ usePageSeo(() => page.value.seoTitle || page.value.title, () => page.value.seoDe
 <template>
   <div>
     <PageTitle :title="page.title" :subtitle="page.excerpt" />
-    <div v-if="available.length > 1" class="mx-auto max-w-3xl px-4 pt-6 text-right text-sm" role="group" aria-label="Langue de la page">
-      <template v-for="([code, label], i) in available" :key="code">
-        <span v-if="i" class="mx-2 text-slate-400" aria-hidden="true">|</span>
-        <NuxtLink :to="code === 'fr' ? { query: {} } : { query: { lang: code } }" :hreflang="code" :lang="code" :class="lang === code ? 'font-bold text-navy' : 'text-navy underline'">{{ label }}</NuxtLink>
-      </template>
+    <div :class="['mx-auto grid gap-10 px-4 py-12', section ? 'max-w-6xl lg:grid-cols-[minmax(0,1fr)_19rem]' : 'max-w-3xl']">
+      <div class="min-w-0">
+        <div v-if="available.length > 1" class="mb-6 flex justify-end gap-2 text-sm" role="group" aria-label="Langue de la page">
+          <NuxtLink v-for="[code, label] in available" :key="code" :to="code === 'fr' ? { query: {} } : { query: { lang: code } }" :hreflang="code" :lang="code" :class="['rounded-full border px-3.5 py-1 font-semibold', lang === code ? 'border-navy bg-navy text-white' : 'border-navy/40 text-navy hover:border-navy']">{{ label }}</NuxtLink>
+        </div>
+        <!-- Contenu nettoyé côté serveur à l'enregistrement (balises de mise en forme uniquement). -->
+        <article class="rich text-lg" :lang="lang" v-html="page.content" />
+      </div>
+
+      <aside v-if="section" class="space-y-5">
+        <nav class="card overflow-hidden" :aria-label="section.label">
+          <h2 class="bg-navy px-5 py-3 font-serif text-lg font-bold text-white">{{ section.label }}</h2>
+          <ul class="divide-y divide-slate-100">
+            <li v-for="c in section.children" :key="c.to">
+              <NuxtLink :to="c.to" :class="['flex items-center justify-between gap-2 px-5 py-3 text-[0.95rem] transition hover:bg-cream', c.to === route.path ? 'border-l-4 border-gold bg-cream font-semibold text-navy' : 'text-slate-700']" :aria-current="c.to === route.path ? 'page' : undefined">
+                {{ c.label }}<Icon name="chevron-right" class="text-gold-dark" />
+              </NuxtLink>
+            </li>
+          </ul>
+        </nav>
+        <div class="bg-pattern rounded-2xl bg-navy p-6 text-white shadow-card">
+          <h2 class="font-serif text-xl font-bold">Une question ?</h2>
+          <p class="mt-2 text-white/85">Le secrétariat paroissial est à votre écoute.</p>
+          <NuxtLink to="/contact" class="btn btn-sm btn-gold mt-5">Nous contacter <Icon name="arrow" /></NuxtLink>
+        </div>
+      </aside>
     </div>
-    <!-- Contenu nettoyé côté serveur à l'enregistrement (balises de mise en forme uniquement). -->
-    <article class="rich mx-auto max-w-3xl px-4 py-10" :lang="lang" v-html="page.content" />
   </div>
 </template>

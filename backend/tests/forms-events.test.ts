@@ -22,7 +22,12 @@ describe.skipIf(!process.env.RUN_DB_TESTS)('formulaires et agenda', () => {
     fullName: `${tag} Marie`, email: `${tag}@example.test`, message: 'Bonjour, une question sur la catéchèse.', consent: true, ...over,
   });
 
+  let savedContact: string | null = null;
+
   beforeAll(async () => {
+    // Les notifications partent vers « E-mail de contact » s'il est renseigné : on le vide le temps des tests (indépendance vis-à-vis du contenu de la base).
+    savedContact = (await prisma.setting.findUnique({ where: { key: 'site.contactEmail' } }))?.value ?? null;
+    if (savedContact) await prisma.setting.update({ where: { key: 'site.contactEmail' }, data: { value: '' } });
     // NOTIFY_EMAIL pour que les notifications partent vers l'outbox de test
     app = await buildApp(loadEnv({ ...process.env, NODE_ENV: 'test', NOTIFY_EMAIL: 'secretariat@example.test' }));
     const hash = await hashPassword(pw);
@@ -34,6 +39,7 @@ describe.skipIf(!process.env.RUN_DB_TESTS)('formulaires et agenda', () => {
   });
 
   afterAll(async () => {
+    if (savedContact) await prisma.setting.update({ where: { key: 'site.contactEmail' }, data: { value: savedContact } });
     await prisma.formSubmission.deleteMany({ where: { OR: [{ fullName: { startsWith: tag } }, { email: { startsWith: tag } }] } });
     await prisma.event.deleteMany({ where: { title: { startsWith: tag } } });
     await prisma.eventCategory.deleteMany({ where: { slug: { startsWith: tag } } });

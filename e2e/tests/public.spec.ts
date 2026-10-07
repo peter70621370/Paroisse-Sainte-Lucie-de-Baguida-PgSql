@@ -81,7 +81,7 @@ test('sitemap et robots.txt sont servis', async ({ request }) => {
 
 test('en-têtes de sécurité (production)', async ({ request }) => {
   // À RÉACTIVER avec les en-têtes de sécurité (retirés pour l'instant : voir docs/SECURITE.md).
-  test.fixme(true, 'En-têtes de sécurité retirés pour l'instant');
+  test.fixme(true, 'En-têtes de sécurité retirés pour le moment');
   test.skip(!process.env.EXPECT_SECURITY_HEADERS, 'Vérifié seulement sur la pile de production');
   const res = await request.get('/');
   const h = res.headers();

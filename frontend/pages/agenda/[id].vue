@@ -28,22 +28,24 @@ useJsonLd(() => ({
 <template>
   <div>
     <PageTitle :title="e.title" :subtitle="e.category?.name" />
-    <article class="mx-auto max-w-2xl px-4 py-10">
-      <dl class="space-y-4 rounded-lg border border-gold/30 bg-white p-6 shadow-sm">
-        <div>
-          <dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Quand</dt>
-          <dd class="mt-1">{{ when }}</dd>
+    <article class="mx-auto max-w-3xl px-4 py-12">
+      <div class="card overflow-hidden">
+        <dl class="grid divide-y divide-gold/20 bg-cream-dark sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <div class="flex gap-4 p-6">
+            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-navy text-xl text-gold-light"><Icon name="calendar" /></span>
+            <div><dt class="eyebrow">Quand</dt><dd class="mt-1 font-semibold text-navy first-letter:uppercase">{{ when }}</dd></div>
+          </div>
+          <div v-if="e.location" class="flex gap-4 p-6">
+            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-navy text-xl text-gold-light"><Icon name="pin" /></span>
+            <div><dt class="eyebrow">Où</dt><dd class="mt-1 font-semibold text-navy">{{ e.location }}</dd></div>
+          </div>
+        </dl>
+        <div v-if="e.description" class="p-6 md:p-8">
+          <h2 class="font-serif text-xl font-bold text-navy">Détails</h2>
+          <p class="mt-3 whitespace-pre-line text-lg leading-relaxed text-slate-700">{{ e.description }}</p>
         </div>
-        <div v-if="e.location">
-          <dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Où</dt>
-          <dd class="mt-1">{{ e.location }}</dd>
-        </div>
-        <div v-if="e.description">
-          <dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Détails</dt>
-          <dd class="mt-1 whitespace-pre-line">{{ e.description }}</dd>
-        </div>
-      </dl>
-      <NuxtLink to="/agenda" class="mt-6 inline-block text-sm text-navy underline">← Retour à l'agenda</NuxtLink>
+      </div>
+      <NuxtLink to="/agenda" class="link-arrow mt-8"><Icon name="chevron-left" />Retour à l'agenda</NuxtLink>
     </article>
   </div>
 </template>

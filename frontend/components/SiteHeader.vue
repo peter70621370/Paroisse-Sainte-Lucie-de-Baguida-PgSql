@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { name, tagline, logo } = await useSite();
+const { s, name, tagline, customLogo, social } = await useSite();
 const route = useRoute();
 const mobileOpen = ref(false);
 const hoverOpened = ref(false);
@@ -19,60 +19,86 @@ function onClick(label: string) {
 
 const isActive = (item: NavItem) =>
   item.to ? (item.to === '/' ? route.path === '/' : route.path.startsWith(item.to)) : item.children?.some((c) => route.path.startsWith(c.to));
+
+// « Paroisse Sainte Lucie de Baguida » → sur-titre « Paroisse », nom « Sainte Lucie », lieu « de Baguida »
+const parts = computed(() => {
+  const m = name.value.match(/^(Paroisse)\s+(.+?)\s+(d[eu']\s?.+)$/i);
+  return m ? { over: m[1], main: m[2], under: m[3] } : { over: '', main: name.value, under: '' };
+});
+const linkCls = 'block px-3.5 py-3.5 text-[0.82rem] font-semibold uppercase tracking-wider text-white transition hover:text-gold-light';
 </script>
 
 <template>
-  <header class="border-b border-gold/30 bg-cream">
-    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-      <NuxtLink to="/" class="flex items-center gap-3" :aria-label="`${name} – accueil`">
-        <img :src="logo" width="224" height="56" :alt="`Logo ${name}`" class="h-14 w-auto max-w-[260px] object-contain md:h-16" />
-      </NuxtLink>
-      <p v-if="tagline" class="hidden font-serif text-sm italic text-navy/70 lg:block">{{ tagline }}</p>
-      <button
-        class="rounded border border-navy/40 px-3 py-2 text-sm text-navy lg:hidden"
-        :aria-expanded="mobileOpen"
-        aria-controls="main-nav"
-        @click="mobileOpen = !mobileOpen"
-      >
-        {{ mobileOpen ? 'Fermer' : 'Menu' }}
-      </button>
+  <!-- Bandeau d'informations pratiques (ordinateur) -->
+  <div class="hidden bg-navy-deep text-sm text-white/85 md:block">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-2">
+      <p class="flex min-w-0 items-center gap-5">
+        <span v-if="s['site.address']" class="flex min-w-0 items-center gap-1.5"><Icon name="pin" class="text-gold-light" /><span class="truncate">{{ s['site.address'] }}</span></span>
+        <a v-if="s['site.phone']" :href="`tel:${s['site.phone'].replace(/\s/g, '')}`" class="flex shrink-0 items-center gap-1.5 hover:text-gold-light"><Icon name="phone" class="text-gold-light" />{{ s['site.phone'] }}</a>
+        <span v-if="!s['site.address'] && !s['site.phone'] && tagline" class="italic">{{ tagline }}</span>
+      </p>
+      <p class="flex shrink-0 items-center gap-4">
+        <NuxtLink to="/direct" class="flex items-center gap-1.5 hover:text-gold-light"><Icon name="video" class="text-gold-light" />Messe en direct</NuxtLink>
+        <a v-for="[icon, label, url] in social" :key="label" :href="url" target="_blank" rel="noopener noreferrer" :aria-label="label" class="hover:text-gold-light"><Icon :name="icon" /></a>
+      </p>
     </div>
+  </div>
 
-    <nav id="main-nav" aria-label="Navigation principale" :class="[mobileOpen ? 'block' : 'hidden', 'bg-navy lg:block']">
-      <ul class="mx-auto flex max-w-6xl flex-col px-2 lg:flex-row lg:flex-wrap lg:justify-center lg:px-4">
-        <li
-          v-for="item in NAV"
-          :key="item.label"
-          class="group relative"
-          @mouseleave="onLeave"
+  <header class="border-b border-gold/25 bg-cream">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:py-4">
+      <NuxtLink to="/" class="flex min-w-0 items-center gap-3" :aria-label="`${name} – accueil`">
+        <img v-if="customLogo" :src="customLogo" width="224" height="56" :alt="`Logo ${name}`" class="h-14 w-auto max-w-[260px] object-contain md:h-16" />
+        <template v-else>
+          <img :src="PLACEHOLDERS.emblem" width="60" height="60" alt="" class="h-12 w-12 shrink-0 md:h-[60px] md:w-[60px]" />
+          <span class="min-w-0 leading-none">
+            <span v-if="parts.over" class="block text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-gold-dark md:text-xs">{{ parts.over }}</span>
+            <span class="mt-1 block truncate font-serif text-xl font-bold text-navy md:text-[1.7rem]">{{ parts.main }}</span>
+            <span v-if="parts.under" class="mt-1 block text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-navy/75 md:text-xs">{{ parts.under }}</span>
+          </span>
+        </template>
+      </NuxtLink>
+
+      <div class="flex shrink-0 items-center gap-3">
+        <NuxtLink to="/horaires" class="btn btn-sm btn-outline hidden lg:inline-flex"><Icon name="clock" />Horaires des messes</NuxtLink>
+        <NuxtLink to="/dons" class="btn btn-sm btn-gold hidden sm:inline-flex"><Icon name="heart" />Faire un don</NuxtLink>
+        <button
+          class="flex items-center gap-2 rounded-full border border-navy/40 px-4 py-2 text-sm font-semibold text-navy lg:hidden"
+          :aria-expanded="mobileOpen"
+          aria-controls="main-nav"
+          @click="mobileOpen = !mobileOpen"
         >
-          <NuxtLink
-            v-if="item.to"
-            :to="item.to"
-            :class="['block px-4 py-3 text-sm font-medium tracking-wide text-white hover:text-gold-light', isActive(item) ? 'text-gold-light lg:border-b-2 lg:border-gold' : '']"
-          >
-            {{ item.label }}
-          </NuxtLink>
-          <template v-else>
-            <button
-              :class="['flex w-full items-center gap-1 px-4 py-3 text-left text-sm font-medium tracking-wide text-white hover:text-gold-light', isActive(item) ? 'text-gold-light lg:border-b-2 lg:border-gold' : '']"
-              :aria-expanded="openMenu === item.label"
-              @click="onClick(item.label)"
-              @mouseenter="onEnter(item.label)"
-            >
-              {{ item.label }} <span aria-hidden="true" class="text-xs">▾</span>
-            </button>
-            <ul
-              v-show="openMenu === item.label"
-              class="bg-navy-dark lg:absolute lg:left-0 lg:top-full lg:z-30 lg:min-w-[14rem] lg:rounded-b lg:shadow-lg"
-            >
-              <li v-for="c in item.children" :key="c.to">
-                <NuxtLink :to="c.to" class="block px-6 py-2.5 text-sm text-white/90 hover:bg-white/10 hover:text-gold-light lg:px-4">{{ c.label }}</NuxtLink>
-              </li>
-            </ul>
-          </template>
-        </li>
-      </ul>
-    </nav>
+          <Icon :name="mobileOpen ? 'close' : 'menu'" />{{ mobileOpen ? 'Fermer' : 'Menu' }}
+        </button>
+      </div>
+    </div>
   </header>
+
+  <nav id="main-nav" aria-label="Navigation principale" :class="[mobileOpen ? 'block' : 'hidden', 'z-30 bg-navy shadow-md lg:sticky lg:top-0 lg:block']">
+    <ul class="mx-auto flex max-w-6xl flex-col px-2 py-2 lg:flex-row lg:flex-wrap lg:justify-center lg:px-4 lg:py-0">
+      <li v-for="item in NAV" :key="item.label" class="group relative" @mouseleave="onLeave">
+        <NuxtLink v-if="item.to" :to="item.to" :class="[linkCls, isActive(item) ? '!text-gold-light lg:shadow-[inset_0_-3px_0_theme(colors.gold.DEFAULT)]' : '']">
+          {{ item.label }}
+        </NuxtLink>
+        <template v-else>
+          <button
+            :class="[linkCls, 'flex w-full items-center gap-1 text-left', isActive(item) ? '!text-gold-light lg:shadow-[inset_0_-3px_0_theme(colors.gold.DEFAULT)]' : '']"
+            :aria-expanded="openMenu === item.label"
+            @click="onClick(item.label)"
+            @mouseenter="onEnter(item.label)"
+          >
+            {{ item.label }} <Icon name="chevron-down" :class="['!h-3.5 !w-3.5 transition', openMenu === item.label ? 'rotate-180' : '']" />
+          </button>
+          <ul
+            v-show="openMenu === item.label"
+            class="rounded-lg bg-navy-dark py-1 lg:absolute lg:left-0 lg:top-full lg:z-30 lg:min-w-[16rem] lg:rounded-b-xl lg:rounded-t-none lg:border-t-[3px] lg:border-gold lg:bg-white lg:py-2 lg:shadow-lift"
+          >
+            <li v-for="c in item.children" :key="c.to">
+              <NuxtLink :to="c.to" class="block px-6 py-2.5 text-[0.95rem] text-white/90 hover:bg-white/10 hover:text-gold-light lg:px-5 lg:text-navy lg:hover:bg-cream lg:hover:text-gold-dark">{{ c.label }}</NuxtLink>
+            </li>
+          </ul>
+        </template>
+      </li>
+      <li class="px-3 py-3 sm:hidden"><NuxtLink to="/dons" class="btn btn-sm btn-gold w-full"><Icon name="heart" />Faire un don</NuxtLink></li>
+    </ul>
+  </nav>
 </template>

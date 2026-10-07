@@ -3,6 +3,7 @@ export type SiteSettings = Record<string, string>;
 
 export const PLACEHOLDERS = {
   logo: '/placeholders/logo.svg',
+  emblem: '/placeholders/emblem.svg',
   hero: '/placeholders/hero.webp',
   photo: '/placeholders/photo.svg',
   avatar: '/placeholders/avatar.svg',
@@ -17,6 +18,17 @@ export const useSite = async () => {
     name: computed(() => s.value['site.name'] || 'Paroisse Sainte Lucie de Baguida'),
     tagline: computed(() => s.value['site.tagline'] || ''),
     logo: computed(() => s.value['site.logo'] || PLACEHOLDERS.logo),
+    /** Logo téléversé par la paroisse (sinon : emblème provisoire + nom en toutes lettres). */
+    customLogo: computed(() => s.value['site.logo'] || ''),
+    hours: computed(() => (s.value['site.hours'] || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean)),
+    social: computed(() => {
+      const all: ['facebook' | 'youtube' | 'whatsapp', string, string | undefined][] = [
+        ['facebook', 'Facebook', s.value['social.facebook']],
+        ['youtube', 'YouTube', s.value['social.youtube']],
+        ['whatsapp', 'WhatsApp', s.value['social.whatsapp']],
+      ];
+      return all.filter((x): x is ['facebook' | 'youtube' | 'whatsapp', string, string] => !!x[2]);
+    }),
     hero: computed(() => s.value['home.heroImage'] || PLACEHOLDERS.hero),
   };
 };

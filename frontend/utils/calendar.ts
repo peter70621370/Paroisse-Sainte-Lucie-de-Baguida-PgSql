@@ -7,7 +7,7 @@ const timeFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: PARISH_TZ, hour: '2
 /** Jour (AAAA-MM-JJ) d'un instant, à l'heure de la paroisse. */
 export const dayKey = (iso: string | Date) => dayFmt.format(new Date(iso));
 /** « 18h30 » */
-export const timeLabel = (iso: string | Date) => timeFmt.format(new Date(iso)).replace(':', 'h');
+export const timeLabel = (iso: string | Date) => timeFmt.format(new Date(iso)).replace(':', 'h').replace(/^0/, '');
 export const todayKey = () => dayKey(new Date());
 
 const utcDate = (key: string) => new Date(`${key}T00:00:00Z`);

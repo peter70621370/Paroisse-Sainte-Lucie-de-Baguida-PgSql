@@ -10,7 +10,7 @@ dist/
 .vscode/
 .idea/
 coverage/
-uploads/
+/backend/uploads/
 
 # Tests de bout en bout
 e2e/node_modules/
