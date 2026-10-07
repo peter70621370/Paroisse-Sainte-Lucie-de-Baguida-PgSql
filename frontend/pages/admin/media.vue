@@ -80,29 +80,29 @@ const size = (n: number) => (n > 1048576 ? (n / 1048576).toFixed(1) + ' Mo' : Ma
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-[#1F3A5F]">Médiathèque</h1>
+    <h1 class="font-serif text-3xl font-bold text-navy">Médiathèque</h1>
     <p class="mt-1 text-sm text-slate-600">Images (JPG, PNG, WebP, GIF : redimensionnées et optimisées automatiquement) et PDF. 10 Mo maximum par fichier.</p>
 
     <div class="mt-4 flex flex-wrap items-center gap-3">
-      <label class="cursor-pointer rounded bg-[#1F3A5F] px-4 py-2 text-sm text-white">
+      <label class="btn btn-sm btn-navy cursor-pointer">
         {{ uploading ? 'Envoi…' : 'Ajouter des fichiers' }}
         <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" class="hidden" :disabled="uploading" @change="upload" />
       </label>
-      <select v-model="type" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1">
+      <select v-model="type" class="field !w-auto text-sm" @change="page = 1">
         <option value="">Tous les types</option>
         <option value="image">Images</option>
         <option value="pdf">PDF</option>
       </select>
-      <input v-model.lazy="q" placeholder="Rechercher un nom…" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1" />
+      <input v-model.lazy="q" placeholder="Rechercher un nom…" class="field !w-auto text-sm" @change="page = 1" />
     </div>
 
-    <p v-if="err" class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
-    <p v-if="msg" class="mt-4 rounded bg-green-50 px-3 py-2 text-sm text-green-800" role="status">{{ msg }}</p>
+    <p v-if="err" class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
+    <p v-if="msg" class="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800" role="status">{{ msg }}</p>
 
     <p v-if="!data?.items.length" class="mt-8 text-slate-600">Aucun fichier.</p>
 
     <ul class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-      <li v-for="m in data?.items" :key="m.id" class="overflow-hidden rounded-xl bg-white shadow">
+      <li v-for="m in data?.items" :key="m.id" class="overflow-hidden card">
         <a :href="m.url" target="_blank" rel="noopener" class="flex h-32 items-center justify-center bg-slate-100">
           <img v-if="m.thumbUrl" :src="m.thumbUrl" :alt="m.alt ?? m.filename" class="h-full w-full object-cover" loading="lazy" />
           <span v-else class="rounded bg-red-100 px-3 py-1 text-sm font-semibold text-red-700">PDF</span>
@@ -110,7 +110,7 @@ const size = (n: number) => (n > 1048576 ? (n / 1048576).toFixed(1) + ' Mo' : Ma
         <div class="space-y-1 p-3 text-xs">
           <p class="truncate font-medium" :title="m.filename">{{ m.filename }}</p>
           <p class="text-slate-600">{{ size(m.size) }}</p>
-          <div class="flex flex-wrap gap-x-3 pt-1 text-[#1F3A5F]">
+          <div class="flex flex-wrap gap-x-3 pt-1 text-navy">
             <button class="underline" @click="copy(m)">Copier le lien</button>
             <button v-if="canManage && m.thumbUrl" class="underline" @click="editAlt(m)">Texte alt</button>
             <button v-if="canManage" class="text-red-700 underline" @click="remove(m)">Supprimer</button>
@@ -120,9 +120,9 @@ const size = (n: number) => (n > 1048576 ? (n / 1048576).toFixed(1) + ' Mo' : Ma
     </ul>
 
     <div v-if="pages > 1" class="mt-6 flex items-center gap-3 text-sm">
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
       <span>Page {{ page }} / {{ pages }}</span>
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
     </div>
   </div>
 </template>

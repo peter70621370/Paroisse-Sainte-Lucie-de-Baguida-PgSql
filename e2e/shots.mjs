@@ -11,6 +11,14 @@ const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: mobile ? { width: 390, height: 844 } : { width: 1280, height: 900 }, deviceScaleFactor: 1 });
 await ctx.addInitScript(() => localStorage.setItem('consent-analytics', 'denied'));
 const page = await ctx.newPage();
+// Pages d'administration : connexion préalable avec le compte du fichier .env
+if (paths.some((p) => p.startsWith('/admin') && p !== '/admin/login')) {
+  await page.goto(base + '/admin/login', { waitUntil: 'networkidle' });
+  await page.getByLabel('E-mail').fill(process.env.ADMIN_EMAIL);
+  await page.getByLabel('Mot de passe').fill(process.env.ADMIN_PASSWORD);
+  await page.getByRole('button', { name: 'Se connecter' }).click();
+  await page.waitForURL('**/admin');
+}
 for (const p of paths) {
   await page.goto(base + p, { waitUntil: 'networkidle' });
   // Déclenche le chargement des images « lazy »

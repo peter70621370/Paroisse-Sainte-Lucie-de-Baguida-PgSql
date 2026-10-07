@@ -56,30 +56,30 @@ async function remove() {
 <template>
   <div class="max-w-2xl">
     <NuxtLink to="/admin/campaigns" class="text-sm text-navy underline">← Campagnes</NuxtLink>
-    <h1 class="mt-1 text-2xl font-bold text-navy">{{ isNew ? 'Nouvelle campagne' : 'Modifier la campagne' }}</h1>
+    <h1 class="mt-1 font-serif text-3xl font-bold text-navy">{{ isNew ? 'Nouvelle campagne' : 'Modifier la campagne' }}</h1>
 
     <form class="mt-6 space-y-4" @submit.prevent="save">
-      <label class="block text-sm"><span class="mb-1 block font-medium">Titre</span><input v-model="form.title" required maxlength="255" placeholder="Construction de la chapelle" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
-      <label class="block text-sm"><span class="mb-1 block font-medium">Identifiant (adresse)</span><input v-model="form.slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="w-full rounded border border-slate-300 px-3 py-2" @input="slugTouched = true" /></label>
-      <label class="block text-sm"><span class="mb-1 block font-medium">Présentation</span><textarea v-model="form.description" rows="4" maxlength="5000" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
+      <label class="block text-sm"><span class="mb-1.5 block font-semibold text-navy">Titre</span><input v-model="form.title" required maxlength="255" placeholder="Construction de la chapelle" class="field" /></label>
+      <label class="block text-sm"><span class="mb-1.5 block font-semibold text-navy">Identifiant (adresse)</span><input v-model="form.slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="field" @input="slugTouched = true" /></label>
+      <label class="block text-sm"><span class="mb-1.5 block font-semibold text-navy">Présentation</span><textarea v-model="form.description" rows="4" maxlength="5000" class="field" /></label>
       <div class="grid gap-3 sm:grid-cols-3">
-        <label class="text-sm"><span class="mb-1 block font-medium">Objectif (FCFA)</span><input v-model.number="form.goalAmount" type="number" min="1" placeholder="Facultatif" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
-        <label class="text-sm"><span class="mb-1 block font-medium">Début (facultatif)</span><input v-model="form.startsAt" type="datetime-local" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
-        <label class="text-sm"><span class="mb-1 block font-medium">Fin (facultatif)</span><input v-model="form.endsAt" type="datetime-local" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
+        <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Objectif (FCFA)</span><input v-model.number="form.goalAmount" type="number" min="1" placeholder="Facultatif" class="field" /></label>
+        <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Début (facultatif)</span><input v-model="form.startsAt" type="datetime-local" class="field" /></label>
+        <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Fin (facultatif)</span><input v-model="form.endsAt" type="datetime-local" class="field" /></label>
       </div>
       <label class="block max-w-xs text-sm">
-        <span class="mb-1 block font-medium">Statut</span>
-        <select v-model="form.status" class="w-full rounded border border-slate-300 px-3 py-2">
+        <span class="mb-1.5 block font-semibold text-navy">Statut</span>
+        <select v-model="form.status" class="field">
           <option value="DRAFT">Brouillon (non visible)</option>
           <option v-if="canPublish" value="PUBLISHED">Publiée</option>
         </select>
       </label>
       <p class="text-xs text-slate-600">La progression est calculée à partir des dons réussis. Les dons PayPal (euros) sont convertis à la parité fixe 1 € = 655,957 FCFA.</p>
 
-      <p v-if="err" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
-      <p v-if="msg" class="rounded bg-green-50 px-3 py-2 text-sm text-green-800" role="status">{{ msg }}</p>
+      <p v-if="err" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
+      <p v-if="msg" class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800" role="status">{{ msg }}</p>
       <div class="flex items-center gap-3">
-        <button :disabled="saving" class="rounded bg-navy px-5 py-2 text-white disabled:opacity-60">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
+        <button :disabled="saving" class="btn btn-sm btn-navy disabled:opacity-60">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
         <button v-if="id && canPublish" type="button" class="text-sm text-red-700 underline" @click="remove">Supprimer</button>
       </div>
     </form>

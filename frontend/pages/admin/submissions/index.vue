@@ -41,34 +41,34 @@ async function mark(s: S, to: S['status']) {
 <template>
   <div>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h1 class="text-2xl font-bold text-navy">Demandes reçues</h1>
-      <a :href="exportUrl" class="rounded border border-navy px-4 py-2 text-sm text-navy hover:bg-navy hover:text-white" download>Exporter en CSV</a>
+      <h1 class="font-serif text-3xl font-bold text-navy">Demandes reçues</h1>
+      <a :href="exportUrl" class="btn btn-sm btn-outline" download>Exporter en CSV</a>
     </div>
     <p class="mt-1 text-sm text-slate-600">Messages, adhésions, inscriptions, demandes de sacrements et intentions de messe envoyés depuis le site. Données personnelles : à traiter avec discrétion.</p>
 
     <div class="mt-4 flex flex-wrap gap-3">
-      <select v-model="status" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1">
+      <select v-model="status" class="field !w-auto text-sm" @change="page = 1">
         <option value="">Tous les statuts</option>
         <option value="NEW">Nouvelles</option>
         <option value="PROCESSED">Traitées</option>
         <option value="ARCHIVED">Archivées</option>
       </select>
-      <select v-model="type" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1">
+      <select v-model="type" class="field !w-auto text-sm" @change="page = 1">
         <option value="">Tous les types</option>
         <option v-for="[v, l] in types" :key="v" :value="v">{{ l }}</option>
       </select>
-      <input v-model.lazy="q" placeholder="Nom, e-mail, téléphone…" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1" />
+      <input v-model.lazy="q" placeholder="Nom, e-mail, téléphone…" class="field !w-auto text-sm" @change="page = 1" />
     </div>
 
-    <p v-if="err" class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
+    <p v-if="err" class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
 
-    <div class="mt-4 overflow-x-auto rounded-xl bg-white shadow">
+    <div class="mt-4 card overflow-x-auto">
       <table class="w-full text-left text-sm">
-        <thead class="border-b bg-slate-50 text-slate-600">
+        <thead class="border-b border-gold/20 bg-cream-dark/60 text-xs uppercase tracking-wider text-slate-600">
           <tr><th class="px-4 py-3">Reçue le</th><th class="px-4 py-3">Type</th><th class="px-4 py-3">Nom</th><th class="px-4 py-3">Contact</th><th class="px-4 py-3">Statut</th><th class="px-4 py-3"></th></tr>
         </thead>
         <tbody>
-          <tr v-for="s in data?.items" :key="s.id" class="border-b last:border-0">
+          <tr v-for="s in data?.items" :key="s.id" class="border-b border-slate-100 transition last:border-0 hover:bg-cream/60">
             <td class="whitespace-nowrap px-4 py-3">{{ fmt(s.createdAt) }}</td>
             <td class="px-4 py-3">{{ s.typeLabel }}</td>
             <td class="px-4 py-3 font-medium"><NuxtLink :to="`/admin/submissions/${s.id}`" class="text-navy hover:underline">{{ s.fullName }}</NuxtLink></td>
@@ -85,9 +85,9 @@ async function mark(s: S, to: S['status']) {
     </div>
 
     <div v-if="pages > 1" class="mt-4 flex items-center gap-3 text-sm">
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
       <span>Page {{ page }} / {{ pages }}</span>
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
     </div>
   </div>
 </template>

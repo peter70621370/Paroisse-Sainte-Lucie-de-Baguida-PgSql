@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { s, name, tagline, customLogo, social } = await useSite();
+const { name, customLogo } = await useSite();
 const route = useRoute();
 const mobileOpen = ref(false);
 const hoverOpened = ref(false);
@@ -29,21 +29,6 @@ const linkCls = 'block px-3.5 py-3.5 text-[0.82rem] font-semibold uppercase trac
 </script>
 
 <template>
-  <!-- Bandeau d'informations pratiques (ordinateur) -->
-  <div class="hidden bg-navy-deep text-sm text-white/85 md:block">
-    <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-2">
-      <p class="flex min-w-0 items-center gap-5">
-        <span v-if="s['site.address']" class="flex min-w-0 items-center gap-1.5"><Icon name="pin" class="text-gold-light" /><span class="truncate">{{ s['site.address'] }}</span></span>
-        <a v-if="s['site.phone']" :href="`tel:${s['site.phone'].replace(/\s/g, '')}`" class="flex shrink-0 items-center gap-1.5 hover:text-gold-light"><Icon name="phone" class="text-gold-light" />{{ s['site.phone'] }}</a>
-        <span v-if="!s['site.address'] && !s['site.phone'] && tagline" class="italic">{{ tagline }}</span>
-      </p>
-      <p class="flex shrink-0 items-center gap-4">
-        <NuxtLink to="/direct" class="flex items-center gap-1.5 hover:text-gold-light"><Icon name="video" class="text-gold-light" />Messe en direct</NuxtLink>
-        <a v-for="[icon, label, url] in social" :key="label" :href="url" target="_blank" rel="noopener noreferrer" :aria-label="label" class="hover:text-gold-light"><Icon :name="icon" /></a>
-      </p>
-    </div>
-  </div>
-
   <header class="border-b border-gold/25 bg-cream">
     <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 md:py-4">
       <NuxtLink to="/" class="flex min-w-0 items-center gap-3" :aria-label="`${name} – accueil`">
@@ -61,6 +46,7 @@ const linkCls = 'block px-3.5 py-3.5 text-[0.82rem] font-semibold uppercase trac
       <div class="flex shrink-0 items-center gap-3">
         <NuxtLink to="/horaires" class="btn btn-sm btn-outline hidden lg:inline-flex"><Icon name="clock" />Horaires des messes</NuxtLink>
         <NuxtLink to="/dons" class="btn btn-sm btn-gold hidden sm:inline-flex"><Icon name="heart" />Faire un don</NuxtLink>
+        <NuxtLink to="/direct" class="btn btn-sm btn-outline hidden lg:inline-flex"><Icon name="video" />Messe en direct</NuxtLink>
         <button
           class="flex items-center gap-2 rounded-full border border-navy/40 px-4 py-2 text-sm font-semibold text-navy lg:hidden"
           :aria-expanded="mobileOpen"

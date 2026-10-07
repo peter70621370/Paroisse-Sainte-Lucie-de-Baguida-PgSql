@@ -43,24 +43,24 @@ function state(r: Row) {
 <template>
   <div>
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-[#1F3A5F]">{{ title }}</h1>
-      <NuxtLink :to="`${route}/new`" class="rounded bg-[#1F3A5F] px-4 py-2 text-sm text-white">{{ newLabel }}</NuxtLink>
+      <h1 class="font-serif text-3xl font-bold text-navy">{{ title }}</h1>
+      <NuxtLink :to="`${route}/new`" class="btn btn-sm btn-navy">{{ newLabel }}</NuxtLink>
     </div>
 
     <div class="mt-4 flex flex-wrap gap-3">
-      <select v-model="status" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1">
+      <select v-model="status" class="field !w-auto text-sm" @change="page = 1">
         <option value="">Tous les statuts</option>
         <option value="DRAFT">Brouillons</option>
         <option value="PUBLISHED">Publiés</option>
       </select>
-      <input v-model.lazy="q" placeholder="Rechercher un titre…" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1" />
+      <input v-model.lazy="q" placeholder="Rechercher un titre…" class="field !w-auto text-sm" @change="page = 1" />
     </div>
 
-    <p v-if="err" class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
+    <p v-if="err" class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
 
-    <div class="mt-4 overflow-x-auto rounded-xl bg-white shadow">
+    <div class="mt-4 card overflow-x-auto">
       <table class="w-full text-left text-sm">
-        <thead class="border-b bg-slate-50 text-slate-600">
+        <thead class="border-b border-gold/20 bg-cream-dark/60 text-xs uppercase tracking-wider text-slate-600">
           <tr>
             <th class="px-4 py-3">Titre</th>
             <th v-if="extraLabel" class="px-4 py-3">{{ extraLabel }}</th>
@@ -70,15 +70,15 @@ function state(r: Row) {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="r in data?.items" :key="r.id" class="border-b last:border-0">
+          <tr v-for="r in data?.items" :key="r.id" class="border-b border-slate-100 transition last:border-0 hover:bg-cream/60">
             <td class="px-4 py-3 font-medium">
-              <NuxtLink :to="`${route}/${r.id}`" class="text-[#1F3A5F] hover:underline">{{ r.title }}</NuxtLink>
+              <NuxtLink :to="`${route}/${r.id}`" class="text-navy hover:underline">{{ r.title }}</NuxtLink>
             </td>
             <td v-if="extraLabel" class="px-4 py-3 text-slate-600">{{ extra?.(r) }}</td>
             <td class="px-4 py-3"><span :class="['rounded-full px-2 py-0.5 text-xs', state(r).cls]">{{ state(r).label }}</span></td>
             <td class="px-4 py-3 text-slate-600">{{ fmtDate(r.updatedAt) }}</td>
             <td class="whitespace-nowrap px-4 py-3 text-right">
-              <NuxtLink :to="`${route}/${r.id}`" class="mr-3 text-[#1F3A5F] underline">Modifier</NuxtLink>
+              <NuxtLink :to="`${route}/${r.id}`" class="mr-3 text-navy underline">Modifier</NuxtLink>
               <button v-if="canDelete" class="text-red-700 underline" @click="remove(r)">Supprimer</button>
             </td>
           </tr>
@@ -88,9 +88,9 @@ function state(r: Row) {
     </div>
 
     <div v-if="pages > 1" class="mt-4 flex items-center gap-3 text-sm">
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
       <span>Page {{ page }} / {{ pages }}</span>
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
     </div>
   </div>
 </template>

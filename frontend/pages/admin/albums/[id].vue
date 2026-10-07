@@ -93,34 +93,34 @@ async function move(i: number, d: number) {
 <template>
   <div class="max-w-4xl">
     <NuxtLink to="/admin/albums" class="text-sm text-navy underline">← Albums</NuxtLink>
-    <h1 class="mt-1 text-2xl font-bold text-navy">{{ isNew ? 'Nouvel album' : 'Modifier l\'album' }}</h1>
+    <h1 class="mt-1 font-serif text-3xl font-bold text-navy">{{ isNew ? 'Nouvel album' : 'Modifier l\'album' }}</h1>
 
     <form class="mt-6 space-y-4" @submit.prevent="save">
-      <label class="block text-sm"><span class="mb-1 block font-medium">Titre</span><input v-model="form.title" required maxlength="255" placeholder="Fête patronale 2026" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
+      <label class="block text-sm"><span class="mb-1.5 block font-semibold text-navy">Titre</span><input v-model="form.title" required maxlength="255" placeholder="Fête patronale 2026" class="field" /></label>
       <div class="grid gap-3 sm:grid-cols-2">
-        <label class="text-sm"><span class="mb-1 block font-medium">Adresse (slug)</span><input v-model="form.slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="w-full rounded border border-slate-300 px-3 py-2" @input="slugTouched = true" /></label>
-        <label class="text-sm"><span class="mb-1 block font-medium">Date (facultatif)</span><input v-model="form.date" type="date" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
+        <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Adresse (slug)</span><input v-model="form.slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="field" @input="slugTouched = true" /></label>
+        <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Date (facultatif)</span><input v-model="form.date" type="date" class="field" /></label>
       </div>
-      <label class="block text-sm"><span class="mb-1 block font-medium">Description (facultatif)</span><textarea v-model="form.description" rows="3" maxlength="5000" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
+      <label class="block text-sm"><span class="mb-1.5 block font-semibold text-navy">Description (facultatif)</span><textarea v-model="form.description" rows="3" maxlength="5000" class="field" /></label>
 
       <div class="text-sm">
-        <span class="mb-1 block font-medium">Image de couverture (facultatif : sinon la première photo)</span>
+        <span class="mb-1.5 block font-semibold text-navy">Image de couverture (facultatif : sinon la première photo)</span>
         <div class="flex items-center gap-3">
           <img v-if="form.coverUrl" :src="form.coverUrl" alt="" class="h-16 w-24 rounded object-cover" />
-          <button type="button" class="rounded border border-slate-300 px-3 py-2" @click="picker = 'cover'">{{ form.coverId ? 'Changer' : 'Choisir' }}</button>
+          <button type="button" class="field !w-auto" @click="picker = 'cover'">{{ form.coverId ? 'Changer' : 'Choisir' }}</button>
           <button v-if="form.coverId" type="button" class="text-slate-600 underline" @click="form.coverId = null; form.coverUrl = ''">Retirer</button>
         </div>
       </div>
 
       <label class="block max-w-xs text-sm">
-        <span class="mb-1 block font-medium">Statut</span>
-        <select v-model="form.status" class="w-full rounded border border-slate-300 px-3 py-2"><option value="DRAFT">Brouillon (non visible)</option><option v-if="canPublish" value="PUBLISHED">Publié</option></select>
+        <span class="mb-1.5 block font-semibold text-navy">Statut</span>
+        <select v-model="form.status" class="field"><option value="DRAFT">Brouillon (non visible)</option><option v-if="canPublish" value="PUBLISHED">Publié</option></select>
       </label>
 
-      <p v-if="err" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
-      <p v-if="msg" class="rounded bg-green-50 px-3 py-2 text-sm text-green-800" role="status">{{ msg }}</p>
+      <p v-if="err" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
+      <p v-if="msg" class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800" role="status">{{ msg }}</p>
       <div class="flex items-center gap-3">
-        <button :disabled="saving" class="rounded bg-navy px-5 py-2 text-white disabled:opacity-60">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
+        <button :disabled="saving" class="btn btn-sm btn-navy disabled:opacity-60">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
         <button v-if="id && canPublish" type="button" class="text-sm text-red-700 underline" @click="remove">Supprimer</button>
       </div>
     </form>
@@ -129,21 +129,21 @@ async function move(i: number, d: number) {
       <h2 class="text-xl font-bold text-navy">Photos et vidéos ({{ items.length }})</h2>
       <p v-if="!canEditItems" class="mt-1 text-sm text-slate-600">Seuls les éditeurs et administrateurs peuvent modifier le contenu de l'album.</p>
       <template v-else>
-        <div class="mt-3 flex flex-wrap items-end gap-4 rounded-xl bg-white p-4 shadow">
-          <button type="button" class="rounded bg-navy px-4 py-2 text-sm text-white" @click="picker = 'item'">+ Ajouter une photo</button>
+        <div class="mt-3 flex flex-wrap items-end gap-4 card p-5">
+          <button type="button" class="btn btn-sm btn-navy" @click="picker = 'item'">+ Ajouter une photo</button>
           <div class="flex flex-wrap items-end gap-2">
-            <label class="text-sm"><span class="mb-1 block font-medium">Vidéo (lien YouTube / Facebook)</span><input v-model="video.url" type="url" placeholder="https://…" class="w-64 rounded border border-slate-300 px-3 py-2" /></label>
-            <label class="text-sm"><span class="mb-1 block font-medium">Légende</span><input v-model="video.caption" maxlength="255" class="w-48 rounded border border-slate-300 px-3 py-2" /></label>
-            <button type="button" :disabled="!video.url" class="rounded border border-navy px-4 py-2 text-sm text-navy hover:bg-navy hover:text-white disabled:opacity-50" @click="addVideo">+ Ajouter la vidéo</button>
+            <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Vidéo (lien YouTube / Facebook)</span><input v-model="video.url" type="url" placeholder="https://…" class="field !w-64" /></label>
+            <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Légende</span><input v-model="video.caption" maxlength="255" class="field !w-48" /></label>
+            <button type="button" :disabled="!video.url" class="btn btn-sm btn-outline disabled:opacity-50" @click="addVideo">+ Ajouter la vidéo</button>
           </div>
         </div>
 
         <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <li v-for="(it, i) in items" :key="it.id" class="overflow-hidden rounded-xl bg-white shadow">
+          <li v-for="(it, i) in items" :key="it.id" class="overflow-hidden card">
             <img v-if="it.type === 'image'" :src="it.thumbUrl || it.url!" alt="" class="aspect-[4/3] w-full object-cover" />
             <div v-else class="flex aspect-[4/3] w-full flex-col items-center justify-center bg-navy-dark text-white"><span class="text-3xl" aria-hidden="true">▶</span><span class="mt-1 max-w-full truncate px-3 text-xs">{{ it.videoUrl }}</span></div>
             <div class="space-y-2 p-3">
-              <input v-model="it.caption" maxlength="255" placeholder="Légende" aria-label="Légende" class="w-full rounded border border-slate-300 px-2 py-1 text-sm" @change="saveCaption(it)" />
+              <input v-model="it.caption" maxlength="255" placeholder="Légende" aria-label="Légende" class="field !px-2.5 !py-1.5 text-sm" @change="saveCaption(it)" />
               <div class="flex items-center justify-between text-sm">
                 <span><button type="button" class="mr-1 rounded border px-2 py-0.5 disabled:opacity-30" :disabled="i === 0" aria-label="Monter" @click="move(i, -1)">↑</button><button type="button" class="rounded border px-2 py-0.5 disabled:opacity-30" :disabled="i === items.length - 1" aria-label="Descendre" @click="move(i, 1)">↓</button></span>
                 <button type="button" class="text-red-700 underline" @click="removeItem(it)">Retirer</button>

@@ -45,7 +45,7 @@ const btn = (active: boolean) =>
 </script>
 
 <template>
-  <div class="overflow-hidden rounded border border-slate-300 bg-white">
+  <div class="overflow-hidden rounded-lg border border-slate-300 bg-white">
     <div v-if="editor" class="flex flex-wrap gap-1 border-b border-slate-200 bg-slate-50 p-1.5" role="toolbar" aria-label="Mise en forme">
       <button type="button" :class="btn(editor.isActive('bold'))" title="Gras" @click="editor.chain().focus().toggleBold().run()"><b>G</b></button>
       <button type="button" :class="btn(editor.isActive('italic'))" title="Italique" @click="editor.chain().focus().toggleItalic().run()"><i>I</i></button>

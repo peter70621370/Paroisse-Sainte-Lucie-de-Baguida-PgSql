@@ -23,8 +23,8 @@ const fmtDay = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('fr-
 <template>
   <div>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h1 class="text-2xl font-bold text-navy">Statistiques de fréquentation</h1>
-      <select v-model.number="days" class="rounded border border-slate-300 px-3 py-2 text-sm" aria-label="Période">
+      <h1 class="font-serif text-3xl font-bold text-navy">Statistiques de fréquentation</h1>
+      <select v-model.number="days" class="field !w-auto text-sm" aria-label="Période">
         <option :value="7">7 derniers jours</option>
         <option :value="30">30 derniers jours</option>
         <option :value="90">90 derniers jours</option>
@@ -33,12 +33,12 @@ const fmtDay = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('fr-
     <p class="mt-1 text-sm text-slate-600">Mesure anonyme, sans cookie : seuls les visiteurs ayant accepté sont comptés. Aucune adresse IP ni donnée personnelle n'est conservée.</p>
 
     <div class="mt-4 grid gap-3 sm:grid-cols-3">
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Pages vues</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ data?.totals.views ?? 0 }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Visiteurs (cumul des jours)</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ data?.totals.visitors ?? 0 }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Pages par visiteur</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ data?.totals.visitors ? (data.totals.views / data.totals.visitors).toFixed(1) : '—' }}</p></div>
+      <div class="card p-5"><p class="text-xs text-slate-600">Pages vues</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ data?.totals.views ?? 0 }}</p></div>
+      <div class="card p-5"><p class="text-xs text-slate-600">Visiteurs (cumul des jours)</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ data?.totals.visitors ?? 0 }}</p></div>
+      <div class="card p-5"><p class="text-xs text-slate-600">Pages par visiteur</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ data?.totals.visitors ? (data.totals.views / data.totals.visitors).toFixed(1) : '—' }}</p></div>
     </div>
 
-    <section class="mt-6 rounded-xl bg-white p-5 shadow" aria-labelledby="chart-title">
+    <section class="mt-6 card p-5" aria-labelledby="chart-title">
       <h2 id="chart-title" class="font-semibold">Pages vues par jour</h2>
       <div class="mt-4 flex h-44 items-end gap-px" role="img" :aria-label="`Graphique des pages vues sur ${days} jours : ${data?.totals.views ?? 0} au total`">
         <div v-for="d in data?.series" :key="d.day" class="group relative flex h-full flex-1 flex-col justify-end" :title="`${fmtDay(d.day)} : ${d.views} vues, ${d.visitors} visiteurs`">
@@ -49,17 +49,17 @@ const fmtDay = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('fr-
     </section>
 
     <div class="mt-6 grid gap-6 lg:grid-cols-3">
-      <section class="rounded-xl bg-white p-5 shadow lg:col-span-2">
+      <section class="card p-5 lg:col-span-2">
         <h2 class="font-semibold">Pages les plus vues</h2>
         <table class="mt-3 w-full text-left text-sm">
           <tbody>
-            <tr v-for="p in data?.topPages" :key="p.path" class="border-b last:border-0"><td class="py-2 pr-3 font-mono text-xs">{{ p.path }}</td><td class="py-2 text-right font-semibold">{{ p.views }}</td></tr>
+            <tr v-for="p in data?.topPages" :key="p.path" class="border-b border-slate-100 transition last:border-0 hover:bg-cream/60"><td class="py-2 pr-3 font-mono text-xs">{{ p.path }}</td><td class="py-2 text-right font-semibold">{{ p.views }}</td></tr>
             <tr v-if="!data?.topPages.length"><td class="py-4 text-center text-slate-600">Aucune donnée pour le moment.</td></tr>
           </tbody>
         </table>
       </section>
       <div class="space-y-6">
-        <section class="rounded-xl bg-white p-5 shadow">
+        <section class="card p-5">
           <h2 class="font-semibold">Appareils</h2>
           <ul class="mt-3 space-y-2 text-sm">
             <li v-for="d in data?.devices" :key="d.device">
@@ -69,7 +69,7 @@ const fmtDay = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('fr-
             <li v-if="!data?.devices.length" class="text-slate-600">—</li>
           </ul>
         </section>
-        <section class="rounded-xl bg-white p-5 shadow">
+        <section class="card p-5">
           <h2 class="font-semibold">Sites d'origine</h2>
           <ul class="mt-3 space-y-1.5 text-sm">
             <li v-for="r in data?.referrers" :key="r.referrer" class="flex justify-between"><span class="truncate">{{ r.referrer }}</span><span class="font-semibold">{{ r.views }}</span></li>

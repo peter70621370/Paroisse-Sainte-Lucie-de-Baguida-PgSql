@@ -50,21 +50,21 @@ const pages = computed(() => Math.max(1, Math.ceil(total.value / pageSize)));
 
 <template>
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" @click.self="emit('close')">
-    <div class="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-5 shadow-xl">
+    <div class="max-h-[90vh] w-full max-w-3xl overflow-y-auto card p-5-xl">
       <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold text-[#1F3A5F]">{{ type === 'image' ? 'Choisir une image' : 'Choisir un PDF' }}</h2>
+        <h2 class="text-lg font-semibold text-navy">{{ type === 'image' ? 'Choisir une image' : 'Choisir un PDF' }}</h2>
         <button class="text-slate-600 hover:text-slate-800" aria-label="Fermer" @click="emit('close')">✕</button>
       </div>
 
       <div class="mt-3 flex flex-wrap items-center gap-3">
-        <label class="cursor-pointer rounded bg-[#1F3A5F] px-3 py-1.5 text-sm text-white">
+        <label class="btn btn-sm btn-navy cursor-pointer">
           Envoyer un nouveau fichier
           <input type="file" class="hidden" :accept="type === 'image' ? 'image/jpeg,image/png,image/webp,image/gif' : 'application/pdf'" @change="upload" />
         </label>
-        <input v-model.lazy="q" placeholder="Rechercher…" class="rounded border border-slate-300 px-3 py-1.5 text-sm" @change="page = 1; load()" />
+        <input v-model.lazy="q" placeholder="Rechercher…" class="field !w-auto !py-1.5 text-sm" @change="page = 1; load()" />
       </div>
 
-      <p v-if="err" class="mt-3 rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
+      <p v-if="err" class="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
       <p v-if="!loading && !items.length" class="mt-6 text-sm text-slate-600">Aucun fichier. Envoyez-en un ci-dessus.</p>
 
       <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
@@ -80,9 +80,9 @@ const pages = computed(() => Math.max(1, Math.ceil(total.value / pageSize)));
       </ul>
 
       <div v-if="pages > 1" class="mt-4 flex items-center gap-3 text-sm">
-        <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page <= 1" @click="page--; load()">Précédent</button>
+        <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page <= 1" @click="page--; load()">Précédent</button>
         <span>Page {{ page }} / {{ pages }}</span>
-        <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page >= pages" @click="page++; load()">Suivant</button>
+        <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page >= pages" @click="page++; load()">Suivant</button>
       </div>
     </div>
   </div>

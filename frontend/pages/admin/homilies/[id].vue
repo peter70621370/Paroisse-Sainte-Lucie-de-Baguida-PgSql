@@ -58,45 +58,45 @@ async function remove() {
 
 <template>
   <div class="max-w-3xl">
-    <NuxtLink to="/admin/homilies" class="text-sm text-[#1F3A5F] underline">← Homélies</NuxtLink>
-    <h1 class="mt-1 text-2xl font-bold text-[#1F3A5F]">{{ isNew ? 'Nouvelle homélie' : 'Modifier l\'homélie' }}</h1>
+    <NuxtLink to="/admin/homilies" class="text-sm text-navy underline">← Homélies</NuxtLink>
+    <h1 class="mt-1 font-serif text-3xl font-bold text-navy">{{ isNew ? 'Nouvelle homélie' : 'Modifier l\'homélie' }}</h1>
 
     <form class="mt-6 space-y-4" @submit.prevent="save">
       <label class="block text-sm">
-        <span class="mb-1 block font-medium">Titre</span>
-        <input v-model="form.title" required maxlength="255" class="w-full rounded border border-slate-300 px-3 py-2" />
+        <span class="mb-1.5 block font-semibold text-navy">Titre</span>
+        <input v-model="form.title" required maxlength="255" class="field" />
       </label>
       <div class="grid gap-3 sm:grid-cols-2">
         <label class="text-sm">
-          <span class="mb-1 block font-medium">Date</span>
-          <input v-model="form.date" type="date" required class="w-full rounded border border-slate-300 px-3 py-2" />
+          <span class="mb-1.5 block font-semibold text-navy">Date</span>
+          <input v-model="form.date" type="date" required class="field" />
         </label>
         <label class="text-sm">
-          <span class="mb-1 block font-medium">Prédicateur</span>
-          <input v-model="form.preacher" maxlength="150" class="w-full rounded border border-slate-300 px-3 py-2" />
+          <span class="mb-1.5 block font-semibold text-navy">Prédicateur</span>
+          <input v-model="form.preacher" maxlength="150" class="field" />
         </label>
         <label class="text-sm">
-          <span class="mb-1 block font-medium">Vidéo (lien YouTube / Facebook)</span>
-          <input v-model="form.videoUrl" type="url" placeholder="https://…" class="w-full rounded border border-slate-300 px-3 py-2" />
+          <span class="mb-1.5 block font-semibold text-navy">Vidéo (lien YouTube / Facebook)</span>
+          <input v-model="form.videoUrl" type="url" placeholder="https://…" class="field" />
         </label>
         <label class="text-sm">
-          <span class="mb-1 block font-medium">Audio (lien)</span>
-          <input v-model="form.audioUrl" type="url" placeholder="https://…" class="w-full rounded border border-slate-300 px-3 py-2" />
+          <span class="mb-1.5 block font-semibold text-navy">Audio (lien)</span>
+          <input v-model="form.audioUrl" type="url" placeholder="https://…" class="field" />
         </label>
       </div>
 
       <div class="text-sm">
-        <span class="mb-1 block font-medium">Texte (facultatif)</span>
+        <span class="mb-1.5 block font-semibold text-navy">Texte (facultatif)</span>
         <RichEditor v-model="form.content" />
       </div>
 
       <PublishFields v-model:status="form.status" v-model:published-at="form.publishedAt" />
 
-      <p v-if="err" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
-      <p v-if="msg" class="rounded bg-green-50 px-3 py-2 text-sm text-green-800" role="status">{{ msg }}</p>
+      <p v-if="err" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
+      <p v-if="msg" class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800" role="status">{{ msg }}</p>
 
       <div class="flex items-center gap-3">
-        <button :disabled="saving" class="rounded bg-[#1F3A5F] px-5 py-2 text-white disabled:opacity-60">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
+        <button :disabled="saving" class="btn btn-sm btn-navy disabled:opacity-60">{{ saving ? 'Enregistrement…' : 'Enregistrer' }}</button>
         <button v-if="id && user?.role !== 'CONTRIBUTOR'" type="button" class="text-sm text-red-700 underline" @click="remove">Supprimer</button>
       </div>
     </form>

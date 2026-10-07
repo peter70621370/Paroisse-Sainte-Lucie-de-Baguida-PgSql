@@ -62,36 +62,36 @@ async function removeSub(s: Sub) {
 
 <template>
   <div class="max-w-4xl">
-    <h1 class="text-2xl font-bold text-navy">Lettre d'information</h1>
+    <h1 class="font-serif text-3xl font-bold text-navy">Lettre d'information</h1>
 
     <div class="mt-4 grid gap-3 sm:grid-cols-3">
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Abonnés confirmés</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.confirmed ?? 0 }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">En attente de confirmation</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.pending ?? 0 }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Désinscrits</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.unsubscribed ?? 0 }}</p></div>
+      <div class="card p-5"><p class="text-xs text-slate-600">Abonnés confirmés</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.confirmed ?? 0 }}</p></div>
+      <div class="card p-5"><p class="text-xs text-slate-600">En attente de confirmation</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.pending ?? 0 }}</p></div>
+      <div class="card p-5"><p class="text-xs text-slate-600">Désinscrits</p><p class="mt-1 font-serif text-3xl font-bold text-navy">{{ summary?.unsubscribed ?? 0 }}</p></div>
     </div>
 
-    <section class="mt-6 rounded-xl bg-white p-5 shadow">
+    <section class="mt-6 card p-5">
       <h2 class="font-semibold">Rédiger un message</h2>
       <form class="mt-3 space-y-4" @submit.prevent="sendAll">
-        <label class="block text-sm"><span class="mb-1 block font-medium">Objet</span><input v-model="subject" required maxlength="255" placeholder="Les nouvelles de la paroisse – octobre" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
-        <div class="text-sm"><span class="mb-1 block font-medium">Message</span><RichEditor v-model="content" /></div>
+        <label class="block text-sm"><span class="mb-1.5 block font-semibold text-navy">Objet</span><input v-model="subject" required maxlength="255" placeholder="Les nouvelles de la paroisse – octobre" class="field" /></label>
+        <div class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Message</span><RichEditor v-model="content" /></div>
         <p class="text-xs text-slate-600">Chaque message contient automatiquement le lien de désinscription. Faites d'abord un test sur votre propre adresse.</p>
         <div class="flex flex-wrap items-end gap-3">
-          <label class="text-sm"><span class="mb-1 block font-medium">Envoyer un test à</span><input v-model="testTo" type="email" placeholder="vous@exemple.org" class="rounded border border-slate-300 px-3 py-2" /></label>
-          <button type="button" :disabled="!subject || !content || !testTo" class="rounded border border-navy px-4 py-2 text-sm text-navy hover:bg-navy hover:text-white disabled:opacity-50" @click="sendTest">Envoyer le test</button>
-          <button :disabled="busy || !subject || !content" class="ml-auto rounded bg-navy px-5 py-2 text-sm text-white disabled:opacity-50">Envoyer à {{ summary?.confirmed ?? 0 }} abonné(s)</button>
+          <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Envoyer un test à</span><input v-model="testTo" type="email" placeholder="vous@exemple.org" class="field !w-auto" /></label>
+          <button type="button" :disabled="!subject || !content || !testTo" class="btn btn-sm btn-outline disabled:opacity-50" @click="sendTest">Envoyer le test</button>
+          <button :disabled="busy || !subject || !content" class="btn btn-sm btn-navy ml-auto disabled:opacity-50">Envoyer à {{ summary?.confirmed ?? 0 }} abonné(s)</button>
         </div>
-        <p v-if="err" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
-        <p v-if="msg" class="rounded bg-green-50 px-3 py-2 text-sm text-green-800" role="status">{{ msg }}</p>
+        <p v-if="err" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
+        <p v-if="msg" class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800" role="status">{{ msg }}</p>
       </form>
     </section>
 
-    <section class="mt-6 rounded-xl bg-white p-5 shadow">
+    <section class="mt-6 card p-5">
       <h2 class="font-semibold">Messages envoyés</h2>
       <table class="mt-3 w-full text-left text-sm">
         <thead class="border-b text-slate-600"><tr><th class="py-2">Objet</th><th class="py-2">Date</th><th class="py-2">Envoyés</th><th class="py-2">État</th></tr></thead>
         <tbody>
-          <tr v-for="i in issues?.items" :key="i.id" class="border-b last:border-0">
+          <tr v-for="i in issues?.items" :key="i.id" class="border-b border-slate-100 transition last:border-0 hover:bg-cream/60">
             <td class="py-2 pr-3 font-medium">{{ i.subject }}</td><td class="py-2 pr-3">{{ fmt(i.createdAt) }}</td><td class="py-2 pr-3">{{ i.sentCount }} / {{ i.recipients }}</td>
             <td class="py-2"><span :class="['rounded-full px-2 py-0.5 text-xs', i.status === 'SENT' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800']">{{ i.status === 'SENT' ? 'Envoyé' : 'En cours' }}</span></td>
           </tr>
@@ -100,19 +100,19 @@ async function removeSub(s: Sub) {
       </table>
     </section>
 
-    <section class="mt-6 rounded-xl bg-white p-5 shadow">
+    <section class="mt-6 card p-5">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <button class="font-semibold" :aria-expanded="showSubs" @click="showSubs = !showSubs">{{ showSubs ? '▾' : '▸' }} Abonnés ({{ subs?.total ?? 0 }})</button>
         <a :href="exportUrl" download class="text-sm text-navy underline">Exporter en CSV</a>
       </div>
       <div v-if="showSubs" class="mt-3">
         <div class="flex flex-wrap gap-3">
-          <select v-model="status" class="rounded border border-slate-300 px-3 py-2 text-sm"><option value="">Tous</option><option value="confirmed">Confirmés</option><option value="pending">En attente</option><option value="unsubscribed">Désinscrits</option></select>
-          <input v-model.lazy="q" placeholder="Rechercher une adresse…" class="rounded border border-slate-300 px-3 py-2 text-sm" />
+          <select v-model="status" class="field !w-auto text-sm"><option value="">Tous</option><option value="confirmed">Confirmés</option><option value="pending">En attente</option><option value="unsubscribed">Désinscrits</option></select>
+          <input v-model.lazy="q" placeholder="Rechercher une adresse…" class="field !w-auto text-sm" />
         </div>
         <table class="mt-3 w-full text-left text-sm">
           <tbody>
-            <tr v-for="s in subs?.items" :key="s.id" class="border-b last:border-0">
+            <tr v-for="s in subs?.items" :key="s.id" class="border-b border-slate-100 transition last:border-0 hover:bg-cream/60">
               <td class="py-2 pr-3">{{ s.email }}</td><td class="py-2 pr-3">{{ stateOf(s) }}</td><td class="py-2 pr-3 text-slate-600">{{ fmt(s.createdAt) }}</td>
               <td class="py-2 text-right"><button v-if="user?.role === 'ADMIN'" class="text-red-700 underline" @click="removeSub(s)">Effacer</button></td>
             </tr>

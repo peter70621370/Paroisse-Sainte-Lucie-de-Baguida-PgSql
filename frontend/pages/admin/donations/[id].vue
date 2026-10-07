@@ -24,10 +24,10 @@ async function recheck() {
 <template>
   <div class="max-w-2xl">
     <NuxtLink to="/admin/donations" class="text-sm text-navy underline">← Dons reçus</NuxtLink>
-    <h1 class="mt-1 text-2xl font-bold text-navy">Don de {{ formatAmount(d.amount, d.currency) }}</h1>
+    <h1 class="mt-1 font-serif text-3xl font-bold text-navy">Don de {{ formatAmount(d.amount, d.currency) }}</h1>
     <p class="mt-1"><span :class="['rounded-full px-2 py-0.5 text-xs', DONATION_STATUS[d.status]?.cls]">{{ DONATION_STATUS[d.status]?.label }}</span></p>
 
-    <dl class="mt-5 grid gap-4 rounded-xl bg-white p-6 shadow sm:grid-cols-2">
+    <dl class="mt-5 grid gap-4 card p-6 sm:grid-cols-2">
       <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Référence</dt><dd class="mt-0.5 break-all font-mono text-sm">{{ d.reference }}</dd></div>
       <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Moyen de paiement</dt><dd class="mt-0.5">{{ d.methodLabel }} <span class="text-xs text-slate-600">({{ d.provider }})</span></dd></div>
       <div><dt class="text-xs font-semibold uppercase tracking-wide text-gold-dark">Créé le</dt><dd class="mt-0.5">{{ fmt(d.createdAt) }}</dd></div>
@@ -40,7 +40,7 @@ async function recheck() {
       <div v-if="d.note" class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-red-700">Note / anomalie</dt><dd class="mt-0.5 text-red-800">{{ d.note }}</dd></div>
     </dl>
 
-    <p v-if="err" class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
-    <button v-if="d.status === 'PENDING'" class="mt-5 rounded bg-navy px-4 py-2 text-sm text-white" @click="recheck">Revérifier auprès du prestataire</button>
+    <p v-if="err" class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
+    <button v-if="d.status === 'PENDING'" class="btn btn-sm btn-navy mt-5" @click="recheck">Revérifier auprès du prestataire</button>
   </div>
 </template>

@@ -44,21 +44,21 @@ async function remove(c: C) {
 <template>
   <div class="max-w-2xl">
     <NuxtLink to="/admin/events" class="text-sm text-navy underline">← Agenda</NuxtLink>
-    <h1 class="mt-1 text-2xl font-bold text-navy">Catégories d'événements</h1>
+    <h1 class="mt-1 font-serif text-3xl font-bold text-navy">Catégories d'événements</h1>
 
-    <form v-if="canWrite" class="mt-4 grid gap-3 rounded-xl bg-white p-5 shadow sm:grid-cols-3" @submit.prevent="save">
-      <label class="text-sm"><span class="mb-1 block font-medium">Nom</span><input v-model="form.name" required maxlength="100" class="w-full rounded border border-slate-300 px-3 py-2" /></label>
-      <label class="text-sm"><span class="mb-1 block font-medium">Identifiant</span><input v-model="form.slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="w-full rounded border border-slate-300 px-3 py-2" @input="slugTouched = true" /></label>
-      <label class="text-sm"><span class="mb-1 block font-medium">Couleur</span><input v-model="form.color" type="color" class="h-10 w-full rounded border border-slate-300" /></label>
-      <p v-if="err" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700 sm:col-span-3" role="alert">{{ err }}</p>
-      <p v-if="msg" class="rounded bg-green-50 px-3 py-2 text-sm text-green-800 sm:col-span-3" role="status">{{ msg }}</p>
+    <form v-if="canWrite" class="mt-4 grid gap-3 card p-5 sm:grid-cols-3" @submit.prevent="save">
+      <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Nom</span><input v-model="form.name" required maxlength="100" class="field" /></label>
+      <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Identifiant</span><input v-model="form.slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" class="field" @input="slugTouched = true" /></label>
+      <label class="text-sm"><span class="mb-1.5 block font-semibold text-navy">Couleur</span><input v-model="form.color" type="color" class="h-10 w-full rounded border border-slate-300" /></label>
+      <p v-if="err" class="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700 sm:col-span-3" role="alert">{{ err }}</p>
+      <p v-if="msg" class="rounded-lg border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-800 sm:col-span-3" role="status">{{ msg }}</p>
       <div class="flex gap-2 sm:col-span-3">
-        <button class="rounded bg-navy px-4 py-2 text-sm text-white">{{ editingId ? 'Enregistrer' : 'Ajouter' }}</button>
-        <button v-if="editingId" type="button" class="rounded border border-slate-300 px-4 py-2 text-sm" @click="reset">Annuler</button>
+        <button class="btn btn-sm btn-navy">{{ editingId ? 'Enregistrer' : 'Ajouter' }}</button>
+        <button v-if="editingId" type="button" class="btn btn-sm btn-outline" @click="reset">Annuler</button>
       </div>
     </form>
 
-    <ul class="mt-6 divide-y rounded-xl bg-white shadow">
+    <ul class="mt-6 divide-y card">
       <li v-for="c in data?.items" :key="c.id" class="flex items-center justify-between gap-3 px-4 py-3 text-sm">
         <span class="flex items-center gap-3"><span class="h-4 w-4 rounded-full" :style="{ backgroundColor: c.color ?? '#1F3A5F' }" />{{ c.name }}</span>
         <span v-if="canWrite" class="whitespace-nowrap">

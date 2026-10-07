@@ -38,14 +38,14 @@ async function recheck(d: D) {
 <template>
   <div>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h1 class="text-2xl font-bold text-navy">Dons reçus</h1>
-      <a :href="exportUrl" download class="rounded border border-navy px-4 py-2 text-sm text-navy hover:bg-navy hover:text-white">Exporter en CSV</a>
+      <h1 class="font-serif text-3xl font-bold text-navy">Dons reçus</h1>
+      <a :href="exportUrl" download class="btn btn-sm btn-outline">Exporter en CSV</a>
     </div>
 
     <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Total encaissé (équivalent FCFA)</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ formatAmount(summary?.totalXof ?? 0, 'XOF') }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow"><p class="text-xs text-slate-600">Dons réussis</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ summary?.count ?? 0 }}</p></div>
-      <div class="rounded-xl bg-white p-4 shadow">
+      <div class="card p-5"><p class="text-xs text-slate-600">Total encaissé (équivalent FCFA)</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ formatAmount(summary?.totalXof ?? 0, 'XOF') }}</p></div>
+      <div class="card p-5"><p class="text-xs text-slate-600">Dons réussis</p><p class="mt-1 font-serif text-2xl font-bold text-navy">{{ summary?.count ?? 0 }}</p></div>
+      <div class="card p-5">
         <p class="text-xs text-slate-600">Détail par devise</p>
         <p class="mt-1 text-sm">FCFA : <strong>{{ formatAmount(summary?.byCurrency?.XOF?.total ?? 0, 'XOF') }}</strong></p>
         <p class="text-sm">Euros (PayPal) : <strong>{{ formatAmount(summary?.byCurrency?.EUR?.total ?? 0, 'EUR') }}</strong></p>
@@ -58,26 +58,26 @@ async function recheck(d: D) {
     </div>
 
     <div class="mt-5 flex flex-wrap gap-3">
-      <select v-model="status" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1">
+      <select v-model="status" class="field !w-auto text-sm" @change="page = 1">
         <option value="">Tous les statuts</option><option value="SUCCEEDED">Réussis</option><option value="PENDING">En attente</option><option value="FAILED">Échoués</option><option value="CANCELLED">Annulés</option>
       </select>
-      <select v-model="method" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1">
+      <select v-model="method" class="field !w-auto text-sm" @change="page = 1">
         <option value="">Tous les moyens</option><option value="MOBILE_MONEY">Mobile Money</option><option value="CARD">Carte bancaire</option><option value="PAYPAL">PayPal</option>
       </select>
-      <label class="flex items-center gap-1 text-sm">Du <input v-model="from" type="date" class="rounded border border-slate-300 px-2 py-1.5" @change="page = 1" /></label>
-      <label class="flex items-center gap-1 text-sm">au <input v-model="to" type="date" class="rounded border border-slate-300 px-2 py-1.5" @change="page = 1" /></label>
-      <input v-model.lazy="q" placeholder="Nom, e-mail, référence…" class="rounded border border-slate-300 px-3 py-2 text-sm" @change="page = 1" />
+      <label class="flex items-center gap-1 text-sm">Du <input v-model="from" type="date" class="field !w-auto !px-2.5 !py-1.5" @change="page = 1" /></label>
+      <label class="flex items-center gap-1 text-sm">au <input v-model="to" type="date" class="field !w-auto !px-2.5 !py-1.5" @change="page = 1" /></label>
+      <input v-model.lazy="q" placeholder="Nom, e-mail, référence…" class="field !w-auto text-sm" @change="page = 1" />
     </div>
 
-    <p v-if="err" class="mt-4 rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ err }}</p>
+    <p v-if="err" class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700" role="alert">{{ err }}</p>
 
-    <div class="mt-4 overflow-x-auto rounded-xl bg-white shadow">
+    <div class="mt-4 card overflow-x-auto">
       <table class="w-full text-left text-sm">
-        <thead class="border-b bg-slate-50 text-slate-600">
+        <thead class="border-b border-gold/20 bg-cream-dark/60 text-xs uppercase tracking-wider text-slate-600">
           <tr><th class="px-4 py-3">Date</th><th class="px-4 py-3">Montant</th><th class="px-4 py-3">Moyen</th><th class="px-4 py-3">Donateur</th><th class="px-4 py-3">Campagne</th><th class="px-4 py-3">Statut</th><th class="px-4 py-3"></th></tr>
         </thead>
         <tbody>
-          <tr v-for="d in data?.items" :key="d.id" class="border-b last:border-0">
+          <tr v-for="d in data?.items" :key="d.id" class="border-b border-slate-100 transition last:border-0 hover:bg-cream/60">
             <td class="whitespace-nowrap px-4 py-3">{{ fmt(d.createdAt) }}</td>
             <td class="whitespace-nowrap px-4 py-3 font-semibold">{{ formatAmount(d.amount, d.currency) }}</td>
             <td class="px-4 py-3">{{ d.methodLabel }}</td>
@@ -98,9 +98,9 @@ async function recheck(d: D) {
     </div>
 
     <div v-if="pages > 1" class="mt-4 flex items-center gap-3 text-sm">
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page <= 1" @click="page--">Précédent</button>
       <span>Page {{ page }} / {{ pages }}</span>
-      <button class="rounded border px-3 py-1 disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
+      <button class="btn btn-sm btn-outline disabled:opacity-40" :disabled="page >= pages" @click="page++">Suivant</button>
     </div>
   </div>
 </template>
