@@ -12,6 +12,8 @@ const form = reactive({
   status: 'DRAFT' as 'DRAFT' | 'PUBLISHED', publishedAt: '',
 });
 const slugTouched = ref(!isNew);
+// Adresse publique selon la langue : /p/x (français), /en/p/x (anglais), /p/x?lang=ee (éwé)
+const publicPath = computed(() => (form.locale === 'en' ? `/en/p/${form.slug}` : `/p/${form.slug}${form.locale === 'ee' ? '?lang=ee' : ''}`));
 
 if (id) {
   const { data, error } = await useAdminFetch<{ item: any }>(`/api/admin/pages/${id}`);
@@ -75,7 +77,7 @@ async function remove() {
           <span class="mt-1 block text-xs text-slate-600">Lettres minuscules, chiffres et tirets. Ex. : histoire-de-la-paroisse</span>
           <span v-if="form.slug" class="mt-1 block text-xs text-slate-600">
             Adresse publique :
-            <a :href="`/p/${form.slug}${form.locale === 'ee' ? '?lang=ee' : ''}`" target="_blank" rel="noopener" class="font-medium text-navy underline">/p/{{ form.slug }}{{ form.locale === 'ee' ? '?lang=ee' : '' }}</a>
+            <a :href="publicPath" target="_blank" rel="noopener" class="font-medium text-navy underline">{{ publicPath }}</a>
             (visible une fois la page publiée)
           </span>
         </label>
@@ -83,6 +85,7 @@ async function remove() {
           <span class="mb-1.5 block font-semibold text-navy">Langue</span>
           <select v-model="form.locale" class="field">
             <option value="fr">Français</option>
+            <option value="en">English (anglais)</option>
             <option value="ee">Éwé</option>
           </select>
         </label>

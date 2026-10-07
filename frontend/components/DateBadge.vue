@@ -3,7 +3,7 @@
 const props = defineProps<{ date: string; tone?: 'navy' | 'gold' }>();
 const d = computed(() => new Date(`${dayKey(props.date)}T00:00:00Z`));
 const day = computed(() => d.value.getUTCDate());
-const month = computed(() => d.value.toLocaleDateString('fr-FR', { month: 'short', timeZone: 'UTC' }).replace('.', ''));
+const month = computed(() => d.value.toLocaleDateString(dateLocale(), { month: 'short', timeZone: 'UTC' }).replace('.', ''));
 </script>
 
 <template>

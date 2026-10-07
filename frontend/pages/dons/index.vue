@@ -9,7 +9,7 @@ const { s } = await useSite();
 const [{ data: cfg }, { data: camps }, { data: intro }] = await Promise.all([
   useFetch<{ mode: string; methods: Method[] }>('/api/donations/methods'),
   useFetch<{ items: Campaign[] }>('/api/campaigns'),
-  useFetch<{ page: { content: string } }>('/api/pages/dons', { key: 'dons-intro', onResponseError: () => {} }),
+  usePageContent('dons'),
 ]);
 
 const methods = computed(() => cfg.value?.methods ?? []);
@@ -62,115 +62,115 @@ const methodHelp: Record<string, string> = { MOBILE_MONEY: 'Flooz, T-Money… en
 
 <template>
   <div>
-    <PageTitle title="Faire un don" subtitle="Soutenez la vie et les projets de la paroisse" />
+    <PageTitle :title="t(`Faire un don`)" :subtitle="t(`Soutenez la vie et les projets de la paroisse`)" />
     <div class="mx-auto max-w-4xl px-4 py-12">
       <!-- Texte d'introduction modifiable : Administration › Pages (adresse « dons ») -->
-      <div v-if="intro?.page?.content" class="rich mb-8 text-center text-lg" v-html="intro.page.content" />
+      <div v-if="intro?.content" class="rich mb-8 text-center text-lg" v-html="intro.content" />
 
       <p v-if="cfg?.mode === 'mock'" class="mb-8 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="note">
-        <strong>Mode simulation :</strong> aucun vrai paiement n'est effectué.
+        <strong>{{ t(`Mode simulation`) }} :</strong> {{ t(`aucun vrai paiement n'est effectué.`) }}
       </p>
 
       <!-- Campagnes en cours -->
       <section v-if="camps?.items.length" class="mb-10">
-        <h2 class="font-serif text-2xl font-bold text-navy md:text-3xl">Campagnes en cours</h2>
+        <h2 class="font-serif text-2xl font-bold text-navy md:text-3xl">{{ t(`Campagnes en cours`) }}</h2>
         <ul class="mt-5 grid gap-5 md:grid-cols-2">
           <li v-for="c in camps.items" :key="c.slug" :class="['card flex flex-col p-6', campaign === c.slug ? 'ring-2 ring-gold' : '']">
             <h3 class="font-serif text-xl font-bold leading-snug text-navy">{{ c.title }}</h3>
             <p v-if="c.description" class="mt-2 text-[0.95rem] text-slate-600">{{ c.description }}</p>
             <div v-if="c.goalAmount" class="mt-auto pt-5">
-              <div class="h-3 overflow-hidden rounded-full bg-cream-dark" role="progressbar" :aria-valuenow="c.percent ?? 0" aria-valuemin="0" aria-valuemax="100" :aria-label="`Progression de la collecte : ${c.title}`">
+              <div class="h-3 overflow-hidden rounded-full bg-cream-dark" role="progressbar" :aria-valuenow="c.percent ?? 0" aria-valuemin="0" aria-valuemax="100" :aria-label="t(`Progression de la collecte : {titre}`, { titre: c.title })">
                 <div class="h-full rounded-full bg-gradient-to-r from-gold-dark to-gold" :style="{ width: `${c.percent ?? 0}%` }" />
               </div>
-              <p class="mt-2 text-sm text-slate-600"><strong class="text-navy">{{ formatAmount(c.raised, 'XOF') }}</strong> récoltés sur {{ formatAmount(c.goalAmount, 'XOF') }} ({{ c.percent }} %) · {{ c.donors }} don(s)</p>
+              <p class="mt-2 text-sm text-slate-600"><strong class="text-navy">{{ formatAmount(c.raised, 'XOF') }}</strong> {{ t(`récoltés sur`) }} {{ formatAmount(c.goalAmount, 'XOF') }} ({{ c.percent }} %) · {{ c.donors }} {{ t(`don(s)`) }}</p>
             </div>
-            <button type="button" :class="['btn btn-sm mt-5 self-start', campaign === c.slug ? 'btn-gold' : 'btn-outline']" @click="campaign = c.slug"><Icon :name="campaign === c.slug ? 'check' : 'heart'" />{{ campaign === c.slug ? 'Campagne choisie' : 'Soutenir cette campagne' }}</button>
+            <button type="button" :class="['btn btn-sm mt-5 self-start', campaign === c.slug ? 'btn-gold' : 'btn-outline']" @click="campaign = c.slug"><Icon :name="campaign === c.slug ? 'check' : 'heart'" />{{ campaign === c.slug ? t(`Campagne choisie`) : t(`Soutenir cette campagne`) }}</button>
           </li>
         </ul>
       </section>
 
       <!-- Aucun moyen de paiement configuré -->
       <div v-if="!methods.length" class="card p-8 text-center">
-        <p class="font-serif text-xl font-semibold text-navy">Les dons en ligne ouvrent bientôt</p>
-        <p class="mt-2 text-slate-600">En attendant, vous pouvez remettre votre don au secrétariat paroissial<span v-if="s['site.phone']"> ou nous appeler au {{ s['site.phone'] }}</span>.</p>
-        <NuxtLink to="/contact" class="btn btn-navy mt-5">Nous contacter</NuxtLink>
+        <p class="font-serif text-xl font-semibold text-navy">{{ t(`Les dons en ligne ouvrent bientôt`) }}</p>
+        <p class="mt-2 text-slate-600">{{ t(`En attendant, vous pouvez remettre votre don au secrétariat paroissial`) }}<span v-if="s['site.phone']"> {{ t(`ou nous appeler au`) }} {{ s['site.phone'] }}</span>.</p>
+        <NuxtLink :to="lp('/contact')" class="btn btn-navy mt-5">{{ t(`Nous contacter`) }}</NuxtLink>
       </div>
 
       <form v-else class="card space-y-8 p-6 md:p-9" novalidate @submit.prevent="submit">
         <fieldset>
-          <legend class="font-serif text-xl font-bold text-navy">1. Moyen de paiement</legend>
+          <legend class="font-serif text-xl font-bold text-navy">1. {{ t(`Moyen de paiement`) }}</legend>
           <div class="mt-3 grid gap-3 sm:grid-cols-3">
             <label v-for="m in methods" :key="m.method" :class="['cursor-pointer rounded-xl border-2 p-4 text-sm transition', method === m.method ? 'border-gold bg-cream shadow-sm' : 'border-slate-200 hover:border-gold/60']">
               <input v-model="method" type="radio" name="method" :value="m.method" class="sr-only" />
-              <span class="block font-semibold text-navy">{{ m.label }}</span>
-              <span class="block text-xs text-slate-600">{{ methodHelp[m.method] }}</span>
+              <span class="block font-semibold text-navy">{{ t(m.label) }}</span>
+              <span class="block text-xs text-slate-600">{{ t(methodHelp[m.method]) }}</span>
             </label>
           </div>
         </fieldset>
 
         <fieldset>
-          <legend class="font-serif text-xl font-bold text-navy">2. Montant ({{ currency === 'EUR' ? '€' : 'FCFA' }})</legend>
+          <legend class="font-serif text-xl font-bold text-navy">2. {{ t(`Montant`) }} ({{ currency === 'EUR' ? '€' : 'FCFA' }})</legend>
           <div class="mt-3 flex flex-wrap gap-2">
             <button v-for="p in presets" :key="p" type="button" :class="['rounded-full border-2 px-5 py-2.5 font-semibold transition', amount === p && !custom ? 'border-gold-dark bg-gold-dark text-white' : 'border-navy/30 text-navy hover:border-gold']" @click="pickPreset(p)">{{ formatAmount(p, currency) }}</button>
           </div>
           <label class="mt-3 block text-sm">
-            <span class="mb-1 block font-medium">Autre montant <span v-if="current" class="font-normal text-slate-600">(min. {{ formatAmount(current.limits.min, currency) }})</span></span>
-            <input v-model="custom" inputmode="numeric" :placeholder="currency === 'EUR' ? 'Ex. : 25' : 'Ex. : 7500'" :class="[inputCls, 'max-w-xs']" />
+            <span class="mb-1 block font-medium">{{ t(`Autre montant`) }} <span v-if="current" class="font-normal text-slate-600">{{ t(`(min.`) }} {{ formatAmount(current.limits.min, currency) }})</span></span>
+            <input v-model="custom" inputmode="numeric" :placeholder="currency === 'EUR' ? t(`Ex. : 25`) : t(`Ex. : 7500`)" :class="[inputCls, 'max-w-xs']" />
           </label>
-          <p v-if="amount" class="mt-2 text-sm text-slate-600">Votre don : <strong>{{ formatAmount(amount, currency) }}</strong></p>
-          <p v-if="fieldErrors.amount" class="mt-1 text-sm text-red-700" role="alert">{{ fieldErrors.amount.join(', ') }}</p>
+          <p v-if="amount" class="mt-2 text-sm text-slate-600">{{ t(`Votre don`) }} : <strong>{{ formatAmount(amount, currency) }}</strong></p>
+          <p v-if="fieldErrors.amount" class="mt-1 text-sm text-red-700" role="alert">{{ fieldErrors.amount.map((m) => t(m)).join(', ') }}</p>
         </fieldset>
 
         <fieldset v-if="camps?.items.length">
-          <legend class="font-serif text-xl font-bold text-navy">3. Destination</legend>
-          <select v-model="campaign" aria-label="Destination du don" class="field mt-3 max-w-md">
-            <option value="">Don libre pour la paroisse</option>
+          <legend class="font-serif text-xl font-bold text-navy">3. {{ t(`Destination`) }}</legend>
+          <select v-model="campaign" :aria-label="t(`Destination du don`)" class="field mt-3 max-w-md">
+            <option value="">{{ t(`Don libre pour la paroisse`) }}</option>
             <option v-for="c in camps.items" :key="c.slug" :value="c.slug">{{ c.title }}</option>
           </select>
         </fieldset>
 
         <fieldset>
-          <legend class="font-serif text-xl font-bold text-navy">{{ camps?.items.length ? '4' : '3' }}. Vos coordonnées</legend>
+          <legend class="font-serif text-xl font-bold text-navy">{{ camps?.items.length ? '4' : '3' }}. {{ t(`Vos coordonnées`) }}</legend>
           <div class="mt-3 grid gap-4 sm:grid-cols-2">
             <label class="text-sm">
-              <span class="mb-1 block font-medium">Nom et prénoms<span v-if="needIdentity" class="text-red-700"> *</span></span>
+              <span class="mb-1 block font-medium">{{ t(`Nom et prénoms`) }}<span v-if="needIdentity" class="text-red-700"> *</span></span>
               <input v-model="form.donorName" autocomplete="name" :class="inputCls" />
-              <span v-if="fieldErrors.donorName" class="mt-1 block text-red-700" role="alert">{{ fieldErrors.donorName.join(', ') }}</span>
+              <span v-if="fieldErrors.donorName" class="mt-1 block text-red-700" role="alert">{{ fieldErrors.donorName.map((m) => t(m)).join(', ') }}</span>
             </label>
             <label class="text-sm">
-              <span class="mb-1 block font-medium">Téléphone<span v-if="needIdentity" class="text-red-700"> *</span></span>
+              <span class="mb-1 block font-medium">{{ t(`Téléphone`) }}<span v-if="needIdentity" class="text-red-700"> *</span></span>
               <input v-model="form.donorPhone" type="tel" autocomplete="tel" placeholder="+228 90 00 00 00" :class="inputCls" />
-              <span v-if="fieldErrors.donorPhone" class="mt-1 block text-red-700" role="alert">{{ fieldErrors.donorPhone.join(', ') }}</span>
+              <span v-if="fieldErrors.donorPhone" class="mt-1 block text-red-700" role="alert">{{ fieldErrors.donorPhone.map((m) => t(m)).join(', ') }}</span>
             </label>
             <label class="text-sm sm:col-span-2">
-              <span class="mb-1 block font-medium">E-mail (pour recevoir la confirmation)</span>
+              <span class="mb-1 block font-medium">{{ t(`E-mail (pour recevoir la confirmation)`) }}</span>
               <input v-model="form.donorEmail" type="email" autocomplete="email" :class="inputCls" />
-              <span v-if="fieldErrors.donorEmail" class="mt-1 block text-red-700" role="alert">{{ fieldErrors.donorEmail.join(', ') }}</span>
+              <span v-if="fieldErrors.donorEmail" class="mt-1 block text-red-700" role="alert">{{ fieldErrors.donorEmail.map((m) => t(m)).join(', ') }}</span>
             </label>
             <label class="text-sm sm:col-span-2">
-              <span class="mb-1 block font-medium">Un message (facultatif)</span>
+              <span class="mb-1 block font-medium">{{ t(`Un message (facultatif)`) }}</span>
               <textarea v-model="form.message" rows="2" maxlength="500" :class="inputCls" />
             </label>
           </div>
         </fieldset>
 
         <div class="absolute left-[-9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-          <label>Ne pas remplir <input v-model="trap" type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          <label>{{ t(`Ne pas remplir`) }} <input v-model="trap" type="text" name="website" tabindex="-1" autocomplete="off" /></label>
         </div>
 
         <div>
           <label class="flex items-start gap-2 text-sm">
             <input v-model="consent" type="checkbox" class="mt-1 h-4 w-4" />
-            <span>J'accepte que mes informations soient utilisées par la paroisse pour traiter mon don. <NuxtLink to="/p/confidentialite" class="text-navy underline">Politique de confidentialité</NuxtLink></span>
+            <span>{{ t(`J'accepte que mes informations soient utilisées par la paroisse pour traiter mon don.`) }} <NuxtLink :to="lp('/p/confidentialite')" class="text-navy underline">{{ t(`Politique de confidentialité`) }}</NuxtLink></span>
           </label>
-          <p v-if="fieldErrors.consent" class="mt-1 text-sm text-red-700" role="alert">{{ fieldErrors.consent.join(', ') }}</p>
+          <p v-if="fieldErrors.consent" class="mt-1 text-sm text-red-700" role="alert">{{ fieldErrors.consent.map((m) => t(m)).join(', ') }}</p>
         </div>
 
-        <p v-if="generalError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ generalError }}</p>
+        <p v-if="generalError" class="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ t(generalError) }}</p>
         <button :disabled="loading" class="btn btn-gold w-full px-8 py-3.5 text-lg disabled:opacity-60 sm:w-auto">
-          {{ loading ? 'Redirection vers le paiement…' : amount ? `Donner ${formatAmount(amount, currency)}` : 'Donner' }}
+          {{ loading ? t(`Redirection vers le paiement…`) : amount ? t(`Donner {montant}`, { montant: formatAmount(amount, currency) }) : t(`Donner`) }}
         </button>
-        <p class="text-xs text-slate-600">Paiement sécurisé : vous serez redirigé vers la page de paiement de notre prestataire. La paroisse ne conserve aucune donnée de carte ni de compte Mobile Money.</p>
+        <p class="text-xs text-slate-600">{{ t(`Paiement sécurisé : vous serez redirigé vers la page de paiement de notre prestataire. La paroisse ne conserve aucune donnée de carte ni de compte Mobile Money.`) }}</p>
       </form>
     </div>
   </div>

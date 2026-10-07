@@ -32,9 +32,9 @@ const byDay = computed(() => {
     for (let d = start; d <= end && d <= grid.value.to; d = addDays(d, 1)) {
       if (d < grid.value.from) continue;
       push(d, {
-        key: `e${e.id}-${d}`, kind: 'event', title: e.title, to: `/agenda/${e.id}`, place: e.location,
-        time: e.allDay ? 'Journée' : d === start ? timeLabel(e.startsAt) : '', sort: e.allDay ? '00:00' : d === start ? timeLabel(e.startsAt).replace('h', ':').padStart(5, '0') : '00:00',
-        color: e.category?.color || '#1F3A5F', category: e.category?.name ?? 'Événement',
+        key: `e${e.id}-${d}`, kind: 'event', title: e.title, to: lp(`/agenda/${e.id}`), place: e.location,
+        time: e.allDay ? t('Journée') : d === start ? timeLabel(e.startsAt) : '', sort: e.allDay ? '00:00' : d === start ? timeKey(e.startsAt) : '00:00',
+        color: e.category?.color || '#1F3A5F', category: t(e.category?.name ?? 'Événement'),
       });
     }
   }
@@ -43,8 +43,8 @@ const byDay = computed(() => {
       for (const { key } of week) {
         for (const m of (sched.value?.items ?? []).filter((x) => x.weekday === WEEKDAY_KEYS[weekdayIndex(key)])) {
           push(key, {
-            key: `m${m.id}-${key}`, kind: 'mass', title: kindLabel[m.kind] || m.notes || 'Célébration', time: hm(m.time), sort: m.time,
-            color: '#86610A', place: m.location, category: 'Messes et confessions',
+            key: `m${m.id}-${key}`, kind: 'mass', title: t(kindLabel[m.kind] || m.notes || 'Célébration'), time: hm(m.time), sort: m.time,
+            color: '#86610A', place: m.location, category: t('Messes et confessions'),
           });
         }
       }
@@ -66,32 +66,33 @@ const weekNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 <template>
   <div>
-    <PageTitle title="Agenda paroissial" subtitle="Messes, célébrations et événements" />
+    <PageTitle :title="t(`Agenda paroissial`)" :subtitle="t(`Messes, célébrations et événements`)" />
+    <ContentLangNote />
     <div class="mx-auto max-w-6xl px-4 py-12">
       <!-- Navigation et filtres -->
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-          <button class="flex h-10 w-10 items-center justify-center rounded-full border border-navy/50 text-navy hover:bg-navy hover:text-white" aria-label="Mois précédent" @click="go(-1)"><Icon name="chevron-left" /></button>
+          <button class="flex h-10 w-10 items-center justify-center rounded-full border border-navy/50 text-navy hover:bg-navy hover:text-white" :aria-label="t(`Mois précédent`)" @click="go(-1)"><Icon name="chevron-left" /></button>
           <h2 class="min-w-48 text-center font-serif text-2xl font-bold capitalize text-navy md:text-3xl" aria-live="polite">{{ monthLabel(ym) }}</h2>
-          <button class="flex h-10 w-10 items-center justify-center rounded-full border border-navy/50 text-navy hover:bg-navy hover:text-white" aria-label="Mois suivant" @click="go(1)"><Icon name="chevron-right" /></button>
-          <NuxtLink v-if="ym !== nowYm" :to="{ query: {} }" class="ml-2 text-sm text-navy underline">Aujourd'hui</NuxtLink>
+          <button class="flex h-10 w-10 items-center justify-center rounded-full border border-navy/50 text-navy hover:bg-navy hover:text-white" :aria-label="t(`Mois suivant`)" @click="go(1)"><Icon name="chevron-right" /></button>
+          <NuxtLink v-if="ym !== nowYm" :to="{ query: {} }" class="ml-2 text-sm text-navy underline">{{ t(`Aujourd'hui`) }}</NuxtLink>
         </div>
-        <div class="hidden gap-1 md:flex" role="group" aria-label="Affichage">
-          <button :class="['rounded-l-full border border-navy px-4 py-2 text-sm font-semibold', view === 'month' ? 'bg-navy text-white' : 'text-navy']" @click="view = 'month'">Mois</button>
-          <button :class="['rounded-r-full border border-navy px-4 py-2 text-sm font-semibold', view === 'list' ? 'bg-navy text-white' : 'text-navy']" @click="view = 'list'">Liste</button>
+        <div class="hidden gap-1 md:flex" role="group" :aria-label="t(`Affichage`)">
+          <button :class="['rounded-l-full border border-navy px-4 py-2 text-sm font-semibold', view === 'month' ? 'bg-navy text-white' : 'text-navy']" @click="view = 'month'">{{ t(`Mois`) }}</button>
+          <button :class="['rounded-r-full border border-navy px-4 py-2 text-sm font-semibold', view === 'list' ? 'bg-navy text-white' : 'text-navy']" @click="view = 'list'">{{ t(`Liste`) }}</button>
         </div>
       </div>
 
-      <div class="mt-4 flex flex-wrap gap-2" role="group" aria-label="Filtrer par catégorie">
-        <button :class="['rounded-full border px-4 py-1.5 text-sm font-medium', category === 'all' ? 'border-navy bg-navy text-white' : 'border-navy/40 text-navy']" @click="category = 'all'">Tout</button>
-        <button :class="['rounded-full border px-4 py-1.5 text-sm font-medium', category === 'masses' ? 'border-gold bg-gold-dark text-white' : 'border-gold/60 text-gold-dark']" @click="category = 'masses'">Messes et confessions</button>
-        <button v-for="c in cats?.items" :key="c.id" :class="['rounded-full border px-4 py-1.5 text-sm font-medium', category === c.slug ? 'bg-navy text-white' : 'border-navy/40 text-navy']" @click="category = c.slug">{{ c.name }}</button>
+      <div class="mt-4 flex flex-wrap gap-2" role="group" :aria-label="t(`Filtrer par catégorie`)">
+        <button :class="['rounded-full border px-4 py-1.5 text-sm font-medium', category === 'all' ? 'border-navy bg-navy text-white' : 'border-navy/40 text-navy']" @click="category = 'all'">{{ t(`Tout`) }}</button>
+        <button :class="['rounded-full border px-4 py-1.5 text-sm font-medium', category === 'masses' ? 'border-gold bg-gold-dark text-white' : 'border-gold/60 text-gold-dark']" @click="category = 'masses'">{{ t(`Messes et confessions`) }}</button>
+        <button v-for="c in cats?.items" :key="c.id" :class="['rounded-full border px-4 py-1.5 text-sm font-medium', category === c.slug ? 'bg-navy text-white' : 'border-navy/40 text-navy']" @click="category = c.slug">{{ t(c.name) }}</button>
       </div>
 
       <!-- Grille mensuelle (ordinateur) -->
       <div v-if="view === 'month'" class="card mt-6 hidden overflow-hidden md:block">
         <div class="grid grid-cols-7 bg-navy text-center text-sm font-semibold uppercase tracking-wider text-white">
-          <div v-for="w in weekNames" :key="w" class="py-2">{{ w }}</div>
+          <div v-for="w in weekNames" :key="w" class="py-2">{{ t(w) }}</div>
         </div>
         <div v-for="(week, wi) in grid.weeks" :key="wi" class="grid grid-cols-7 border-t border-slate-100">
           <div v-for="d in week" :key="d.key" :class="['min-h-28 border-l border-slate-100 p-1.5 first:border-l-0', d.inMonth ? '' : 'bg-cream-dark text-slate-600']">
@@ -104,7 +105,7 @@ const weekNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
                   <span v-if="it.time" class="font-semibold">{{ it.time }}</span> {{ it.title }}
                 </component>
               </li>
-              <li v-if="(byDay.get(d.key) ?? []).length > 4" class="px-1 text-xs text-slate-600">+ {{ (byDay.get(d.key) ?? []).length - 4 }} autres</li>
+              <li v-if="(byDay.get(d.key) ?? []).length > 4" class="px-1 text-xs text-slate-600">+ {{ (byDay.get(d.key) ?? []).length - 4 }} {{ t(`autres`) }}</li>
             </ul>
           </div>
         </div>
@@ -112,7 +113,7 @@ const weekNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
       <!-- Liste (mobile, ou choix « Liste ») -->
       <div :class="['mt-6 space-y-3', view === 'month' ? 'md:hidden' : '']">
-        <p v-if="!listDays.length" class="text-center text-slate-600">Rien de prévu ce mois-ci.</p>
+        <p v-if="!listDays.length" class="text-center text-slate-600">{{ t(`Rien de prévu ce mois-ci.`) }}</p>
         <section v-for="[day, items] in listDays" :key="day" class="card overflow-hidden">
           <h3 :class="['px-4 py-2 font-serif text-lg font-semibold capitalize', day === today ? 'bg-gold-dark text-white' : 'bg-cream-dark text-navy']">{{ dayLong(day) }}</h3>
           <ul class="divide-y divide-slate-100">

@@ -58,11 +58,11 @@ export const weekdayLabel: Record<string, string> = {
 export const kindLabel: Record<string, string> = { MASS: 'Messe', CONFESSION: 'Confessions', ADORATION: 'Adoration', OTHER: '' };
 
 /** « 06:15 » → « 6h15 » */
-export const hm = (t: string) => t.replace(/^0/, '').replace(':', 'h');
+export const hm = (time: string) => (loc() === 'en' ? time : time.replace(/^0/, '').replace(':', 'h'));
 
 /** Affiche une date AAAA-MM-JJ(T…) en « 5 octobre 2026 ». */
 export const longDate = (iso: string | null | undefined) =>
-  iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '';
+  iso ? new Date(iso).toLocaleDateString(dateLocale(), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '';
 
 export type ScheduleItem = { id: number; weekday: string; time: string; kind: string; language: string | null; location: string | null; notes: string | null };
 

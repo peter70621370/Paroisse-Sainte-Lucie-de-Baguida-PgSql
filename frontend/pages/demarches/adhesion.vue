@@ -14,9 +14,9 @@ const steps = ['Remplissez le formulaire : il arrive directement au secrétariat
 
 <template>
   <div>
-    <PageTitle title="Adhésion à la paroisse" subtitle="Faites-vous connaître et rejoignez notre communauté" />
+    <PageTitle :title="t(`Adhésion à la paroisse`)" :subtitle="t(`Faites-vous connaître et rejoignez notre communauté`)" />
     <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-3">
-      <div class="lg:col-span-2"><PublicForm slug="membership" :fields="fields" submit-label="Envoyer mon adhésion" /></div>
+      <div class="lg:col-span-2"><PublicForm slug="membership" :fields="fields" :submit-label="t(`Envoyer mon adhésion`)" /></div>
       <SideHelp :steps="steps" />
     </div>
   </div>

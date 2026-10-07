@@ -18,9 +18,9 @@ const steps = ['Indiquez le sacrement souhaité et vos coordonnées.', 'Le secr�
 
 <template>
   <div>
-    <PageTitle title="Demande de sacrement" subtitle="Le secrétariat vous recontactera pour la préparation" />
+    <PageTitle :title="t(`Demande de sacrement`)" :subtitle="t(`Le secrétariat vous recontactera pour la préparation`)" />
     <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-3">
-      <div class="lg:col-span-2"><PublicForm slug="sacrament" :fields="fields" submit-label="Envoyer la demande" /></div>
+      <div class="lg:col-span-2"><PublicForm slug="sacrament" :fields="fields" :submit-label="t(`Envoyer la demande`)" /></div>
       <SideHelp :steps="steps" />
     </div>
   </div>

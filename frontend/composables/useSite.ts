@@ -12,7 +12,14 @@ export const PLACEHOLDERS = {
 
 export const useSite = async () => {
   const { data } = await useFetch<{ settings: SiteSettings }>('/api/settings', { key: 'site-settings', dedupe: 'defer' });
-  const s = computed(() => data.value?.settings ?? {});
+  // En anglais, un réglage « xxx.en » renseigné remplace le réglage français « xxx » (sinon le français reste affiché).
+  const s = computed<SiteSettings>(() => {
+    const all = data.value?.settings ?? {};
+    if (loc() !== 'en') return all;
+    const out = { ...all };
+    for (const [key, value] of Object.entries(all)) if (key.endsWith('.en') && value) out[key.slice(0, -3)] = value;
+    return out;
+  });
   return {
     s,
     name: computed(() => s.value['site.name'] || 'Paroisse Sainte Lucie de Baguida'),
@@ -33,6 +40,16 @@ export const useSite = async () => {
   };
 };
 
+/**
+ * Valeur d'en-tête (titre, description…). Côté serveur, les en-têtes sont assemblés APRÈS le rendu, hors du contexte de la page :
+ * on calcule donc la valeur tout de suite (les données sont déjà chargées). Côté navigateur, elle reste recalculée à chaque changement.
+ */
+const lazy = <T>(fn: () => T): (() => T) => {
+  if (!import.meta.server) return fn;
+  const value = fn();
+  return () => value;
+};
+
 type SeoOpts = { image?: string | null; noindex?: boolean; lang?: string; canonical?: string };
 
 /**
@@ -45,35 +62,68 @@ export const usePageSeo = (title: MaybeRefOrGetter<string>, description?: MaybeR
   const route = useRoute();
   const abs = (u: string) => (/^https?:\/\//.test(u) ? u : siteUrl + u);
 
-  const full = computed(() => (toValue(title) ? `${toValue(title)} – ${siteName}` : siteName));
-  const canonical = computed(() => abs(toValue(opts).canonical ?? route.path));
-  const image = computed(() => abs(toValue(opts).image || PLACEHOLDERS.og));
+  // Les titres et descriptions fixes (en français dans le code) sont traduits ; les contenus saisis restent tels quels.
+  const full = lazy(() => (toValue(title) ? `${t(toValue(title))} – ${siteName}` : siteName));
+  const desc = lazy(() => t(toValue(description)) || undefined);
+  const lang = lazy(() => toValue(opts).lang || loc());
+  const bare = barePath(route.path);
+  const canonical = lazy(() => abs(toValue(opts).canonical ?? route.path));
+  const image = lazy(() => abs(toValue(opts).image || PLACEHOLDERS.og));
 
   useSeoMeta({
     title: full,
     ogTitle: full,
     twitterTitle: full,
-    description: () => toValue(description) || undefined,
-    ogDescription: () => toValue(description) || undefined,
-    twitterDescription: () => toValue(description) || undefined,
+    description: desc,
+    ogDescription: desc,
+    twitterDescription: desc,
     ogType: 'website',
     ogSiteName: siteName,
     ogUrl: canonical,
     ogImage: image,
     twitterImage: image,
     twitterCard: 'summary_large_image',
-    ogLocale: () => (toValue(opts).lang === 'ee' ? 'ee_TG' : 'fr_FR'),
-    robots: () => (toValue(opts).noindex ? 'noindex, nofollow' : undefined),
+    ogLocale: lazy(() => ({ ee: 'ee_TG', en: 'en_GB' } as Record<string, string>)[lang()] ?? 'fr_FR'),
+    robots: lazy(() => (toValue(opts).noindex ? 'noindex, nofollow' : undefined)),
   });
   useHead({
-    link: [{ rel: 'canonical', href: canonical }],
-    htmlAttrs: { lang: () => toValue(opts).lang || 'fr' },
+    link: [
+      { rel: 'canonical', href: canonical },
+      // Versions linguistiques de la page (pour les moteurs de recherche)
+      { rel: 'alternate', hreflang: 'fr', href: abs(lp(bare, 'fr')) },
+      { rel: 'alternate', hreflang: 'en', href: abs(lp(bare, 'en')) },
+      { rel: 'alternate', hreflang: 'x-default', href: abs(lp(bare, 'fr')) },
+    ],
+    htmlAttrs: { lang },
   });
 };
 
 /** Données structurées schema.org (JSON-LD) pour les moteurs de recherche. */
 export const useJsonLd = (data: MaybeRefOrGetter<Record<string, unknown>>) => {
   useHead({
-    script: [{ type: 'application/ld+json', innerHTML: () => JSON.stringify({ '@context': 'https://schema.org', ...toValue(data) }).replace(/</g, '\\u003c') }],
+    script: [{ type: 'application/ld+json', innerHTML: lazy(() => JSON.stringify({ '@context': 'https://schema.org', ...toValue(data) }).replace(/</g, '\\u003c')) }],
+  });
+};
+
+type PageContent = { title: string; excerpt: string | null; content: string; seoTitle: string | null; seoDescription: string | null };
+
+/**
+ * Page rédigée dans l'administration, dans la langue du visiteur.
+ * Si la version demandée n'existe pas, la version française est renvoyée avec « fallback: true ». `null` si la page n'existe pas.
+ */
+export const usePageContent = (slug: string, forced?: string) => {
+  const locale = forced || loc();
+  return useAsyncData(`page-${slug}-${locale}`, async () => {
+    const get = (l: string) => $fetch<{ page: PageContent }>(`/api/pages/${slug}`, { query: { locale: l } });
+    try {
+      return { ...(await get(locale)).page, locale, fallback: false };
+    } catch {
+      if (locale === 'fr') return null;
+      try {
+        return { ...(await get('fr')).page, locale: 'fr', fallback: true };
+      } catch {
+        return null;
+      }
+    }
   });
 };

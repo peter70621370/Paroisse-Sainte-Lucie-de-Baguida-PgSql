@@ -16,9 +16,9 @@ const steps = ['Remplissez une demande par enfant (ou par adulte).', 'Le respons
 
 <template>
   <div>
-    <PageTitle title="Inscription au catéchisme" subtitle="Préparation aux sacrements pour enfants et adultes" />
+    <PageTitle :title="t(`Inscription au catéchisme`)" :subtitle="t(`Préparation aux sacrements pour enfants et adultes`)" />
     <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-3">
-      <div class="lg:col-span-2"><PublicForm slug="catechism" :fields="fields" submit-label="Envoyer l'inscription" /></div>
+      <div class="lg:col-span-2"><PublicForm slug="catechism" :fields="fields" :submit-label="t(`Envoyer l'inscription`)" /></div>
       <SideHelp :steps="steps" />
     </div>
   </div>

@@ -7,7 +7,10 @@ const timeFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: PARISH_TZ, hour: '2
 /** Jour (AAAA-MM-JJ) d'un instant, à l'heure de la paroisse. */
 export const dayKey = (iso: string | Date) => dayFmt.format(new Date(iso));
 /** « 18h30 » */
-export const timeLabel = (iso: string | Date) => timeFmt.format(new Date(iso)).replace(':', 'h').replace(/^0/, '');
+/** « 18:30 » (tri, comparaisons) */
+export const timeKey = (iso: string | Date) => timeFmt.format(new Date(iso));
+/** « 18h30 » (« 18:30 » en anglais) */
+export const timeLabel = (iso: string | Date) => (loc() === 'en' ? timeKey(iso) : timeKey(iso).replace(':', 'h').replace(/^0/, ''));
 export const todayKey = () => dayKey(new Date());
 
 const utcDate = (key: string) => new Date(`${key}T00:00:00Z`);
@@ -17,8 +20,8 @@ export const weekdayIndex = (key: string) => (utcDate(key).getUTCDay() + 6) % 7;
 export const WEEKDAY_KEYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 
 export const monthLabel = (ym: string) =>
-  utcDate(`${ym}-01`).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-export const dayLong = (key: string) => utcDate(key).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+  utcDate(`${ym}-01`).toLocaleDateString(dateLocale(), { month: 'long', year: 'numeric', timeZone: 'UTC' });
+export const dayLong = (key: string) => utcDate(key).toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 export const shiftMonth = (ym: string, delta: number) => {
   const [y, m] = ym.split('-').map(Number) as [number, number];
   const d = new Date(Date.UTC(y, m - 1 + delta, 1));

@@ -28,6 +28,16 @@ export default defineNuxtConfig({
       ],
     },
   },
+  hooks: {
+    // Site en anglais : chaque page publique existe aussi sous « /en/… » (même fichier, textes traduits par t()).
+    // L'administration reste en français, sans préfixe.
+    'pages:extend'(pages) {
+      const english = pages
+        .filter((p) => !p.path.startsWith('/admin'))
+        .map((p) => ({ ...p, name: `en___${p.name}`, path: p.path === '/' ? '/en' : `/en${p.path}` }));
+      pages.push(...english);
+    },
+  },
   typescript: { strict: true },
   vite: {
     // Nécessaire pour le rechargement à chaud sur volumes Docker (Windows).

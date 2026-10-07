@@ -15,9 +15,9 @@ const steps = ['Rédigez votre intention et indiquez, si vous le souhaitez, une 
 
 <template>
   <div>
-    <PageTitle title="Intention de messe" subtitle="Confiez vos intentions à la prière de la communauté" />
+    <PageTitle :title="t(`Intention de messe`)" :subtitle="t(`Confiez vos intentions à la prière de la communauté`)" />
     <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-3">
-      <div class="lg:col-span-2"><PublicForm slug="mass-intention" :fields="fields" submit-label="Envoyer l'intention" success-text="Votre intention a bien été transmise. Le secrétariat vous confirmera la date de la messe." /></div>
+      <div class="lg:col-span-2"><PublicForm slug="mass-intention" :fields="fields" :submit-label="t(`Envoyer l'intention`)" :success-text="t(`Votre intention a bien été transmise. Le secrétariat vous confirmera la date de la messe.`)" /></div>
       <SideHelp :steps="steps" />
     </div>
   </div>

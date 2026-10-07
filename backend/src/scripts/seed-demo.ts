@@ -79,6 +79,12 @@ async function settings() {
     'site.contactEmail': 'contact@paroissesaintelucie-baguida.org',
     'site.hours': 'Mardi au vendredi : 8h – 12h et 15h – 18h\nSamedi : 8h – 12h\nDimanche et lundi : fermé',
     'live.label': 'Chaque dimanche à 8h30',
+    // Version anglaise
+    'site.tagline.en': 'A community of faith, prayer and fellowship',
+    'home.welcomeTitle.en': 'Welcome to Sainte Lucie Parish',
+    'home.welcomeText.en': 'Whether you are a parishioner, a visitor passing through or a member of the diaspora, we are happy to welcome you. Find here the Mass times, announcements, bulletins and the whole life of our community.',
+    'site.hours.en': 'Tuesday to Friday: 8:00 – 12:00 and 15:00 – 18:00\nSaturday: 8:00 – 12:00\nSunday and Monday: closed',
+    'live.label.en': 'Every Sunday at 8:30',
   };
   for (const [key, value] of Object.entries(values)) {
     const cur = await prisma.setting.findUnique({ where: { key } });
@@ -258,15 +264,162 @@ async function pages() {
       content: p('La paroisse ne vit que des dons de ses fidèles et de ses amis. Votre générosité permet d’entretenir l’église, de former les catéchistes, d’aider les familles en difficulté et de mener à bien nos projets. <strong>Merci de votre soutien, quel qu’en soit le montant.</strong>'),
     },
   ];
-  for (const pg of list) {
-    const where = { slug_locale: { slug: pg.slug, locale: 'fr' } };
-    const cur = await prisma.page.findUnique({ where });
-    if (!cur) {
-      const created = await prisma.page.create({ data: { ...pg, locale: 'fr', status: 'PUBLISHED', publishedAt: new Date() } });
-      note('page', created.id);
-    } else if (cur.content.includes('[Texte provisoire]') || manifest.ids.page?.includes(cur.id)) {
-      await prisma.page.update({ where, data: pg });
-      if (!manifest.ids.page?.includes(cur.id)) note('page', cur.id);
+  // Version anglaise des mêmes pages (site en « /en/… »).
+  const listEn: typeof list = [
+    {
+      slug: 'mot-du-cure',
+      title: 'A word from the Parish Priest',
+      excerpt: 'May everyone find here a home where we pray, listen to one another and leave with a lighter heart.',
+      content:
+        p('Dear parishioners, dear friends, dear visitors,', 'It is a great joy to welcome you to the website of Sainte Lucie Parish in Baguida. Whether you have always lived in the neighbourhood, are passing through or follow us from abroad, you are at home here.') +
+        '<blockquote><p>“I am the light of the world. Whoever follows me will not walk in darkness, but will have the light of life.” (John 8:12)</p></blockquote>' +
+        p('Our patron saint, Lucy, whose name means “light”, reminds us every day of our calling: to welcome the light of Christ and carry it around us, in our families, our workplaces and our neighbourhoods.') +
+        '<h2>A parish that welcomes</h2>' +
+        p('Our community wants to be an open house. People come to pray, to celebrate the great moments of life, to entrust an intention, to ask for advice or simply to find a little peace. The priests, catechists and all the volunteers are here to listen.') +
+        '<h2>A parish that grows</h2>' +
+        p('Catechesis for children and adults, prayer groups, youth movements, the choir, service teams: so many places where everyone can find their place and grow in faith. Do not hesitate to come in.') +
+        '<h2>A parish that serves</h2>' +
+        p('Faith is also lived through charity. With your help, we accompany the sick, the elderly and families in difficulty. Thank you to all who give their time, talents and means.') +
+        p('I wish you a good visit of this site and, above all, I hope to have the joy of meeting you at church.', '<strong>May the Lord bless you and keep you.</strong>', '<em>Your Parish Priest</em>'),
+    },
+    {
+      slug: 'histoire',
+      title: 'History of the parish',
+      excerpt: 'From a small prayer community by the ocean to a living parish: the main stages of our journey.',
+      content:
+        p('<em>This text is an example: it will be replaced by the real history of the parish, with its dates, founders and archive photographs.</em>') +
+        '<h2>The first steps</h2>' +
+        p('It all began with a few families of fishermen and farmers who gathered to pray the rosary under a makeshift shelter, a stone’s throw from the ocean. A catechist came to visit them, then a priest celebrated Mass from time to time. The community grew, carried by the fervour of the elders.') +
+        '<h2>The outstation becomes a parish</h2>' +
+        p('As the neighbourhood developed, the chapel became too small. The faithful rallied round: everyone brought sand, bricks and a few days of work. The present church rose thanks to this generosity. The community was then established as a parish under the patronage of Saint Lucy, virgin and martyr.') +
+        '<h2>Saint Lucy, our patron</h2>' +
+        p('Lucy of Syracuse gave her life for Christ at the beginning of the 4th century. Her name evokes light: her feast is celebrated on 13 December, in the heart of Advent. Each year the patronal feast gathers the whole parish around a solemn Mass, a procession and a shared meal.') +
+        '<h2>Today</h2>' +
+        p('The parish now has several neighbourhood communities, many movements and a dynamic youth. It continues its mission with three priorities:') +
+        ul('<strong>proclaiming</strong> the Gospel to all, children, young people and adults;', '<strong>celebrating</strong> the sacraments with care and beauty;', '<strong>serving</strong> the most vulnerable, in the neighbourhood and beyond.'),
+    },
+    {
+      slug: 'vision-mission',
+      title: 'Vision and mission',
+      excerpt: 'A fraternal community, rooted in prayer, carrying the light of Christ to Baguida and beyond.',
+      content:
+        '<h2>Our vision</h2>' +
+        p('To be a fraternal and missionary community where everyone, whatever their age or story, can meet Christ, grow in faith and serve others.') +
+        '<h2>Our mission</h2>' +
+        ul(
+          '<strong>Pray and celebrate</strong>: offer beautiful, prayerful liturgies where everyone feels welcome.',
+          '<strong>Form</strong>: accompany children, young people and adults through catechesis and biblical formation.',
+          '<strong>Gather</strong>: bring fraternity to life through neighbourhood communities and movements.',
+          '<strong>Serve</strong>: be attentive to the sick, the lonely and families in difficulty.',
+          '<strong>Witness</strong>: be, like Saint Lucy, bearers of light where we live.',
+        ) +
+        '<h2>Our values</h2>' +
+        '<h3>Welcome</h3>' +
+        p('No one is a stranger in the house of God. We want every visitor to leave wishing to come back.') +
+        '<h3>Shared responsibility</h3>' +
+        p('The parish is everyone’s concern: priests, religious and lay people carry the mission together, each according to their gifts.') +
+        '<h3>Transparency</h3>' +
+        p('The gifts of the faithful are managed rigorously. The Finance Council reports regularly on how resources are used.') +
+        '<blockquote><p>“You are the light of the world.” (Matthew 5:14)</p></blockquote>',
+    },
+    {
+      slug: 'sacrements',
+      title: 'The sacraments',
+      excerpt: 'Baptism, Eucharist, confirmation, reconciliation, marriage, anointing of the sick: the great stages of Christian life.',
+      content:
+        p('The sacraments are signs of God’s love that mark the whole of Christian life. The parish accompanies you in preparing for them. For any request, you can call at the parish office or use the <a href="/en/demarches/sacrement">sacrament request form</a>.') +
+        '<h2>Baptism</h2>' +
+        p('Baptism brings us into the family of God’s children. It is offered at any age.') +
+        ul('<strong>Infants</strong>: parents register at the parish office at least two months before the desired date and take part in three preparation meetings.', '<strong>School-age children, young people and adults</strong>: preparation takes place within catechesis (the catechumenate).') +
+        '<h2>The Eucharist (First Communion)</h2>' +
+        p('Children prepare to receive the Body of Christ over several years of catechesis. Adults are accompanied by a dedicated team.') +
+        '<h2>Confirmation</h2>' +
+        p('Through confirmation, the baptised receive the strength of the Holy Spirit to bear witness to their faith. It is celebrated each year by the bishop or his delegate.') +
+        '<h2>Reconciliation (confession)</h2>' +
+        p('A priest is available every Saturday afternoon and by appointment. Penitential services are offered during Advent and Lent. See the <a href="/en/horaires">Mass times</a>.') +
+        '<h2>Marriage</h2>' +
+        p('Engaged couples contact the parish <strong>at least six months</strong> before the planned date. Preparation includes meetings with a priest and with accompanying couples.') +
+        '<h2>Anointing of the sick</h2>' +
+        p('This sacrament brings comfort and peace to those tried by illness or old age. Do not wait until the last moment: call the parish office and a priest will come to the home or hospital.') +
+        '<h2>Documents required</h2>' +
+        ul('birth certificate;', 'baptism card or certificate (for communion, confirmation and marriage);', 'for godparents: confirmation certificate.'),
+    },
+    {
+      slug: 'groupes-de-priere',
+      title: 'Prayer groups and movements',
+      excerpt: 'Choirs, Legion of Mary, Charismatic Renewal, altar servers… Find the group that suits you.',
+      content:
+        p('The parish lives thanks to its many groups. Each has its own charism, schedule and leaders. You are welcome to come to a first meeting, with no commitment.') +
+        '<h2>Prayer and praise</h2>' +
+        ul('<strong>Charismatic Renewal</strong>: praise, listening to the Word and intercession. Every Tuesday at 18:30, in the church.', '<strong>Legion of Mary</strong>: rosary and visits to the sick. Every Thursday at 17:00.', '<strong>Sacred Heart group</strong>: adoration and Mass on the first Friday of the month.') +
+        '<h2>Liturgy and song</h2>' +
+        ul('<strong>Sainte Cécile choir</strong> (French): rehearsals on Wednesday and Friday at 19:00.', '<strong>Hanyé choir</strong> (Ewe): rehearsals on Tuesday and Thursday at 19:00.', '<strong>Readers</strong>: preparation of the readings on Saturday at 16:00.', '<strong>Altar servers</strong>: for children and young people from the age of 8, on Saturday at 15:00.') +
+        '<h2>Fraternity and service</h2>' +
+        ul('<strong>Neighbourhood communities</strong>: sharing the Word in homes, once a week.', '<strong>Parish Caritas</strong>: help for families in difficulty, visits to the sick and prisoners.', '<strong>Catholic Women</strong> and <strong>Catholic Men</strong>: monthly meetings, mutual support and formation.') +
+        p('Would you like to join a group? Write to us through the <a href="/en/contact">Contact</a> page or call at the parish office.'),
+    },
+    {
+      slug: 'catechese',
+      title: 'Catechesis and formation',
+      excerpt: 'A path for every age: awakening to faith, First Communion, confirmation and the adult catechumenate.',
+      content:
+        p('Catechesis helps everyone to know Jesus, to pray and to live as a Christian. It is for children, young people and adults. Sessions take place <strong>on Saturday from 15:00 to 17:00</strong> and <strong>on Sunday after the 8:30 Mass</strong>.') +
+        '<h2>The stages</h2>' +
+        ul('<strong>Awakening to faith</strong> (ages 5–7): discovering God through song, stories and prayer.', '<strong>Preparation for baptism</strong>: for school-age children who are not yet baptised.', '<strong>First Communion</strong>: a three-year journey.', '<strong>Profession of faith</strong>: going deeper and saying “I believe” for oneself.', '<strong>Confirmation</strong>: two years, from the age of 13.', '<strong>Adults (catechumenate)</strong>: personal accompaniment towards the sacraments.') +
+        '<h2>Enrolling</h2>' +
+        p('Enrolment takes place at the start of the pastoral year, at the parish office or online with the <a href="/en/demarches/catechisme">enrolment form</a>. Please bring a birth certificate and, where applicable, the baptism card.') +
+        '<h2>Becoming a catechist</h2>' +
+        p('The parish needs catechists! Training is provided throughout the year. If you enjoy passing on the faith and have two hours a week, speak to a priest or to the head of catechesis.') +
+        '<blockquote><p>“Let the little children come to me.” (Mark 10:14)</p></blockquote>',
+    },
+    {
+      slug: 'jeunesse',
+      title: 'Youth',
+      excerpt: 'Movements, gatherings, sport, camps and times of prayer: the parish gives young people a big place.',
+      content:
+        p('Young people are not only the future of the Church: they are its present. At Sainte Lucie they lead Masses, organise outings, serve and learn together.') +
+        '<h2>The movements</h2>' +
+        ul('<strong>Cœurs Vaillants – Âmes Vaillantes (CV-AV)</strong>: for ages 6–14, games, songs and human and Christian formation, on Sunday at 15:00.', '<strong>Scouts and guides</strong>: team life, nature and service, on Saturday at 15:00.', '<strong>Young Catholic Students (JEC)</strong>: for secondary-school pupils.', '<strong>Young adults group</strong>: students and young professionals, every other Friday at 19:00.') +
+        '<h2>Highlights of the year</h2>' +
+        ul('the youth Mass, every last Sunday of the month;', 'the back-to-school day of recollection;', 'the Christmas vigil and the Way of the Cross led by young people;', 'the summer camp and the outing to Baguida beach;', 'the inter-movement football tournament.') +
+        '<h2>Join us</h2>' +
+        p('Come as you are! Introduce yourself to the youth chaplain after Mass or write to us through the <a href="/en/contact">Contact</a> page.'),
+    },
+    {
+      slug: 'sengager',
+      title: 'Get involved',
+      excerpt: 'Everyone has received a gift to put at the service of all. Discover the services that need you.',
+      content:
+        p('A living parish relies on the commitment of its members. An hour a week or a month: every gesture counts. Here are a few services where you can find your place.') +
+        '<h2>Serving the liturgy</h2>' +
+        ul('sing in a choir or play an instrument;', 'proclaim the Word (readers);', 'serve at the altar;', 'decorate and look after the church;', 'welcome people and help with order at Masses.') +
+        '<h2>Serving the faith</h2>' +
+        ul('become a catechist or accompany catechumens;', 'lead a neighbourhood community;', 'accompany engaged couples or parents asking for baptism.') +
+        '<h2>Serving our brothers and sisters</h2>' +
+        ul('join the parish Caritas;', 'visit the sick and the elderly;', 'take part in clean-up days and parish works.') +
+        '<h2>Serving communication</h2>' +
+        ul('write the parish bulletin;', 'take photos and videos of celebrations;', 'help broadcast the Mass live.') +
+        p('Ready to start? Fill in the <a href="/en/demarches/adhesion">registration form</a> or speak to a member of the pastoral team. You can also <a href="/en/dons">support the parish with a gift</a>.'),
+    },
+    {
+      slug: 'dons',
+      title: 'Giving and support',
+      excerpt: 'Support the life and projects of the parish.',
+      content: p('The parish lives only on the gifts of its faithful and friends. Your generosity makes it possible to maintain the church, train catechists, help families in difficulty and carry out our projects. <strong>Thank you for your support, whatever the amount.</strong>'),
+    },
+  ];
+
+  for (const [locale, pagesOfLocale] of [['fr', list], ['en', listEn]] as const) {
+    for (const pg of pagesOfLocale) {
+      const where = { slug_locale: { slug: pg.slug, locale } };
+      const cur = await prisma.page.findUnique({ where });
+      if (!cur) {
+        const created = await prisma.page.create({ data: { ...pg, locale, status: 'PUBLISHED', publishedAt: new Date() } });
+        note('page', created.id);
+      } else if (cur.content.includes('[Texte provisoire]') || manifest.ids.page?.includes(cur.id)) {
+        await prisma.page.update({ where, data: pg });
+        if (!manifest.ids.page?.includes(cur.id)) note('page', cur.id);
+      }
     }
   }
 }

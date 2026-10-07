@@ -19,9 +19,9 @@ const links = [
     <div class="bg-pattern border-b border-white/10 bg-navy-dark">
       <div class="mx-auto grid max-w-6xl items-center gap-6 px-4 py-10 md:grid-cols-2">
         <div>
-          <p class="eyebrow !text-gold-light">Lettre d'information</p>
-          <p class="mt-2 font-serif text-2xl font-bold text-white md:text-3xl">Restez proches de la paroisse</p>
-          <p class="mt-2 text-white/80">Annonces, temps forts et bulletin : l'essentiel, directement dans votre boîte e-mail.</p>
+          <p class="eyebrow !text-gold-light">{{ t(`Lettre d'information`) }}</p>
+          <p class="mt-2 font-serif text-2xl font-bold text-white md:text-3xl">{{ t(`Restez proches de la paroisse`) }}</p>
+          <p class="mt-2 text-white/80">{{ t(`Annonces, temps forts et bulletin : l'essentiel, directement dans votre boîte e-mail.`) }}</p>
         </div>
         <NewsletterForm />
       </div>
@@ -41,37 +41,37 @@ const links = [
       </div>
 
       <div>
-        <h2 class="font-serif text-lg font-semibold text-gold-light">Contact</h2>
+        <h2 class="font-serif text-lg font-semibold text-gold-light">{{ t(`Contact`) }}</h2>
         <address class="mt-4 space-y-3 text-[0.95rem] not-italic">
           <p v-if="s['site.address']" class="flex gap-2.5"><Icon name="pin" class="mt-1 text-gold-light" /><span>{{ s['site.address'] }}</span></p>
           <p v-if="s['site.phone']" class="flex gap-2.5"><Icon name="phone" class="mt-1 text-gold-light" /><a :href="`tel:${s['site.phone'].replace(/\s/g, '')}`" class="hover:text-gold-light hover:underline">{{ s['site.phone'] }}</a></p>
           <p v-if="s['site.contactEmail']" class="flex gap-2.5"><Icon name="mail" class="mt-1 text-gold-light" /><a :href="`mailto:${s['site.contactEmail']}`" class="break-all hover:text-gold-light hover:underline">{{ s['site.contactEmail'] }}</a></p>
-          <p v-if="!s['site.address'] && !s['site.phone'] && !s['site.contactEmail']" class="text-white/70">Coordonnées à renseigner dans l'administration.</p>
+          <p v-if="!s['site.address'] && !s['site.phone'] && !s['site.contactEmail']" class="text-white/70">{{ t(`Coordonnées à renseigner dans l'administration.`) }}</p>
         </address>
       </div>
 
       <div>
-        <h2 class="font-serif text-lg font-semibold text-gold-light">Secrétariat</h2>
+        <h2 class="font-serif text-lg font-semibold text-gold-light">{{ t(`Secrétariat`) }}</h2>
         <ul v-if="hours.length" class="mt-4 space-y-2 text-[0.95rem]">
           <li v-for="h in hours" :key="h" class="flex gap-2.5"><Icon name="clock" class="mt-1 text-gold-light" /><span>{{ h }}</span></li>
         </ul>
-        <p v-else class="mt-4 text-[0.95rem] text-white/70">Horaires d'ouverture à venir.</p>
-        <NuxtLink to="/contact" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-gold-light hover:underline">Nous écrire <Icon name="arrow" /></NuxtLink>
+        <p v-else class="mt-4 text-[0.95rem] text-white/70">{{ t(`Horaires d'ouverture à venir.`) }}</p>
+        <NuxtLink :to="lp('/contact')" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-gold-light hover:underline">{{ t(`Nous écrire`) }} <Icon name="arrow" /></NuxtLink>
       </div>
 
       <div>
-        <h2 class="font-serif text-lg font-semibold text-gold-light">Liens utiles</h2>
+        <h2 class="font-serif text-lg font-semibold text-gold-light">{{ t(`Liens utiles`) }}</h2>
         <ul class="mt-4 space-y-2 text-[0.95rem]">
-          <li v-for="[to, label] in links" :key="to"><NuxtLink :to="to" class="hover:text-gold-light hover:underline">{{ label }}</NuxtLink></li>
+          <li v-for="[to, label] in links" :key="to"><NuxtLink :to="lp(to)" class="hover:text-gold-light hover:underline">{{ t(label) }}</NuxtLink></li>
         </ul>
       </div>
     </div>
 
     <div class="border-t border-white/10 px-4 py-5 text-center text-sm text-white/70">
       © {{ year }} {{ name }} ·
-      <NuxtLink to="/p/mentions-legales" class="hover:text-white hover:underline">Mentions légales</NuxtLink> ·
-      <NuxtLink to="/p/confidentialite" class="hover:text-white hover:underline">Confidentialité</NuxtLink> ·
-      <button class="hover:text-white hover:underline" @click="set('unset')">Gérer mes choix</button>
+      <NuxtLink :to="lp('/p/mentions-legales')" class="hover:text-white hover:underline">{{ t(`Mentions légales`) }}</NuxtLink> ·
+      <NuxtLink :to="lp('/p/confidentialite')" class="hover:text-white hover:underline">{{ t(`Confidentialité`) }}</NuxtLink> ·
+      <button class="hover:text-white hover:underline" @click="set('unset')">{{ t(`Gérer mes choix`) }}</button>
     </div>
   </footer>
 </template>

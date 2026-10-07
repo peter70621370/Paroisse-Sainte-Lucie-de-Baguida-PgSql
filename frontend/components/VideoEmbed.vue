@@ -16,13 +16,13 @@ const media = computed(() => {
 <template>
   <div v-if="media">
     <div v-if="loaded" class="aspect-video w-full overflow-hidden rounded-lg bg-black">
-      <iframe :src="media.src" :title="title || 'Vidéo'" class="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" />
+      <iframe :src="media.src" :title="title || t(`Vidéo`)" class="h-full w-full" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" />
     </div>
     <button v-else type="button" class="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg bg-navy-dark p-6 text-center text-white hover:bg-navy" @click="loaded = true">
       <span class="flex h-16 w-16 items-center justify-center rounded-full bg-gold-dark text-3xl" aria-hidden="true">▶</span>
-      <span class="font-serif text-xl font-semibold">Regarder la vidéo</span>
-      <span class="max-w-md text-xs text-white/70">Au clic, la vidéo est chargée depuis {{ media.provider }}, qui peut déposer ses propres cookies.</span>
+      <span class="font-serif text-xl font-semibold">{{ t(`Regarder la vidéo`) }}</span>
+      <span class="max-w-md text-xs text-white/70">{{ t(`Au clic, la vidéo est chargée depuis`) }} {{ media.provider }}, {{ t(`qui peut déposer ses propres cookies.`) }}</span>
     </button>
   </div>
-  <a v-else :href="url" target="_blank" rel="noopener noreferrer" class="inline-block rounded border border-navy px-4 py-2 text-navy hover:bg-navy hover:text-white">Voir la vidéo</a>
+  <a v-else :href="url" target="_blank" rel="noopener noreferrer" class="inline-block rounded border border-navy px-4 py-2 text-navy hover:bg-navy hover:text-white">{{ t(`Voir la vidéo`) }}</a>
 </template>

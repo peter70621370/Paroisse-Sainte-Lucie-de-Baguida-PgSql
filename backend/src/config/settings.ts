@@ -18,6 +18,12 @@ export const SETTINGS = {
   'social.facebook': { label: 'Page Facebook (URL)', type: 'text', group: 'Réseaux sociaux' },
   'social.youtube': { label: 'Chaîne YouTube (URL)', type: 'text', group: 'Réseaux sociaux' },
   'social.whatsapp': { label: 'WhatsApp (URL)', type: 'text', group: 'Réseaux sociaux' },
+  // Version anglaise du site : laissés vides, les textes français ci-dessus sont affichés.
+  'site.tagline.en': { label: 'Slogan (anglais)', type: 'text', group: 'Version anglaise' },
+  'home.welcomeTitle.en': { label: 'Titre de bienvenue (anglais)', type: 'text', group: 'Version anglaise' },
+  'home.welcomeText.en': { label: 'Texte de bienvenue (anglais)', type: 'textarea', group: 'Version anglaise' },
+  'site.hours.en': { label: 'Horaires du secrétariat (anglais)', type: 'textarea', group: 'Version anglaise' },
+  'live.label.en': { label: 'Intitulé de la diffusion en direct (anglais)', type: 'text', group: 'Version anglaise' },
 } as const satisfies Record<string, { label: string; type: SettingType; group: string }>;
 
 export type SettingKey = keyof typeof SETTINGS;

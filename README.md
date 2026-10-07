@@ -122,8 +122,13 @@ Un hébergeur limite souvent les envois en masse par SMTP : pour de gros volumes
 
 - **Galerie :** albums de photos (optimisées automatiquement) et de vidéos YouTube/Facebook, avec visionneuse plein écran.
 - **Messe en direct :** renseigner le lien dans Administration › Paramètres du site › « Messe en direct ». Un bandeau apparaît sur l'accueil et la page `/direct` ; vider le champ pour le retirer.
-- **Éwé :** chaque **page** peut exister en éwé (Administration › Pages › Langue). Un sélecteur « Français | Éwé » apparaît automatiquement quand les deux versions existent.
-  Le menu et les textes du site restent en français : la traduction de l'interface demande des textes éwé fournis par la paroisse.
+- **Langues :** français (par défaut, adresses sans préfixe) et **anglais** (adresses en `/en/…`). Le sélecteur FR / EN / EE est dans l'en-tête ; l'**éwé** y est annoncé mais pas encore activé.
+  - *Interface* (menus, boutons, formulaires, messages) : traduite dans `frontend/locales/en.ts`. Dans le code, le texte français sert de clé : `t('Faire un don')`. Un texte sans traduction s'affiche en français.
+  - *Pages rédigées* : créer une seconde page avec la **même adresse (slug)** et la langue « English » (Administration › Pages). Sans version anglaise, la page française est affichée avec une mention.
+  - *Textes d'accueil, slogan, horaires du secrétariat* : Administration › Paramètres du site › « Version anglaise ».
+  - *Annonces, événements, homélies, campagnes* : une seule langue (celle de la saisie) pour l'instant.
+  - *Activer l'éwé plus tard* : ajouter `locales/ee.ts`, passer `enabled: true` dans `frontend/utils/i18n.ts` et étendre le préfixe de langue (`/ee/…`) dans ce même fichier et dans `nuxt.config.ts`.
+  - L'administration reste en français.
 
 ## Contenu de démonstration et images provisoires
 

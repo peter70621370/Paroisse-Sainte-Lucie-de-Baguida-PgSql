@@ -91,3 +91,23 @@ test('en-têtes de sécurité (production)', async ({ request }) => {
   expect(h['x-frame-options']).toBe('SAMEORIGIN');
   expect(h['referrer-policy']).toBeTruthy();
 });
+
+test('version anglaise : interface traduite, liens conservés dans la langue, éwé annoncé', async ({ page }) => {
+  await open(page, '/en/horaires');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('heading', { level: 1, name: 'Mass times' })).toBeVisible();
+  await expect(page).toHaveTitle(/Mass times/);
+  // les liens restent en anglais
+  await expect(page.locator('footer').getByRole('link', { name: 'Contact us' })).toHaveAttribute('href', '/en/contact');
+  // une page rédigée existe en anglais
+  await open(page, '/en/p/sacrements');
+  await expect(page.getByRole('heading', { level: 1, name: 'The sacraments' })).toBeVisible();
+  // l'éwé est annoncé mais pas encore activé
+  const langs = page.getByRole('group', { name: 'Site language' });
+  if (await langs.isVisible()) {
+    await expect(langs.getByText('coming soon')).toHaveCount(1);
+    await langs.getByRole('link', { name: 'Français' }).click();
+    await expect(page).toHaveURL(/\/p\/sacrements$/);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  }
+});
