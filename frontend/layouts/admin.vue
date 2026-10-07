@@ -59,22 +59,23 @@ const initials = computed(() => `${user.value?.firstName?.[0] ?? ''}${user.value
           <p class="font-serif text-lg font-bold">Administration</p>
         </div>
       </div>
-      <nav class="admin-nav flex flex-col gap-0.5 px-3 py-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pb-6">
+      <nav class="admin-nav flex flex-col gap-0.5 px-3 py-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overflow-x-hidden lg:pb-6">
         <template v-for="l in links" :key="'to' in l ? l.to : l.section">
-          <p v-if="'section' in l" class="mt-4 px-3 pb-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/55">{{ l.section }}</p>
+          <p v-if="'section' in l" class="mt-4 shrink-0 px-3 pb-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/55">{{ l.section }}</p>
           <NuxtLink
             v-else
             :to="l.to"
-            :class="['flex items-center gap-3 rounded-lg px-3 py-2 text-[0.93rem] transition', isActive(l.to) ? 'bg-gold-dark font-semibold text-white shadow-sm' : 'text-white/85 hover:bg-white/10 hover:text-white']"
+            :class="['group flex shrink-0 items-center gap-3 rounded-lg border-l-[3px] px-3 py-2 text-[0.93rem] transition-colors duration-200 ease-out', isActive(l.to) ? 'border-gold-light bg-gold-dark font-semibold text-white shadow-sm' : 'border-transparent text-white/85 hover:border-gold-light hover:bg-white/10 hover:text-gold-light']"
           >
-            <Icon :name="l.icon" :class="isActive(l.to) ? '' : 'text-gold-light'" />
-            <span class="flex-1">{{ l.label }}</span>
+            <Icon :name="l.icon" :class="['transition-transform duration-200 group-hover:scale-125', isActive(l.to) ? '' : 'text-gold-light']" />
+            <!-- L'effet agit sur le libellé (transformation) et non sur la ligne : la mise en page ne bouge pas, donc aucun tremblement -->
+            <span :class="['flex-1 origin-left transition-transform duration-200 ease-out', isActive(l.to) ? '' : 'group-hover:translate-x-1 group-hover:scale-105']">{{ l.label }}</span>
             <span v-if="l.badge" :class="['rounded-full px-2 py-0.5 text-xs font-bold', isActive(l.to) ? 'bg-white text-gold-deep' : 'bg-gold-dark text-white']">{{ l.badge }}</span>
           </NuxtLink>
         </template>
 
         <!-- Compte connecté : tout en bas du menu, à la suite des rubriques (défile avec elles) -->
-        <div class="mt-5 border-t border-white/10 px-1 pt-4">
+        <div class="mt-5 shrink-0 border-t border-white/10 px-1 pt-4">
           <div class="flex items-center gap-3">
             <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 font-serif font-bold text-gold-light" aria-hidden="true">{{ initials }}</span>
             <div class="min-w-0 leading-tight">

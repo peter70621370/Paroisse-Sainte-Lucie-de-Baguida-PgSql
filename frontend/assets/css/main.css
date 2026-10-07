@@ -53,7 +53,7 @@ body {
 .ProseMirror.rich ul > li::before { content: none; }
 
 /* Menu de l'administration : barre de défilement discrète, assortie au fond sombre */
-.admin-nav { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
+.admin-nav { scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
 .admin-nav::-webkit-scrollbar { width: 6px; }
 .admin-nav::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 3px; }
 .admin-nav::-webkit-scrollbar-track { background: transparent; }
