@@ -722,12 +722,70 @@ async function submissions() {
   }
 }
 
+/** Version anglaise des annonces et événements d'exemple (repérés par leur titre français ; ne remplace jamais une traduction déjà saisie). */
+async function translations() {
+  const feast = nextFeast().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const anns: Record<string, { titleEn: string; contentEn: string }> = {
+    'Bienvenue sur le nouveau site de la paroisse': {
+      titleEn: 'Welcome to the new parish website',
+      contentEn:
+        p('Sainte Lucie Parish in Baguida has a new website. Here you will find the <a href="/en/horaires">Mass times</a>, the <a href="/en/agenda">calendar</a>, the <a href="/en/bulletins">bulletins</a>, the <a href="/en/homelies">homilies</a> and photos of our celebrations.') +
+        p('You can also make your requests online: catechism enrolment, sacrament requests, Mass intentions, and support the parish with a <a href="/en/dons">secure gift</a>.'),
+    },
+    'Inscriptions à la catéchèse : c’est le moment': {
+      titleEn: 'Catechism enrolment: now is the time',
+      contentEn:
+        p('Enrolment for the new year of catechesis is open for children, young people and adults.') +
+        ul('at the parish office, Tuesday to Saturday;', 'or online, with the <a href="/en/demarches/catechisme">enrolment form</a>.') +
+        p('Documents required: birth certificate and, for the baptised, the baptism card.'),
+    },
+    'Fête patronale de Sainte Lucie : préparons-nous': {
+      titleEn: 'Patronal feast of Saint Lucy: let us prepare',
+      contentEn:
+        p(`Our patronal feast will be celebrated on <strong>${feast}</strong>. It will be preceded by a novena of prayer every evening at 18:30.`) +
+        p('Groups and movements wishing to take part (songs, procession, shared meal) are invited to let the parish office know.'),
+    },
+    'Appel aux bénévoles : chorale, accueil et retransmission': {
+      titleEn: 'Call for volunteers: choir, welcome and broadcasting',
+      contentEn: p('The parish is looking for choir members (all voices), people to welcome the faithful at Sunday Masses and volunteers for the video broadcast. Training is provided.') + p('To offer your help, use the <a href="/en/demarches/adhesion">registration form</a> or speak to a priest after Mass.'),
+    },
+    'Nouvelle salle paroissiale : la collecte est lancée': {
+      titleEn: 'New parish hall: the appeal is launched',
+      contentEn: p('To host catechesis, meetings and family celebrations, the parish is building a multi-purpose hall. Every contribution counts, however modest.') + p('Follow the progress of the appeal and take part on the <a href="/en/dons">Donate</a> page.'),
+    },
+  };
+  for (const a of await prisma.announcement.findMany({ where: { id: { in: manifest.ids.announcement ?? [] }, titleEn: null } })) {
+    const tr = anns[a.title];
+    if (tr) await prisma.announcement.update({ where: { id: a.id }, data: tr });
+  }
+
+  const church = 'Parish church';
+  const evs: Record<string, { titleEn: string; locationEn: string; descriptionEn: string }> = {
+    'Messe de rentrée pastorale': { titleEn: 'Opening Mass of the pastoral year', locationEn: church, descriptionEn: 'Mass sending all groups and movements on mission, followed by refreshments.' },
+    'Répétition de la chorale Sainte Cécile': { titleEn: 'Sainte Cécile choir rehearsal', locationEn: church, descriptionEn: 'Preparing the hymns for Sunday. New singers are welcome.' },
+    'Rentrée de la catéchèse': { titleEn: 'Start of the catechism year', locationEn: 'Catechism rooms', descriptionEn: 'Welcome of children and parents, allocation to groups and handing out of the year’s calendar.\nPlease bring an exercise book and the baptism card.' },
+    'Chapelet médité et adoration': { titleEn: 'Meditated rosary and adoration', locationEn: church, descriptionEn: 'Rosary led by the Legion of Mary, followed by a time of silent adoration.' },
+    'Récollection des jeunes': { titleEn: 'Youth day of recollection', locationEn: 'Spiritual centre (departure in front of the church)', descriptionEn: 'A day to pray, share and set off again on the right foot.\nContribution: 1,000 CFA francs (meal included). Register with the movement leaders.' },
+    'Réunion du Conseil pastoral paroissial': { titleEn: 'Parish Pastoral Council meeting', locationEn: 'Saint-Joseph hall', descriptionEn: 'Agenda: Advent calendar, patronal feast, update on the construction of the parish hall.' },
+    'Journée de salubrité': { titleEn: 'Clean-up day', locationEn: 'Church and parish courtyard', descriptionEn: 'Cleaning the church, the courtyard and the surroundings. Come with brooms, rakes and good cheer!' },
+    'Triduum de prière pour les vocations': { titleEn: 'Triduum of prayer for vocations', locationEn: church, descriptionEn: 'Three evenings of prayer, teaching and testimonies. Closing Mass on the third evening.' },
+    'Formation des catéchistes': { titleEn: 'Catechist training', locationEn: 'Saint-Joseph hall', descriptionEn: 'Theme: “Telling the Bible to children”. Open to all who wish to become catechists.' },
+    'Kermesse paroissiale': { titleEn: 'Parish fair', locationEn: 'Parish courtyard', descriptionEn: 'Stalls, games, raffle, barbecue and a concert by the choirs. Proceeds will go to the construction of the parish hall.' },
+    'Tournoi de football inter-mouvements': { titleEn: 'Inter-movement football tournament', locationEn: 'College pitch', descriptionEn: 'Final and trophy presentation at 17:30.' },
+    'Fête patronale : solennité de sainte Lucie': { titleEn: 'Patronal feast: solemnity of Saint Lucy', locationEn: church, descriptionEn: 'Solemn Mass at 9:00, procession, then a shared meal in the parish courtyard.\nThe preparatory novena begins nine days earlier, every evening at 18:30.' },
+  };
+  for (const e of await prisma.event.findMany({ where: { id: { in: manifest.ids.event ?? [] }, titleEn: null } })) {
+    const tr = evs[e.title];
+    if (tr) await prisma.event.update({ where: { id: e.id }, data: tr });
+  }
+}
+
 try {
   if (process.argv.includes('--clear')) {
     await clear();
   } else {
     // Enregistré après chaque étape : une interruption ne laisse pas de contenu « orphelin ».
-    for (const step of [settings, pages, announcements, schedules, staff, events, homilies, bulletins, albums, campaigns, submissions]) {
+    for (const step of [settings, pages, announcements, schedules, staff, events, homilies, bulletins, albums, campaigns, submissions, translations]) {
       await step();
       await saveManifest();
     }

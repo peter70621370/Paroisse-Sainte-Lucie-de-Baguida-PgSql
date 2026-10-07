@@ -12,11 +12,11 @@ type Alb = { slug: string; title: string; date: string | null; count: number; co
 
 const [{ data: sched }, { data: anns }, { data: buls }, { data: homs }, { data: cure }, { data: evs }, { data: camps }, { data: albs }] = await Promise.all([
   useFetch<{ items: ScheduleItem[] }>('/api/mass-schedules', { key: 'home-sched' }),
-  useFetch<{ items: Ann[] }>('/api/announcements', { key: 'announcements-bar' }),
+  useFetch<{ items: Ann[] }>('/api/announcements', { query: useLocaleQuery() }),
   useFetch<{ items: Bul[] }>('/api/bulletins', { key: 'home-bul', query: { pageSize: 1 } }),
   useFetch<{ items: Hom[] }>('/api/homilies', { key: 'home-hom', query: { pageSize: 3 } }),
   usePageContent('mot-du-cure'),
-  useFetch<{ items: Ev[] }>('/api/events', { key: 'home-events' }),
+  useFetch<{ items: Ev[] }>('/api/events', { query: useLocaleQuery() }),
   useFetch<{ items: Camp[] }>('/api/campaigns', { key: 'home-camps' }),
   useFetch<{ items: Alb[] }>('/api/albums', { key: 'home-albums' }),
 ]);

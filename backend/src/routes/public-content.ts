@@ -25,14 +25,18 @@ const publicContent: FastifyPluginAsync = async (app) => {
     return { page: { slug, locale, title, excerpt, content, seoTitle, seoDescription, publishedAt, updatedAt } };
   });
 
-  app.get('/announcements', async () => {
+  // Langue demandée par le site (« en » = version anglaise si elle est renseignée, sinon français).
+  const localeOf = (query: unknown) => z.object({ locale: z.string().regex(/^[a-z]{2}$/).default('fr') }).passthrough().parse(query).locale;
+
+  app.get('/announcements', async (req) => {
+    const en = localeOf(req.query) === 'en';
     const now = new Date();
     const items = await db.announcement.findMany({
       where: { ...visible(), OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] },
       orderBy: [{ pinned: 'desc' }, { publishedAt: 'desc' }],
       take: 30,
     });
-    return { items: items.map(({ id, title, content, pinned, publishedAt }) => ({ id, title, content, pinned, publishedAt })) };
+    return { items: items.map((a) => ({ id: a.id, title: (en && a.titleEn) || a.title, content: (en && a.contentEn) || a.content, pinned: a.pinned, publishedAt: a.publishedAt })) };
   });
 
   app.get('/bulletins', async (req) => {
@@ -67,8 +71,8 @@ const publicContent: FastifyPluginAsync = async (app) => {
 
   // ---- Agenda ----
   const dayParam = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-  const eventOut = (e: { id: number; title: string; description: string | null; location: string | null; startsAt: Date; endsAt: Date | null; allDay: boolean; category: { name: string; slug: string; color: string | null } | null }) => ({
-    id: e.id, title: e.title, description: e.description, location: e.location, startsAt: e.startsAt, endsAt: e.endsAt, allDay: e.allDay,
+  const eventOut = (e: { id: number; title: string; description: string | null; location: string | null; titleEn: string | null; descriptionEn: string | null; locationEn: string | null; startsAt: Date; endsAt: Date | null; allDay: boolean; category: { name: string; slug: string; color: string | null } | null }, en = false) => ({
+    id: e.id, title: (en && e.titleEn) || e.title, description: (en && e.descriptionEn) || e.description, location: (en && e.locationEn) || e.location, startsAt: e.startsAt, endsAt: e.endsAt, allDay: e.allDay,
     category: e.category ? { name: e.category.name, slug: e.category.slug, color: e.category.color } : null,
   });
 
@@ -78,7 +82,7 @@ const publicContent: FastifyPluginAsync = async (app) => {
 
   // Événements publiés d'une période (défaut : 90 jours à partir d'aujourd'hui). Inclut ceux qui ont commencé avant et se terminent dans la période.
   app.get('/events', async (req) => {
-    const q = z.object({ from: dayParam.optional(), to: dayParam.optional(), category: z.string().max(100).optional() }).parse(req.query);
+    const q = z.object({ from: dayParam.optional(), to: dayParam.optional(), category: z.string().max(100).optional(), locale: z.string().regex(/^[a-z]{2}$/).optional() }).parse(req.query);
     const from = new Date(`${q.from ?? new Date().toISOString().slice(0, 10)}T00:00:00Z`);
     const to = q.to ? new Date(`${q.to}T00:00:00Z`) : new Date(from.getTime() + 90 * 86_400_000);
     if (to < from || to.getTime() - from.getTime() > 400 * 86_400_000) throw new HttpError(400, 'Période invalide (400 jours maximum)');
@@ -94,14 +98,14 @@ const publicContent: FastifyPluginAsync = async (app) => {
       orderBy: { startsAt: 'asc' },
       take: 500,
     });
-    return { items: items.map(eventOut) };
+    return { items: items.map((e) => eventOut(e, q.locale === 'en')) };
   });
 
   app.get('/events/:id', async (req) => {
     const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
     const e = await db.event.findFirst({ where: { id, status: 'PUBLISHED' }, include: { category: true } });
     if (!e) throw new HttpError(404, 'Événement introuvable');
-    return { event: eventOut(e) };
+    return { event: eventOut(e, localeOf(req.query) === 'en') };
   });
 
   app.get('/homilies/:id', async (req) => {

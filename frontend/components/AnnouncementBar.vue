@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Bandeau d'actualité : l'annonce la plus en avant (épinglée, sinon la plus récente).
-const { data } = await useFetch<{ items: { id: number; title: string }[] }>('/api/announcements', { key: 'announcements-bar' });
+const { data } = await useFetch<{ items: { id: number; title: string }[] }>('/api/announcements', { query: useLocaleQuery() });
 const top = computed(() => data.value?.items[0]);
 </script>
 

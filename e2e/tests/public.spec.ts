@@ -100,6 +100,9 @@ test('version anglaise : interface traduite, liens conservés dans la langue, é
   // les liens restent en anglais
   await expect(page.locator('footer').getByRole('link', { name: 'Contact us' })).toHaveAttribute('href', '/en/contact');
   // une page rédigée existe en anglais
+  // annonces et événements : version anglaise
+  await open(page, '/en/actualites');
+  await expect(page.getByRole('heading', { level: 2, name: 'Welcome to the new parish website' })).toBeVisible();
   await open(page, '/en/p/sacrements');
   await expect(page.getByRole('heading', { level: 1, name: 'The sacraments' })).toBeVisible();
   // l'éwé est annoncé mais pas encore activé
@@ -109,5 +112,7 @@ test('version anglaise : interface traduite, liens conservés dans la langue, é
     await langs.getByRole('link', { name: 'Français' }).click();
     await expect(page).toHaveURL(/\/p\/sacrements$/);
     await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+    // le bandeau d'actualité suit la langue sans rechargement
+    await expect(page.getByRole('link', { name: /Bienvenue sur le nouveau site/ }).first()).toBeVisible();
   }
 });

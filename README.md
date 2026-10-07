@@ -126,7 +126,8 @@ Un hébergeur limite souvent les envois en masse par SMTP : pour de gros volumes
   - *Interface* (menus, boutons, formulaires, messages) : traduite dans `frontend/locales/en.ts`. Dans le code, le texte français sert de clé : `t('Faire un don')`. Un texte sans traduction s'affiche en français.
   - *Pages rédigées* : créer une seconde page avec la **même adresse (slug)** et la langue « English » (Administration › Pages). Sans version anglaise, la page française est affichée avec une mention.
   - *Textes d'accueil, slogan, horaires du secrétariat* : Administration › Paramètres du site › « Version anglaise ».
-  - *Annonces, événements, homélies, campagnes* : une seule langue (celle de la saisie) pour l'instant.
+  - *Annonces et événements* : bloc « Version anglaise » (facultatif) dans leur fiche d'administration ; laissé vide, le site anglais affiche le français.
+  - *Homélies, bulletins, campagnes, albums* : une seule langue (celle de la saisie) pour l'instant.
   - *Activer l'éwé plus tard* : ajouter `locales/ee.ts`, passer `enabled: true` dans `frontend/utils/i18n.ts` et étendre le préfixe de langue (`/ee/…`) dans ce même fichier et dans `nuxt.config.ts`.
   - L'administration reste en français.
 

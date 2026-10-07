@@ -38,3 +38,9 @@ export function t(key: string | null | undefined, params?: Record<string, string
 
 /** Format régional des dates. */
 export const dateLocale = () => (loc() === 'en' ? 'en-GB' : 'fr-FR');
+
+/** Paramètre « locale » des appels à l'API pour les contenus bilingues (annonces, événements) ; suit le changement de langue. */
+export const useLocaleQuery = () => {
+  const route = useRoute();
+  return computed(() => ({ locale: localeOfPath(route.path) }));
+};

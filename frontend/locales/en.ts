@@ -440,7 +440,7 @@ const en: Record<string, string> = {
   "La page que vous cherchez n'existe pas ou n'est plus disponible.": 'The page you are looking for does not exist or is no longer available.',
   'Veuillez réessayer dans un instant.': 'Please try again in a moment.',
   "Cette page n'est pas encore disponible dans cette langue : elle est affichée en français.": 'This page is not yet available in this language: it is shown in French.',
-  'Certains contenus (annonces, événements, homélies) ne sont publiés qu\'en français.': 'Some content (announcements, events, homilies) is published in French only.',
+  "Certains contenus (homélies, bulletins) ne sont publiés qu'en français.": 'Some content (homilies, bulletins) is published in French only.',
 };
 
 export default en;

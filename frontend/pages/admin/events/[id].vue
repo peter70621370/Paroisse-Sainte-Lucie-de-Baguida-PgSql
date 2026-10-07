@@ -10,14 +10,14 @@ const canPublish = computed(() => user.value?.role !== 'CONTRIBUTOR');
 
 const { data: cats } = await useAdminFetch<{ items: { id: number; name: string }[] }>('/api/admin/event-categories', { query: { pageSize: 100 } });
 
-const form = reactive({ title: '', description: '', location: '', startsAt: '', endsAt: '', allDay: false, categoryId: null as number | null, status: 'DRAFT' as 'DRAFT' | 'PUBLISHED' });
+const form = reactive({ title: '', description: '', location: '', titleEn: '', descriptionEn: '', locationEn: '', startsAt: '', endsAt: '', allDay: false, categoryId: null as number | null, status: 'DRAFT' as 'DRAFT' | 'PUBLISHED' });
 
 if (id) {
   const { data, error } = await useAdminFetch<{ item: any }>(`/api/admin/events/${id}`);
   if (error.value || !data.value) throw createError({ statusCode: 404, statusMessage: 'Événement introuvable' });
   const e = data.value.item;
   Object.assign(form, {
-    title: e.title, description: e.description ?? '', location: e.location ?? '', startsAt: toLocalInput(e.startsAt), endsAt: toLocalInput(e.endsAt),
+    title: e.title, description: e.description ?? '', location: e.location ?? '', titleEn: e.titleEn ?? '', descriptionEn: e.descriptionEn ?? '', locationEn: e.locationEn ?? '', startsAt: toLocalInput(e.startsAt), endsAt: toLocalInput(e.endsAt),
     allDay: e.allDay, categoryId: e.categoryId, status: e.status,
   });
 }
@@ -92,6 +92,23 @@ async function remove() {
         <span class="mb-1.5 block font-semibold text-navy">Description (facultatif)</span>
         <textarea v-model="form.description" rows="5" maxlength="5000" class="field" />
       </label>
+      <fieldset class="card grid gap-4 p-5 sm:grid-cols-2">
+        <legend class="px-2 font-serif text-base font-bold text-navy">Version anglaise</legend>
+        <p class="text-xs text-slate-600 sm:col-span-2">Facultatif. Laissé vide, le site anglais affiche le texte français.</p>
+        <label class="text-sm">
+          <span class="mb-1.5 block font-semibold text-navy">Titre (anglais)</span>
+          <input v-model="form.titleEn" maxlength="255" lang="en" class="field" />
+        </label>
+        <label class="text-sm">
+          <span class="mb-1.5 block font-semibold text-navy">Lieu (anglais)</span>
+          <input v-model="form.locationEn" maxlength="255" lang="en" class="field" />
+        </label>
+        <label class="text-sm sm:col-span-2">
+          <span class="mb-1.5 block font-semibold text-navy">Description (anglais)</span>
+          <textarea v-model="form.descriptionEn" rows="5" maxlength="5000" lang="en" class="field" />
+        </label>
+      </fieldset>
+
       <label class="block max-w-xs text-sm">
         <span class="mb-1.5 block font-semibold text-navy">Statut</span>
         <select v-model="form.status" class="field">

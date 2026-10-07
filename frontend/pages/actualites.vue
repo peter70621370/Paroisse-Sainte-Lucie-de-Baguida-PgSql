@@ -1,13 +1,12 @@
 <script setup lang="ts">
 type Ann = { id: number; title: string; content: string; pinned: boolean; publishedAt: string };
-const { data } = await useFetch<{ items: Ann[] }>('/api/announcements', { key: 'announcements-bar' });
+const { data } = await useFetch<{ items: Ann[] }>('/api/announcements', { query: useLocaleQuery() });
 usePageSeo('Annonces paroissiales', 'Les annonces et actualités de la paroisse.');
 </script>
 
 <template>
   <div>
     <PageTitle :title="t(`Annonces paroissiales`)" :subtitle="t(`Les actualités de notre communauté`)" />
-    <ContentLangNote />
     <div class="mx-auto max-w-4xl space-y-6 px-4 py-12">
       <p v-if="!data?.items.length" class="card p-8 text-center text-slate-600">{{ t(`Aucune annonce pour le moment.`) }}</p>
       <article v-for="a in data?.items" :key="a.id" :class="['card flex gap-5 p-6 md:p-7', a.pinned ? 'border-gold/60 ring-1 ring-gold/40' : '']">

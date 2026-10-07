@@ -11,6 +11,8 @@ const dateOnly = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date attendue au forma
 const status = z.enum(['DRAFT', 'PUBLISHED']);
 const optText = (max: number) => z.string().trim().max(max).nullish().transform((v) => v || null);
 const html = (max: number) => z.string().max(max).transform(cleanHtml);
+// Texte riche facultatif : un éditeur laissé vide (« <p></p> ») vaut « pas de texte ».
+const optHtml = (max: number) => z.string().max(max).nullish().transform((v) => { const c = v ? cleanHtml(v) : ''; return c.replace(/<[^>]*>/g, '').trim() || /<img/.test(c) ? c : null; });
 const url = z.string().trim().url().max(500).refine((u) => /^https?:\/\//i.test(u), 'URL http(s) attendue');
 const optUrl = z.union([url, z.literal(''), z.null()]).optional().transform((v) => v || null);
 
@@ -29,6 +31,8 @@ const pageSchema = z.object({
 const announcementSchema = z.object({
   title: z.string().trim().min(1).max(255),
   content: html(100_000),
+  titleEn: optText(255),
+  contentEn: optHtml(100_000),
   pinned: z.boolean().default(false),
   status: status.default('DRAFT'),
   publishedAt: dateTime.nullish(),
@@ -77,6 +81,9 @@ const eventSchema = z.object({
   title: z.string().trim().min(1).max(255),
   description: optText(5000),
   location: optText(255),
+  titleEn: optText(255),
+  descriptionEn: optText(5000),
+  locationEn: optText(255),
   startsAt: dateTime,
   endsAt: dateTime.nullish(),
   allDay: z.boolean().default(false),

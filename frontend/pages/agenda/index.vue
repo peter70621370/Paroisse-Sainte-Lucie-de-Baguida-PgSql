@@ -12,7 +12,7 @@ const category = ref<string>('all'); // all | masses | <slug>
 const view = ref<'month' | 'list'>('month');
 
 const grid = computed(() => monthGrid(ym.value));
-const query = computed(() => ({ from: grid.value.from, to: grid.value.to }));
+const query = computed(() => ({ from: grid.value.from, to: grid.value.to, locale: loc() }));
 
 const [{ data: evs }, { data: sched }, { data: cats }] = await Promise.all([
   useFetch<{ items: Ev[] }>('/api/events', { query, watch: [query] }),
@@ -67,7 +67,6 @@ const weekNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 <template>
   <div>
     <PageTitle :title="t(`Agenda paroissial`)" :subtitle="t(`Messes, célébrations et événements`)" />
-    <ContentLangNote />
     <div class="mx-auto max-w-6xl px-4 py-12">
       <!-- Navigation et filtres -->
       <div class="flex flex-wrap items-center justify-between gap-3">

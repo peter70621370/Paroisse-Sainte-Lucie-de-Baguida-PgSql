@@ -209,4 +209,41 @@ describe.skipIf(!process.env.RUN_DB_TESTS)('formulaires et agenda', () => {
       expect((await call('GET', '/api/events?from=hier')).statusCode).toBe(400);
     });
   });
+  describe('contenus bilingues (annonces et événements)', () => {
+    it('le site anglais reçoit la version anglaise, sinon le français', async () => {
+      const day = '2031-07-10';
+      const ev = await call('POST', '/api/admin/events', 'editor', {
+        title: `${tag} Fête`, titleEn: `${tag} Feast`, description: 'Messe solennelle', descriptionEn: 'Solemn Mass', location: 'Église', startsAt: `${day}T09:00:00Z`, status: 'PUBLISHED',
+      });
+      expect(ev.statusCode).toBe(201);
+      const id = ev.json().item.id;
+
+      const fr = (await call('GET', `/api/events/${id}`)).json().event;
+      expect(fr).toMatchObject({ title: `${tag} Fête`, description: 'Messe solennelle', location: 'Église' });
+      const en = (await call('GET', `/api/events/${id}?locale=en`)).json().event;
+      // titre et description traduits ; lieu non traduit -> français
+      expect(en).toMatchObject({ title: `${tag} Feast`, description: 'Solemn Mass', location: 'Église' });
+      expect(en.titleEn).toBeUndefined(); // les champs internes ne sortent pas de l'API publique
+      const list = (await call('GET', `/api/events?from=${day}&to=${day}&locale=en`)).json().items;
+      expect(list.find((e: { id: number }) => e.id === id).title).toBe(`${tag} Feast`);
+
+      const ann = await call('POST', '/api/admin/announcements', 'editor', {
+        title: `${tag} Annonce`, content: '<p>Bonjour</p>', titleEn: `${tag} Notice`, contentEn: '<p>Hello <script>alert(1)</script></p>', status: 'PUBLISHED',
+      });
+      expect(ann.statusCode).toBe(201);
+      const annId = ann.json().item.id;
+      const find = async (q: string) => (await call('GET', `/api/announcements${q}`)).json().items.find((a: { id: number }) => a.id === annId);
+      expect(await find('')).toMatchObject({ title: `${tag} Annonce`, content: '<p>Bonjour</p>' });
+      const annEn = await find('?locale=en');
+      expect(annEn.title).toBe(`${tag} Notice`);
+      expect(annEn.content).toContain('Hello');
+      expect(annEn.content).not.toMatch(/script/i); // nettoyé comme le texte français
+
+      // traduction vidée (éditeur laissé vide) -> retour au français
+      expect((await call('PATCH', `/api/admin/announcements/${annId}`, 'editor', { titleEn: '', contentEn: '<p></p>' })).statusCode).toBe(200);
+      expect(await find('?locale=en')).toMatchObject({ title: `${tag} Annonce`, content: '<p>Bonjour</p>' });
+
+      await prisma.announcement.delete({ where: { id: annId } });
+    });
+  });
 });

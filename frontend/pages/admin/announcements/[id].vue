@@ -7,13 +7,13 @@ const isNew = route.params.id === 'new';
 const id = isNew ? null : Number(route.params.id);
 const { user } = useAuth();
 
-const form = reactive({ title: '', content: '', pinned: false, expiresAt: '', status: 'DRAFT' as 'DRAFT' | 'PUBLISHED', publishedAt: '' });
+const form = reactive({ title: '', content: '', titleEn: '', contentEn: '', pinned: false, expiresAt: '', status: 'DRAFT' as 'DRAFT' | 'PUBLISHED', publishedAt: '' });
 
 if (id) {
   const { data, error } = await useAdminFetch<{ item: any }>(`/api/admin/announcements/${id}`);
   if (error.value || !data.value) throw createError({ statusCode: 404, statusMessage: 'Annonce introuvable' });
   const a = data.value.item;
-  Object.assign(form, { title: a.title, content: a.content, pinned: a.pinned, expiresAt: toLocalInput(a.expiresAt), status: a.status, publishedAt: toLocalInput(a.publishedAt) });
+  Object.assign(form, { title: a.title, content: a.content, titleEn: a.titleEn ?? '', contentEn: a.contentEn ?? '', pinned: a.pinned, expiresAt: toLocalInput(a.expiresAt), status: a.status, publishedAt: toLocalInput(a.publishedAt) });
 }
 
 const err = ref('');
@@ -65,6 +65,19 @@ async function remove() {
         <span class="mb-1.5 block font-semibold text-navy">Texte</span>
         <RichEditor v-model="form.content" />
       </div>
+
+      <fieldset class="card space-y-4 p-5">
+        <legend class="px-2 font-serif text-base font-bold text-navy">Version anglaise</legend>
+        <p class="text-xs text-slate-600">Facultatif. Laissé vide, le site anglais affiche le texte français.</p>
+        <label class="block text-sm">
+          <span class="mb-1.5 block font-semibold text-navy">Titre (anglais)</span>
+          <input v-model="form.titleEn" maxlength="255" lang="en" class="field" />
+        </label>
+        <div class="text-sm">
+          <span class="mb-1.5 block font-semibold text-navy">Texte (anglais)</span>
+          <RichEditor v-model="form.contentEn" />
+        </div>
+      </fieldset>
 
       <div class="grid gap-3 sm:grid-cols-2">
         <label class="flex items-center gap-2 text-sm">

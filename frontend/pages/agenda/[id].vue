@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute();
-const { data, error } = await useFetch<{ event: { id: number; title: string; description: string | null; location: string | null; startsAt: string; endsAt: string | null; allDay: boolean; category: { name: string } | null } }>(`/api/events/${route.params.id}`);
+const { data, error } = await useFetch<{ event: { id: number; title: string; description: string | null; location: string | null; startsAt: string; endsAt: string | null; allDay: boolean; category: { name: string } | null } }>(`/api/events/${route.params.id}`, { query: useLocaleQuery() });
 if (error.value || !data.value) throw createError({ statusCode: 404, statusMessage: 'Événement introuvable', fatal: true });
 const e = computed(() => data.value!.event);
 
