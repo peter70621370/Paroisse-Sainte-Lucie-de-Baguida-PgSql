@@ -29,9 +29,6 @@ services:
     plan: free
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
-    # Migrations, compte administrateur, puis l'API. Le contenu d'exemple est recréé en arrière-plan à chaque démarrage
-    # (ses images disparaissent avec le disque) : compter une à deux minutes avant qu'il soit complet.
-    dockerCommand: sh -c "./node_modules/.bin/prisma migrate deploy && node dist/scripts/seed.js && (node dist/scripts/seed-demo.js --clear && node dist/scripts/seed-demo.js &) ; exec node dist/server.js"
     healthCheckPath: /api/health
     buildFilter:
       paths:
@@ -48,6 +45,12 @@ services:
       - key: UPLOAD_DIR
         value: /app/uploads
       - key: COOKIE_SECURE
+        value: "true"
+      # Au démarrage (voir backend/start.sh) : compte administrateur, puis contenu d'exemple recréé en arrière-plan
+      # (ses images disparaissent avec le disque) : compter une à deux minutes avant qu'il soit complet.
+      - key: SEED_ON_START
+        value: "true"
+      - key: DEMO_ON_START
         value: "true"
       - key: PAYMENT_MODE
         value: mock            # dons simulés : aucun vrai paiement (démonstration)

@@ -22,8 +22,6 @@ services:
     plan: starter              # payant : nécessaire pour le disque
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
-    # Migrations, puis compte administrateur et contenus initiaux (sans effet s'ils existent déjà), puis l'API.
-    dockerCommand: sh -c "./node_modules/.bin/prisma migrate deploy && node dist/scripts/seed.js && node dist/server.js"
     buildFilter:
       paths:
         - backend/**
@@ -43,6 +41,8 @@ services:
       - key: UPLOAD_DIR
         value: /app/uploads
       - key: COOKIE_SECURE
+        value: "true"
+      - key: SEED_ON_START      # crée le compte administrateur au démarrage s'il n'existe pas (voir backend/start.sh)
         value: "true"
       - key: PAYMENT_MODE
         value: live            # sans clés CinetPay / PayPal, aucun moyen de paiement n'est proposé
