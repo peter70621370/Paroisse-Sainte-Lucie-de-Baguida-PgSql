@@ -35,7 +35,7 @@ import type { FetchLike } from './services/payments/types.js';
 
 export async function buildApp(env: Env, opts: { withDatabase?: boolean; fetchImpl?: FetchLike } = {}): Promise<FastifyInstance> {
   const { withDatabase = true, fetchImpl } = opts;
-  const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+  const allowedOrigins = (env.CORS_ORIGIN || env.PUBLIC_URL).split(',').map((o) => o.trim());
 
   const app = Fastify({
     logger:

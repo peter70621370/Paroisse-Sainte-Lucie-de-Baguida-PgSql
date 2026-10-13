@@ -1,0 +1,93 @@
+# Déploiement sur Render (https://render.com) : site, API, base de données et disque des fichiers.
+# Dans Render : New > Blueprint, choisir ce dépôt. Les valeurs « sync: false » sont demandées à la création.
+# Marche à suivre et points à vérifier : README, section « Déploiement sur Render ».
+
+databases:
+  - name: sainte-lucie-db
+    region: frankfurt
+    plan: basic-256mb          # payant : la base gratuite de Render est supprimée au bout d'un mois
+    postgresMajorVersion: "17"
+    databaseName: sainte_lucie
+    user: sainte_lucie
+    ipAllowList: []            # aucune connexion depuis Internet : seuls les services Render y accèdent
+
+services:
+  # API (Fastify). Service privé : joignable seulement par le site, à travers le réseau interne de Render.
+  - type: pserv
+    name: sainte-lucie-backend
+    runtime: docker
+    region: frankfurt
+    plan: starter              # payant : nécessaire pour le disque
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    # Migrations, puis compte administrateur et contenus initiaux (sans effet s'ils existent déjà), puis l'API.
+    dockerCommand: sh -c "./node_modules/.bin/prisma migrate deploy && node dist/scripts/seed.js && node dist/server.js"
+    buildFilter:
+      paths:
+        - backend/**
+    disk:
+      name: uploads            # photos et bulletins PDF de la médiathèque
+      mountPath: /app/uploads
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "4000"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sainte-lucie-db
+          property: connectionString
+      - key: UPLOAD_DIR
+        value: /app/uploads
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: PAYMENT_MODE
+        value: live            # sans clés CinetPay / PayPal, aucun moyen de paiement n'est proposé
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PUBLIC_URL        # adresse publique du site, sans barre finale : https://…
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD    # 10 caractères minimum
+        sync: false
+      - key: NOTIFY_EMAIL
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: CINETPAY_API_KEY
+        sync: false
+      - key: CINETPAY_SITE_ID
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+
+  # Site public et administration (Nuxt). Seul service exposé : il relaie /api et /uploads vers l'API.
+  - type: web
+    name: sainte-lucie-site
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    dockerContext: ./frontend
+    dockerfilePath: ./frontend/Dockerfile
+    healthCheckPath: /robots.txt
+    buildFilter:
+      paths:
+        - frontend/**
+    envVars:
+      - key: NUXT_API_INTERNAL
+        fromService:
+          type: pserv
+          name: sainte-lucie-backend
+          property: hostport
+      - key: NUXT_PUBLIC_SITE_URL   # même valeur que PUBLIC_URL
+        sync: false

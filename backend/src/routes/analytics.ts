@@ -33,8 +33,9 @@ const analytics: FastifyPluginAsync = async (app) => {
     let referrer = '';
     try {
       const host = new URL(parsed.data.referrer || '').hostname.replace(/^www\./, '');
-      const own = String(req.headers.host ?? '').split(':')[0]!.replace(/^www\./, '');
-      if (host && host !== own && !/^localhost$/.test(host)) referrer = host.slice(0, 191);
+      // Derrière un relais (Nuxt sur Render), l'en-tête Host est celui du réseau interne : on compare aussi à l'adresse publique.
+      const own = [String(req.headers.host ?? '').split(':')[0]!, new URL(app.env.PUBLIC_URL).hostname].map((h) => h.replace(/^www\./, ''));
+      if (host && !own.includes(host) && !/^localhost$/.test(host)) referrer = host.slice(0, 191);
     } catch { /* pas de référent */ }
 
     const device = /mobi|android|iphone|ipad/i.test(ua) ? 'mobile' : 'desktop';

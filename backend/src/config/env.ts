@@ -5,7 +5,8 @@ const schema = z.object({
   HOST: z.string().default('0.0.0.0'),
   PORT: z.coerce.number().int().default(4000),
   DATABASE_URL: z.string().min(1),
-  CORS_ORIGIN: z.string().default('http://localhost:3000'),
+  // Origines autorisées (séparées par des virgules). Par défaut : PUBLIC_URL.
+  CORS_ORIGIN: z.string().optional(),
   // Par défaut : cookie « secure » uniquement en production (HTTPS).
   COOKIE_SECURE: z.enum(['true', 'false']).optional(),
   // Proxys de confiance devant l'API : leurs adresses (plages réseau). Par défaut : réseaux privés / Docker interne, où seul Nginx est joignable.

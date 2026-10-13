@@ -48,6 +48,29 @@ Nginx expose le port 80 : `/` vers le frontend, `/api` vers le backend. Les migr
 Une sauvegarde PostgreSQL quotidienne est conservée 14 jours (volume `backups`).
 Le HTTPS (Let's Encrypt) sera ajouté à la mise en production sur le VPS.
 
+## Déploiement sur Render
+
+Le fichier `render.yaml` (racine du dépôt) décrit tout : le site, l'API, la base PostgreSQL et le disque des fichiers téléversés.
+Les trois éléments sont sur des **offres payantes** (l'offre gratuite de Render n'a pas de disque et supprime la base au bout d'un mois).
+
+1. Dans Render : **New › Blueprint**, autoriser l'accès au dépôt GitHub et le choisir.
+2. Renseigner les valeurs demandées :
+   - `PUBLIC_URL` et `NUXT_PUBLIC_SITE_URL` : l'adresse publique du site, identique pour les deux, sans barre finale.
+     Au premier déploiement : `https://sainte-lucie-site.onrender.com` (si Render attribue un autre nom, corriger ensuite dans **Environment** de chaque service).
+   - `ADMIN_EMAIL`, `ADMIN_PASSWORD` (10 caractères minimum) : compte administrateur créé au premier démarrage.
+   - SMTP, CinetPay, PayPal : peuvent rester vides au début (pas d'e-mails, aucun moyen de paiement proposé).
+3. Lancer : Render construit les deux images, crée la base, applique les migrations et démarre. Chaque `git push` sur `main` redéploie.
+4. Nom de domaine : service `sainte-lucie-site` › **Settings › Custom Domains**, puis remplacer `PUBLIC_URL` et `NUXT_PUBLIC_SITE_URL` par la nouvelle adresse.
+
+Fonctionnement : seul le site est exposé à Internet (HTTPS fourni par Render) ; il relaie `/api` et `/uploads` vers l'API par le réseau privé.
+Nginx et le service de sauvegarde du compose de production ne sont pas utilisés sur Render.
+
+À vérifier après le premier déploiement :
+
+- **Envoi d'un fichier dans la médiathèque.** L'API tourne avec un utilisateur non privilégié ; si l'envoi échoue (« permission denied » dans les journaux), le disque monté n'est pas inscriptible par cet utilisateur.
+- **Adresse des visiteurs.** Les limites anti-spam se fondent sur l'adresse IP lue dans `X-Forwarded-For`. Dans les journaux de l'API, `remoteAddress` / l'adresse retenue doit être celle du visiteur et non une adresse de Render ; sinon ajuster `TRUST_PROXY`.
+- **Sauvegardes.** Vérifier dans Render ce que l'offre choisie inclut pour la base (restauration) et pour le disque (instantanés).
+
 ## Commandes utiles (backend)
 
 ```bash
