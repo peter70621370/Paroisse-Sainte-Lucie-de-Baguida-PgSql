@@ -50,25 +50,40 @@ Le HTTPS (Let's Encrypt) sera ajouté à la mise en production sur le VPS.
 
 ## Déploiement sur Render
 
-Le fichier `render.yaml` (racine du dépôt) décrit tout : le site, l'API, la base PostgreSQL et le disque des fichiers téléversés.
-Les trois éléments sont sur des **offres payantes** (l'offre gratuite de Render n'a pas de disque et supprime la base au bout d'un mois).
+Deux fichiers décrivent le déploiement (site, API, base PostgreSQL) :
 
-1. Dans Render : **New › Blueprint**, autoriser l'accès au dépôt GitHub et le choisir.
-2. Renseigner les valeurs demandées :
-   - `PUBLIC_URL` et `NUXT_PUBLIC_SITE_URL` : l'adresse publique du site, identique pour les deux, sans barre finale.
-     Au premier déploiement : `https://sainte-lucie-site.onrender.com` (si Render attribue un autre nom, corriger ensuite dans **Environment** de chaque service).
-   - `ADMIN_EMAIL`, `ADMIN_PASSWORD` (10 caractères minimum) : compte administrateur créé au premier démarrage.
-   - SMTP, CinetPay, PayPal : peuvent rester vides au début (pas d'e-mails, aucun moyen de paiement proposé).
-3. Lancer : Render construit les deux images, crée la base, applique les migrations et démarre. Chaque `git push` sur `main` redéploie.
-4. Nom de domaine : service `sainte-lucie-site` › **Settings › Custom Domains**, puis remplacer `PUBLIC_URL` et `NUXT_PUBLIC_SITE_URL` par la nouvelle adresse.
+| Fichier | Usage | Coût |
+|---|---|---|
+| `render.yaml` (racine) | **Démonstration** | gratuit |
+| `deploiement/render.payant.yaml` | **Site réel** : fichiers et base conservés, e-mails, API privée | payant |
 
-Fonctionnement : seul le site est exposé à Internet (HTTPS fourni par Render) ; il relaie `/api` et `/uploads` vers l'API par le réseau privé.
+### Démonstration gratuite
+
+1. Dans Render : **Blueprints › New Blueprint Instance**, autoriser l'accès au dépôt GitHub et le choisir.
+2. Renseigner `ADMIN_EMAIL` et `ADMIN_PASSWORD` (10 caractères minimum), puis valider. Chaque `git push` sur `main` redéploie.
+3. Site : `https://sainte-lucie-site.onrender.com`. Si Render attribue d'autres adresses (nom déjà pris), corriger
+   `PUBLIC_URL`, `NUXT_PUBLIC_SITE_URL` et `NUXT_API_INTERNAL` dans l'onglet **Environment** des services.
+
+Limites : la base est **supprimée par Render au bout d'environ un mois** ; les fichiers téléversés sont perdus à chaque redémarrage
+(le contenu d'exemple est alors recréé, ce qui efface aussi les modifications faites sur ce contenu) ; les services s'endorment après
+15 minutes sans visite (premier affichage : une à deux minutes, parfois une erreur à recharger) ; pas d'e-mails ; dons **simulés**.
+
+### Site réel (payant)
+
+Même démarche, en indiquant `deploiement/render.payant.yaml` comme chemin du Blueprint. Valeurs demandées :
+
+- `PUBLIC_URL` et `NUXT_PUBLIC_SITE_URL` : l'adresse publique du site, identique pour les deux, sans barre finale.
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD` : compte administrateur créé au premier démarrage.
+- SMTP, CinetPay, PayPal : peuvent rester vides au début (pas d'e-mails, aucun moyen de paiement proposé).
+
+Nom de domaine : service `sainte-lucie-site` › **Settings › Custom Domains**, puis remplacer les deux adresses ci-dessus.
+Seul le site est exposé à Internet ; il relaie `/api` et `/uploads` vers l'API par le réseau privé.
 Nginx et le service de sauvegarde du compose de production ne sont pas utilisés sur Render.
 
-À vérifier après le premier déploiement :
+À vérifier après le premier déploiement payant :
 
 - **Envoi d'un fichier dans la médiathèque.** L'API tourne avec un utilisateur non privilégié ; si l'envoi échoue (« permission denied » dans les journaux), le disque monté n'est pas inscriptible par cet utilisateur.
-- **Adresse des visiteurs.** Les limites anti-spam se fondent sur l'adresse IP lue dans `X-Forwarded-For`. Dans les journaux de l'API, `remoteAddress` / l'adresse retenue doit être celle du visiteur et non une adresse de Render ; sinon ajuster `TRUST_PROXY`.
+- **Adresse des visiteurs.** Les limites anti-spam se fondent sur l'adresse IP lue dans `X-Forwarded-For` ; si les journaux de l'API montrent une adresse de Render au lieu de celle du visiteur, ajuster `TRUST_PROXY`.
 - **Sauvegardes.** Vérifier dans Render ce que l'offre choisie inclut pour la base (restauration) et pour le disque (instantanés).
 
 ## Commandes utiles (backend)
