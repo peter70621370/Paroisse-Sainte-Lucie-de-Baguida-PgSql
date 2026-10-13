@@ -65,7 +65,7 @@ Deux fichiers décrivent le déploiement (site, API, base PostgreSQL) :
    `PUBLIC_URL`, `NUXT_PUBLIC_SITE_URL` et `NUXT_API_INTERNAL` dans l'onglet **Environment** des services.
 
 Limites : la base est **supprimée par Render au bout d'environ un mois** ; les fichiers téléversés sont perdus à chaque redémarrage
-(le contenu d'exemple est alors recréé, ce qui efface aussi les modifications faites sur ce contenu) ; les services s'endorment après
+(les images et PDF du contenu d'exemple sont alors régénérés en une à deux minutes ; les textes ne bougent pas) ; les services s'endorment après
 15 minutes sans visite (premier affichage : une à deux minutes, parfois une erreur à recharger) ; pas d'e-mails ; dons **simulés**.
 
 ### Site réel (payant)

@@ -3,7 +3,7 @@
 #
 # Limites de l'offre gratuite, à connaître :
 # - la base est SUPPRIMÉE par Render au bout d'environ un mois ;
-# - pas de disque : les fichiers téléversés sont perdus à chaque redémarrage (le contenu d'exemple est recréé au démarrage) ;
+# - pas de disque : les fichiers téléversés sont perdus à chaque redémarrage (ceux du contenu d'exemple sont régénérés) ;
 # - les services s'endorment après 15 minutes sans visite (réveil : une à deux minutes) ;
 # - pas d'envoi d'e-mails.
 # Pour le site réel : deploiement/render.payant.yaml.
@@ -46,8 +46,8 @@ services:
         value: /app/uploads
       - key: COOKIE_SECURE
         value: "true"
-      # Au démarrage (voir backend/start.sh) : compte administrateur, puis contenu d'exemple recréé en arrière-plan
-      # (ses images disparaissent avec le disque) : compter une à deux minutes avant qu'il soit complet.
+      # Au démarrage (voir backend/start.sh) : compte administrateur, puis en arrière-plan le contenu d'exemple
+      # (créé s'il manque ; ses images et PDF, qui disparaissent avec le disque, sont régénérés en une à deux minutes).
       - key: SEED_ON_START
         value: "true"
       - key: DEMO_ON_START

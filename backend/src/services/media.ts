@@ -17,17 +17,20 @@ function cleanName(name: string, forceExt?: string) {
   return forceExt ? base.replace(/\.[^.]*$/, '') + forceExt : base;
 }
 
-/** Vérifie le vrai type du fichier (octets), optimise les images en WebP et enregistre sur disque. */
-export async function storeUpload(uploadDir: string, buffer: Buffer, originalName: string): Promise<StoredFile> {
+/**
+ * Vérifie le vrai type du fichier (octets), optimise les images en WebP et enregistre sur disque.
+ * `at` : emplacement d'un fichier déjà connu de la base, à réécrire à l'identique (fichier disparu du disque).
+ */
+export async function storeUpload(uploadDir: string, buffer: Buffer, originalName: string, at?: string): Promise<StoredFile> {
   const type = await fileTypeFromBuffer(buffer);
   if (!type || (!IMAGE_TYPES.has(type.mime) && type.mime !== 'application/pdf')) {
     throw new HttpError(415, 'Type de fichier non autorisé (images JPG, PNG, WebP, GIF ou PDF uniquement)');
   }
 
   const now = new Date();
-  const dir = `${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+  const dir = at ? path.posix.dirname(at) : `${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
   await mkdir(path.join(uploadDir, dir), { recursive: true });
-  const id = randomUUID();
+  const id = at ? path.posix.basename(at).replace(/\.[^.]*$/, '') : randomUUID();
 
   if (type.mime === 'application/pdf') {
     const storagePath = `${dir}/${id}.pdf`;

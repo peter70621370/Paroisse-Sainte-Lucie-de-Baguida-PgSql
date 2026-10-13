@@ -1,8 +1,11 @@
 // Contenu de DÉMONSTRATION : un site complet et crédible à présenter avant la saisie des vrais contenus.
 // Tout est fictif (noms, dates, montants, illustrations). Dev uniquement.
-//   npm run seed:demo             crée ce qui manque (peut être relancé sans doublon)
+//   npm run seed:demo             crée ce qui manque (peut être relancé sans doublon) et régénère les fichiers
+//                                 d'exemple disparus du disque (hébergement sans disque persistant)
 //   npm run seed:demo -- --clear  supprime tout ce que ce script a créé (les pages restent, à réécrire)
 // Ce qui a été créé est noté dans la table « settings » (clé demo.manifest) pour pouvoir être retiré proprement.
+import { access } from 'node:fs/promises';
+import path from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
 import { removeStoredFiles, storeUpload } from '../services/media.js';
@@ -63,9 +66,13 @@ async function clear() {
 }
 
 // ---------- Création ----------
-async function image(kind: SceneKind, palette: 'dawn' | 'day' | 'dusk' | 'night', seed: number, alt: string) {
-  const png = await sharp(Buffer.from(sceneSvg(kind, palette, seed))).png().toBuffer();
-  const f = await storeUpload(uploadDir, png, `exemple-${kind}-${seed}.png`);
+type Palette = 'dawn' | 'day' | 'dusk' | 'night';
+const scenePng = (kind: SceneKind, palette: Palette, seed: number) => sharp(Buffer.from(sceneSvg(kind, palette, seed))).png().toBuffer();
+
+// Le nom du fichier décrit l'illustration : il suffit à la régénérer (voir repairFiles).
+async function image(kind: SceneKind, palette: Palette, seed: number, alt: string) {
+  const png = await scenePng(kind, palette, seed);
+  const f = await storeUpload(uploadDir, png, `exemple-${kind}-${palette}-${seed}.png`);
   const m = await prisma.media.create({ data: { ...f, alt } });
   note('media', m.id);
   return m;
@@ -600,29 +607,51 @@ async function bulletins() {
   for (let i = 0; i < 4; i++) {
     const sunday = pastSunday(i);
     const day = longDay(sunday);
-    const pdf = simplePdf('Bulletin paroissial', `Paroisse Sainte Lucie de Baguida - Dimanche ${day}`, [
-      '# Le mot de la semaine',
-      'Chers paroissiens, cette semaine encore le Seigneur nous rassemble pour écouter sa Parole et partager le pain. Que chacun se sente accueilli et envoyé en mission dans son quartier.',
-      '# Messes du dimanche',
-      '6h30 (éwé) - 8h30 (français, messe des familles) - 10h30 (grand-messe) - 18h00 (messe du soir).',
-      '# En semaine',
-      'Messe à 6h15 du lundi au vendredi, 6h30 le samedi. Messes du soir le mercredi et le vendredi à 18h30. Adoration le jeudi à 18h00. Confessions le samedi de 16h00 à 17h30.',
-      '# Annonces',
-      '- Les inscriptions à la catéchèse se poursuivent au secrétariat et sur le site de la paroisse.',
-      '- La collecte pour la nouvelle salle paroissiale continue : merci pour votre générosité.',
-      '- Répétition des chorales : mercredi et vendredi à 19h00.',
-      '- Les intentions de messe sont reçues au secrétariat ou en ligne.',
-      '# Prions pour',
-      'Les malades de notre communauté, les familles en deuil, les enfants qui commencent la catéchèse et tous ceux qui se sont recommandés à nos prières.',
-      '',
-      'Document d\'exemple : il sera remplacé par le véritable bulletin de la paroisse.',
-    ]);
+    const pdf = bulletinPdf(sunday);
     const f = await storeUpload(uploadDir, pdf, `bulletin-exemple-${sunday.toISOString().slice(0, 10)}.pdf`);
     const m = await prisma.media.create({ data: f });
     note('media', m.id);
     const row = await prisma.bulletin.create({ data: { title: `Bulletin du dimanche ${day}`, date: sunday, fileId: m.id, status: 'PUBLISHED', publishedAt: new Date(sunday.getTime() - 12 * 3_600_000) } });
     note('bulletin', row.id);
   }
+}
+
+function bulletinPdf(sunday: Date): Buffer {
+  return simplePdf('Bulletin paroissial', `Paroisse Sainte Lucie de Baguida - Dimanche ${longDay(sunday)}`, [
+    '# Le mot de la semaine',
+    'Chers paroissiens, cette semaine encore le Seigneur nous rassemble pour écouter sa Parole et partager le pain. Que chacun se sente accueilli et envoyé en mission dans son quartier.',
+    '# Messes du dimanche',
+    '6h30 (éwé) - 8h30 (français, messe des familles) - 10h30 (grand-messe) - 18h00 (messe du soir).',
+    '# En semaine',
+    'Messe à 6h15 du lundi au vendredi, 6h30 le samedi. Messes du soir le mercredi et le vendredi à 18h30. Adoration le jeudi à 18h00. Confessions le samedi de 16h00 à 17h30.',
+    '# Annonces',
+    '- Les inscriptions à la catéchèse se poursuivent au secrétariat et sur le site de la paroisse.',
+    '- La collecte pour la nouvelle salle paroissiale continue : merci pour votre générosité.',
+    '- Répétition des chorales : mercredi et vendredi à 19h00.',
+    '- Les intentions de messe sont reçues au secrétariat ou en ligne.',
+    '# Prions pour',
+    'Les malades de notre communauté, les familles en deuil, les enfants qui commencent la catéchèse et tous ceux qui se sont recommandés à nos prières.',
+    '',
+    'Document d\'exemple : il sera remplacé par le véritable bulletin de la paroisse.',
+  ]);
+}
+
+/**
+ * Régénère, au même emplacement, les fichiers d'exemple connus de la base mais absents du disque
+ * (hébergement sans disque persistant : ils disparaissent à chaque redémarrage). Rien n'est supprimé ni recréé en base.
+ */
+async function repairFiles() {
+  let repaired = 0;
+  for (const m of await prisma.media.findMany({ where: { id: { in: manifest.ids.media ?? [] } } })) {
+    if (await access(path.join(uploadDir, m.storagePath)).then(() => true, () => false)) continue;
+    const img = /^exemple-(church|beach|procession|feast|window|assembly)-(?:(dawn|day|dusk|night)-)?(\d+)\./.exec(m.filename);
+    const pdf = /^bulletin-exemple-(\d{4}-\d{2}-\d{2})\./.exec(m.filename);
+    if (img) await storeUpload(uploadDir, await scenePng(img[1] as SceneKind, (img[2] ?? 'day') as Palette, Number(img[3])), m.filename, m.storagePath);
+    else if (pdf) await storeUpload(uploadDir, bulletinPdf(new Date(`${pdf[1]}T00:00:00Z`)), m.filename, m.storagePath);
+    else continue;
+    repaired++;
+  }
+  if (repaired) console.log(`Fichiers d'exemple régénérés : ${repaired}.`);
 }
 
 async function albums() {
@@ -789,6 +818,7 @@ try {
       await step();
       await saveManifest();
     }
+    await repairFiles();
     console.log('Contenu de démonstration prêt.');
   }
 } finally {
