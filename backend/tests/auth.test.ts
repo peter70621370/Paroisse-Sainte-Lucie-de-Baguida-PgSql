@@ -14,7 +14,7 @@ describe('mots de passe', () => {
   });
 });
 
-// Tests d'intégration : nécessitent MySQL. Lancer avec RUN_DB_TESTS=1 (dans le conteneur backend).
+// Tests d'intégration : nécessitent PostgreSQL. Lancer avec RUN_DB_TESTS=1 (dans le conteneur backend).
 describe.skipIf(!process.env.RUN_DB_TESTS)('authentification et rôles', () => {
   const prisma = new PrismaClient();
   const tag = `test-${Date.now()}`;

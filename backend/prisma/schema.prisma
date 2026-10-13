@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -107,7 +107,7 @@ model Page {
   locale         String        @default("fr") @db.VarChar(5)
   title          String        @db.VarChar(255)
   excerpt        String?       @db.VarChar(500)
-  content        String        @db.LongText
+  content        String        @db.Text
   status         PublishStatus @default(DRAFT)
   seoTitle       String?       @db.VarChar(255)
   seoDescription String?       @db.VarChar(320)
@@ -126,10 +126,10 @@ model Page {
 model Announcement {
   id          Int           @id @default(autoincrement())
   title       String        @db.VarChar(255)
-  content     String        @db.LongText
+  content     String        @db.Text
   // Version anglaise (facultative) : sans elle, le site anglais affiche le français.
   titleEn     String?       @db.VarChar(255)
-  contentEn   String?       @db.LongText
+  contentEn   String?       @db.Text
   pinned      Boolean       @default(false)
   status      PublishStatus @default(DRAFT)
   publishedAt DateTime?
@@ -247,7 +247,7 @@ model Homily {
   title       String        @db.VarChar(255)
   preacher    String?       @db.VarChar(150)
   date        DateTime      @db.Date
-  content     String?       @db.LongText
+  content     String?       @db.Text
   audioUrl    String?       @db.VarChar(500)
   videoUrl    String?       @db.VarChar(500)
   status      PublishStatus @default(DRAFT)
@@ -357,7 +357,7 @@ model Setting {
 model Newsletter {
   id          Int       @id @default(autoincrement())
   subject     String    @db.VarChar(255)
-  content     String    @db.LongText
+  content     String    @db.Text
   status      String    @default("SENDING") @db.VarChar(10)
   recipients  Int       @default(0)
   sentCount   Int       @default(0)

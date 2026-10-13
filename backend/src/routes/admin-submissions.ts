@@ -38,7 +38,7 @@ const adminSubmissions: FastifyPluginAsync = async (app) => {
   const whereOf = (f: z.infer<typeof filters>, q?: string): Prisma.FormSubmissionWhereInput => ({
     ...(f.type ? { type: f.type } : {}),
     ...(f.status ? { status: f.status } : {}),
-    ...(q ? { OR: [{ fullName: { contains: q } }, { email: { contains: q } }, { phone: { contains: q } }] } : {}),
+    ...(q ? { OR: [{ fullName: { contains: q, mode: 'insensitive' as const } }, { email: { contains: q, mode: 'insensitive' as const } }, { phone: { contains: q, mode: 'insensitive' as const } }] } : {}),
   });
 
   app.get('/admin/submissions', { preHandler: guard }, async (req) => {

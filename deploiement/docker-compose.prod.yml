@@ -3,19 +3,17 @@
 name: sainte-lucie-prod
 
 services:
-  mysql:
-    image: mysql:8.4
+  postgres:
+    image: postgres:17-alpine
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -29,7 +27,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 4000
-      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       CORS_ORIGIN: ${CORS_ORIGIN:-${PUBLIC_URL}}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
       UPLOAD_DIR: /app/uploads
@@ -51,7 +49,7 @@ services:
     volumes:
       - uploads_data:/app/uploads
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     networks: [internal]
 
@@ -81,16 +79,17 @@ services:
 
   # Sauvegarde quotidienne de la base et des fichiers (conservée 14 jours dans le volume backups)
   backup:
-    image: mysql:8.4
+    image: postgres:17-alpine
     restart: always
     environment:
-      MYSQL_PWD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         while true; do
-          mysqldump -h mysql -u root --single-transaction "$$MYSQL_DATABASE" | gzip > /backups/db_$$(date +%F_%H%M).sql.gz
+          pg_dump -h postgres -U "$$POSTGRES_USER" "$$POSTGRES_DB" | gzip > /backups/db_$$(date +%F_%H%M).sql.gz
           tar -czf /backups/uploads_$$(date +%F_%H%M).tar.gz -C /uploads . 2>/dev/null
           find /backups -type f -mtime +14 -name "*.gz" -delete
           sleep 86400
@@ -99,7 +98,7 @@ services:
       - backups:/backups
       - uploads_data:/uploads:ro
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     networks: [internal]
 
@@ -107,6 +106,6 @@ networks:
   internal:
 
 volumes:
-  mysql_data:
+  postgres_data:
   uploads_data:
   backups:

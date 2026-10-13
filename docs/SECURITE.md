@@ -49,9 +49,9 @@ Tout est dans l'historique git : `git show 86de8b0` (sprint 8). Par exemple, pou
 ## À faire avant l'ouverture publique
 
 - [ ] **Décider du sort des mesures retirées ci-dessus** (au minimum les garde-fous de production et les dépendances).
-- [ ] Changer le mot de passe administrateur et choisir des mots de passe MySQL forts (`.env` du serveur) ; `PAYMENT_MODE=live`.
+- [ ] Changer le mot de passe administrateur et choisir des un mot de passe PostgreSQL fort (`.env` du serveur) ; `PAYMENT_MODE=live`.
 - [ ] Activer HTTPS (sprint 9) puis `COOKIE_SECURE=true`, `PUBLIC_URL=https://…`.
 - [ ] Essai de bout en bout des dons avec les comptes **bac à sable** CinetPay et PayPal.
 - [ ] Faire relire les textes légaux (mentions légales, confidentialité).
 - [ ] Vérifier la restauration d'une sauvegarde (base **et** fichiers).
-- [ ] Ne jamais exposer le port MySQL ni celui du backend à Internet (seul Nginx publie un port).
+- [ ] Ne jamais exposer le port PostgreSQL ni celui du backend à Internet (seul Nginx publie un port).

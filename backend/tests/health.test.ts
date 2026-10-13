@@ -4,7 +4,7 @@ import { buildApp } from '../src/app.js';
 
 describe('GET /api/health', () => {
   it('répond ok sans base de données', async () => {
-    const env = loadEnv({ NODE_ENV: 'test', DATABASE_URL: 'mysql://x:x@localhost:3306/x' });
+    const env = loadEnv({ NODE_ENV: 'test', DATABASE_URL: 'postgresql://x:x@localhost:5432/x' });
     const app = await buildApp(env, { withDatabase: false });
     const res = await app.inject({ method: 'GET', url: '/api/health' });
     expect(res.statusCode).toBe(200);

@@ -38,7 +38,7 @@ const adminMedia: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
     const where: Prisma.MediaWhereInput = {
       ...(type === 'image' ? { mimeType: { startsWith: 'image/' } } : {}),
       ...(type === 'pdf' ? { mimeType: 'application/pdf' } : {}),
-      ...(q ? { filename: { contains: q } } : {}),
+      ...(q ? { filename: { contains: q, mode: 'insensitive' as const } } : {}),
     };
     const [total, items] = await Promise.all([
       app.prisma.media.count({ where }),

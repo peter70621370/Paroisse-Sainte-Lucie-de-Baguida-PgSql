@@ -189,7 +189,7 @@ function register(app: FastifyInstance, r: Resource) {
 
   app.get(`/admin/${r.path}`, { preHandler: staff }, async (req) => {
     const { page, pageSize, status: st, q } = listQuery.parse(req.query);
-    const where: Row = { ...(st && r.hasStatus ? { status: st } : {}), ...(q && r.searchField ? { [r.searchField]: { contains: q } } : {}) };
+    const where: Row = { ...(st && r.hasStatus ? { status: st } : {}), ...(q && r.searchField ? { [r.searchField]: { contains: q, mode: 'insensitive' as const } } : {}) };
     const [total, items] = await Promise.all([
       r.delegate.count({ where }),
       r.delegate.findMany({ where, orderBy: r.orderBy, include: r.include, skip: (page - 1) * pageSize, take: pageSize }),

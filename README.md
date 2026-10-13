@@ -1,13 +1,13 @@
 # Paroisse Sainte Lucie de Baguida
 
-Site web officiel de la paroisse : **Nuxt 3 · Node.js (Fastify) · TypeScript · MySQL**, entièrement conteneurisé (Docker).
+Site web officiel de la paroisse : **Nuxt 3 · Node.js (Fastify) · TypeScript · PostgreSQL**, entièrement conteneurisé (Docker).
 Domaine prévu : `www.paroissesaintelucie-baguida.org`
 
 ## Structure
 
 ```
 frontend/     Nuxt 3 : site public et back-office (/admin)
-backend/      API Node.js + TypeScript (Fastify), Prisma, MySQL
+backend/      API Node.js + TypeScript (Fastify), Prisma, PostgreSQL
 api/          Contrat de l'API (openapi.yaml)
 deploiement/  Docker Compose (dev et prod), Nginx
 docs/         Cahier des charges, documentation
@@ -30,7 +30,8 @@ docs/         Cahier des charges, documentation
 | Site (frontend) | http://localhost:3000 |
 | API (backend) | http://localhost:4000/api/health |
 | E-mails de test (Mailpit) | http://localhost:8025 |
-| MySQL (depuis l'hôte) | `localhost:3307` |
+| Administration de la base (pgAdmin) | http://localhost:5050 |
+| PostgreSQL (depuis l'hôte) | `localhost:5433` |
 
 La page d'accueil affiche l'état de l'API et de la base de données.
 Le code est monté en volume : les modifications se rechargent automatiquement.
@@ -44,7 +45,7 @@ docker compose --env-file .env -f deploiement/docker-compose.prod.yml up -d --bu
 ```
 
 Nginx expose le port 80 : `/` vers le frontend, `/api` vers le backend. Les migrations Prisma s'appliquent au démarrage du backend.
-Une sauvegarde MySQL quotidienne est conservée 14 jours (volume `backups`).
+Une sauvegarde PostgreSQL quotidienne est conservée 14 jours (volume `backups`).
 Le HTTPS (Let's Encrypt) sera ajouté à la mise en production sur le VPS.
 
 ## Commandes utiles (backend)
@@ -170,7 +171,7 @@ docker compose --env-file .env -f deploiement/docker-compose.yml restart backend
 
 ## Qualité, sécurité et performance
 
-- **Tests :** 109 tests backend (unitaires + intégration sur MySQL) et 43 tests de bout en bout dans un vrai navigateur (voir `e2e/README.md`).
+- **Tests :** 101 tests backend (unitaires + intégration sur PostgreSQL) et 43 tests de bout en bout dans un vrai navigateur (voir `e2e/README.md`).
 - **Sécurité :** voir `docs/SECURITE.md`. Plusieurs mesures de durcissement sont **volontairement retirées pour l'instant** (verrouillage par compte, garde-fous de production, mises à jour de dépendances, en-têtes HTTP) : la liste et la marche à suivre pour les réactiver y figurent.
 - **Performance / accessibilité (Lighthouse, production, mobile émulé) :** accueil **86 à 90** en performance, **100** en accessibilité, bonnes pratiques et SEO ; les autres pages 87 à 93.
   Les grandes photos sont servies en versions adaptées à l'écran (`/api/image`) : un téléphone télécharge quelques dizaines de Ko au lieu de centaines.
@@ -180,7 +181,7 @@ docker compose --env-file .env -f deploiement/docker-compose.yml restart backend
 Pour tester la vraie pile (Nginx + images de production + base séparée) avant de toucher au serveur, créer un fichier `.env.prod-local` (ignoré par git) :
 
 ```bash
-MYSQL_ROOT_PASSWORD=<aléatoire>   MYSQL_DATABASE=sainte_lucie   MYSQL_USER=sainte_lucie   MYSQL_PASSWORD=<aléatoire>
+POSTGRES_DB=sainte_lucie   POSTGRES_USER=sainte_lucie   POSTGRES_PASSWORD=<aléatoire, lettres et chiffres>
 PUBLIC_URL=http://localhost:8080  HTTP_PORT=8080  COOKIE_SECURE=false
 PAYMENT_MODE=mock                 # ⚠ paiements simulés : répétition locale UNIQUEMENT
 ADMIN_EMAIL=...                   ADMIN_PASSWORD=<fort>

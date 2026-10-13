@@ -30,7 +30,7 @@ Les tests desktop tournent aussi en mobile (Pixel 7) pour `public.spec.ts`.
 - Les **dons** ne sont pas supprimables par l'API (traçabilité) : ceux des tests portent le nom « E2E … ». Pour les retirer de la base de **développement** :
 
 ```bash
-docker compose --env-file .env -f deploiement/docker-compose.yml exec mysql sh -c 'mysql -uroot -p$MYSQL_ROOT_PASSWORD $MYSQL_DATABASE -e "DELETE FROM donations WHERE donorName LIKE \"E2E%\";"'
+docker compose --env-file .env -f deploiement/docker-compose.yml exec postgres sh -c 'psql -U $POSTGRES_USER -d $POSTGRES_DB -c "DELETE FROM donations WHERE \"donorName\" LIKE \$\$E2E%\$\$;"'
 ```
 
 - Un compte « contributeur » de test (`e2e-contributeur@example.test`) est créé une fois ; l'effacer depuis Administration › Utilisateurs (le désactiver) si besoin.

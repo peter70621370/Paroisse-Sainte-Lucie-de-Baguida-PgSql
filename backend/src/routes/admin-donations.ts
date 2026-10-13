@@ -37,7 +37,7 @@ const adminDonations: FastifyPluginAsync = async (app) => {
     ...(f.status ? { status: f.status } : {}),
     ...(f.method ? { method: f.method } : {}),
     ...(f.from || f.to ? { createdAt: { ...(f.from ? { gte: new Date(`${f.from}T00:00:00Z`) } : {}), ...(f.to ? { lt: new Date(new Date(`${f.to}T00:00:00Z`).getTime() + 86_400_000) } : {}) } } : {}),
-    ...(f.q ? { OR: [{ donorName: { contains: f.q } }, { donorEmail: { contains: f.q } }, { reference: { contains: f.q } }] } : {}),
+    ...(f.q ? { OR: [{ donorName: { contains: f.q, mode: 'insensitive' as const } }, { donorEmail: { contains: f.q, mode: 'insensitive' as const } }, { reference: { contains: f.q, mode: 'insensitive' as const } }] } : {}),
   });
   const include = { campaign: { select: { title: true } } } as const;
 

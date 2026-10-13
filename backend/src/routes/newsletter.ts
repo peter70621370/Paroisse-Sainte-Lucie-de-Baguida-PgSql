@@ -108,7 +108,7 @@ const newsletter: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
   });
   const whereOf = (status?: string, q?: string) => ({
     ...(status === 'confirmed' ? { confirmed: true, unsubscribedAt: null } : status === 'pending' ? { confirmed: false, unsubscribedAt: null } : status === 'unsubscribed' ? { unsubscribedAt: { not: null } } : {}),
-    ...(q ? { email: { contains: q } } : {}),
+    ...(q ? { email: { contains: q, mode: 'insensitive' as const } } : {}),
   });
 
   app.get('/admin/subscribers', { preHandler: guard }, async (req) => {
