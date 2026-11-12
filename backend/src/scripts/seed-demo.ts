@@ -13,6 +13,12 @@ import { sceneSvg, simplePdf, type SceneKind } from './demo-assets.js';
 const prisma = new PrismaClient();
 // Disque local, ou Vercel Blob si BLOB_READ_WRITE_TOKEN est défini (contenu d'exemple d'un site déployé sur Vercel).
 const storage = createStorage({ uploadDir: process.env.UPLOAD_DIR ?? './uploads', blobToken: process.env.BLOB_READ_WRITE_TOKEN });
+// Base distante (Neon…) sans jeton Vercel Blob : les fichiers iraient sur ce disque, introuvables pour le site en ligne.
+if (!storage.blob && !/@(localhost|127\.0\.0\.1|postgres|db)(:|\/)/.test(process.env.DATABASE_URL ?? '') && !process.argv.includes('--clear')) {
+  console.error('BLOB_READ_WRITE_TOKEN non défini alors que la base est distante : les fichiers ne seraient pas visibles en ligne. Arrêt.');
+  process.exit(1);
+}
+console.log(storage.blob ? 'Fichiers : Vercel Blob.' : `Fichiers : disque local (${process.env.UPLOAD_DIR ?? './uploads'}).`);
 const MANIFEST_KEY = 'demo.manifest';
 
 type Manifest = { ids: Record<string, number[]>; settings: string[] };
