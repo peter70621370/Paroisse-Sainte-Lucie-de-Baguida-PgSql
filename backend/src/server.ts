@@ -1,5 +1,7 @@
-import { loadEnv } from './config/env.js';
 // Point d'entrée de l'API (Docker, et Vercel qui détecte ce fichier : il ne doit pas s'appeler src/app.ts ni src/index.ts).
+// Vercel n'accepte comme point d'entrée qu'un fichier qui importe lui-même fastify : ne pas retirer cette ligne.
+import 'fastify';
+import { loadEnv } from './config/env.js';
 import { buildApp } from './build-app.js';
 
 const env = loadEnv();
