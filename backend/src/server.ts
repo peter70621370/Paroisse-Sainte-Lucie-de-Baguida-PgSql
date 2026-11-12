@@ -1,5 +1,6 @@
 import { loadEnv } from './config/env.js';
-import { buildApp } from './app.js';
+// Point d'entrée de l'API (Docker, et Vercel qui détecte ce fichier : il ne doit pas s'appeler src/app.ts ni src/index.ts).
+import { buildApp } from './build-app.js';
 
 const env = loadEnv();
 const app = await buildApp(env);

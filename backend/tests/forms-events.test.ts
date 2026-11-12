@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import type { FastifyInstance } from 'fastify';
 import { loadEnv } from '../src/config/env.js';
-import { buildApp } from '../src/app.js';
+import { buildApp } from '../src/build-app.js';
 import { hashPassword } from '../src/auth/password.js';
 
 describe.skipIf(!process.env.RUN_DB_TESTS)('formulaires et agenda', () => {

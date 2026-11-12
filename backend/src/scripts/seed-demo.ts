@@ -4,15 +4,15 @@
 //                                 d'exemple disparus du disque (hébergement sans disque persistant)
 //   npm run seed:demo -- --clear  supprime tout ce que ce script a créé (les pages restent, à réécrire)
 // Ce qui a été créé est noté dans la table « settings » (clé demo.manifest) pour pouvoir être retiré proprement.
-import { access } from 'node:fs/promises';
-import path from 'node:path';
 import { PrismaClient } from '@prisma/client';
 import sharp from 'sharp';
 import { removeStoredFiles, storeUpload } from '../services/media.js';
+import { createStorage } from '../services/storage.js';
 import { sceneSvg, simplePdf, type SceneKind } from './demo-assets.js';
 
 const prisma = new PrismaClient();
-const uploadDir = process.env.UPLOAD_DIR ?? './uploads';
+// Disque local, ou Vercel Blob si BLOB_READ_WRITE_TOKEN est défini (contenu d'exemple d'un site déployé sur Vercel).
+const storage = createStorage({ uploadDir: process.env.UPLOAD_DIR ?? './uploads', blobToken: process.env.BLOB_READ_WRITE_TOKEN });
 const MANIFEST_KEY = 'demo.manifest';
 
 type Manifest = { ids: Record<string, number[]>; settings: string[] };
@@ -55,7 +55,7 @@ async function clear() {
   for (const m of await prisma.media.findMany({ where: { id: { in: ids('media') } } })) {
     try {
       await prisma.media.delete({ where: { id: m.id } });
-      await removeStoredFiles(uploadDir, m.storagePath);
+      await removeStoredFiles(storage, m.storagePath);
     } catch {
       console.warn(`Fichier conservé car encore utilisé : ${m.filename}`);
     }
@@ -72,7 +72,7 @@ const scenePng = (kind: SceneKind, palette: Palette, seed: number) => sharp(Buff
 // Le nom du fichier décrit l'illustration : il suffit à la régénérer (voir repairFiles).
 async function image(kind: SceneKind, palette: Palette, seed: number, alt: string) {
   const png = await scenePng(kind, palette, seed);
-  const f = await storeUpload(uploadDir, png, `exemple-${kind}-${palette}-${seed}.png`);
+  const f = await storeUpload(storage, png, `exemple-${kind}-${palette}-${seed}.png`);
   const m = await prisma.media.create({ data: { ...f, alt } });
   note('media', m.id);
   return m;
@@ -608,7 +608,7 @@ async function bulletins() {
     const sunday = pastSunday(i);
     const day = longDay(sunday);
     const pdf = bulletinPdf(sunday);
-    const f = await storeUpload(uploadDir, pdf, `bulletin-exemple-${sunday.toISOString().slice(0, 10)}.pdf`);
+    const f = await storeUpload(storage, pdf, `bulletin-exemple-${sunday.toISOString().slice(0, 10)}.pdf`);
     const m = await prisma.media.create({ data: f });
     note('media', m.id);
     const row = await prisma.bulletin.create({ data: { title: `Bulletin du dimanche ${day}`, date: sunday, fileId: m.id, status: 'PUBLISHED', publishedAt: new Date(sunday.getTime() - 12 * 3_600_000) } });
@@ -643,11 +643,11 @@ function bulletinPdf(sunday: Date): Buffer {
 async function repairFiles() {
   let repaired = 0;
   for (const m of await prisma.media.findMany({ where: { id: { in: manifest.ids.media ?? [] } } })) {
-    if (await access(path.join(uploadDir, m.storagePath)).then(() => true, () => false)) continue;
+    if (await storage.exists(m.storagePath)) continue;
     const img = /^exemple-(church|beach|procession|feast|window|assembly)-(?:(dawn|day|dusk|night)-)?(\d+)\./.exec(m.filename);
     const pdf = /^bulletin-exemple-(\d{4}-\d{2}-\d{2})\./.exec(m.filename);
-    if (img) await storeUpload(uploadDir, await scenePng(img[1] as SceneKind, (img[2] ?? 'day') as Palette, Number(img[3])), m.filename, m.storagePath);
-    else if (pdf) await storeUpload(uploadDir, bulletinPdf(new Date(`${pdf[1]}T00:00:00Z`)), m.filename, m.storagePath);
+    if (img) await storeUpload(storage, await scenePng(img[1] as SceneKind, (img[2] ?? 'day') as Palette, Number(img[3])), m.filename, m.storagePath);
+    else if (pdf) await storeUpload(storage, bulletinPdf(new Date(`${pdf[1]}T00:00:00Z`)), m.filename, m.storagePath);
     else continue;
     repaired++;
   }

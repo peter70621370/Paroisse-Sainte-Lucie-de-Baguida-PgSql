@@ -13,6 +13,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Adresse INTERNE du backend (réseau Docker). Surchargeable à l'exécution : NUXT_API_INTERNAL.
     apiInternal: process.env.API_INTERNAL_URL || 'http://localhost:4000',
+    // Secret partagé avec l'API (RELAY_SECRET) quand elle est sur Internet (Vercel). Surchargeable : NUXT_RELAY_SECRET.
+    relaySecret: '',
     public: {
       // Adresse publique du site (liens canoniques, sitemap). Surchargeable : NUXT_PUBLIC_SITE_URL.
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',

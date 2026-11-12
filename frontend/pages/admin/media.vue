@@ -81,7 +81,7 @@ const size = (n: number) => (n > 1048576 ? (n / 1048576).toFixed(1) + ' Mo' : Ma
 <template>
   <div>
     <h1 class="font-serif text-3xl font-bold text-navy">Médiathèque</h1>
-    <p class="mt-1 text-sm text-slate-600">Images (JPG, PNG, WebP, GIF : redimensionnées et optimisées automatiquement) et PDF. 10 Mo maximum par fichier.</p>
+    <p class="mt-1 text-sm text-slate-600">Images (JPG, PNG, WebP, GIF : redimensionnées et optimisées automatiquement) et PDF. 10 Mo maximum par fichier (4 Mo sur le site en ligne).</p>
 
     <div class="mt-4 flex flex-wrap items-center gap-3">
       <label class="btn btn-sm btn-navy cursor-pointer">

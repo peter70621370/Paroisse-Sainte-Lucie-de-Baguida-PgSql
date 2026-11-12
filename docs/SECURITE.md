@@ -45,6 +45,15 @@ Tout est dans l'historique git : `git show 86de8b0` (sprint 8). Par exemple, pou
 1. **Paiements** : intégrations testées contre des serveurs simulés, pas encore contre les comptes réels.
 2. **Statistiques** : l'empreinte des visiteurs uniques est gardée en mémoire seulement (remise à zéro au redémarrage).
 3. **Avis `npm audit` du frontend** (outils de compilation, absents de l'image de production).
+4. **Déploiement sur Vercel** :
+   - limites anti-spam (connexion, formulaires, dons, newsletter) gardées **en mémoire par instance** de la fonction : quand
+     Vercel lance plusieurs instances, un attaquant obtient plus d'essais que prévu ;
+   - l'adresse IP des visiteurs vient du site via le secret `RELAY_SECRET` / `NUXT_RELAY_SECRET` : s'il fuit, un tiers peut
+     annoncer de fausses adresses à l'API et contourner les limites. Le garder secret, le changer en cas de doute (dans les deux projets) ;
+   - l'API a sa propre adresse publique (`*.vercel.app`) : elle reste protégée (CSRF, droits, limites par IP), mais sans le relais ;
+   - fichiers limités à 4 Mo ; envois de la newsletter interrompus après 5 minutes ;
+   - Vercel Hobby est réservé à un usage non commercial ; Neon Free et Vercel Blob Hobby ont des quotas mensuels
+     (voir le README) et **pas de sauvegarde téléchargeable** : sauvegarder la base soi-même (`pg_dump`).
 
 ## À faire avant l'ouverture publique
 

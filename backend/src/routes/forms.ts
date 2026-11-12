@@ -28,7 +28,7 @@ const forms: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
       const phone = (data.phone as string | undefined) ?? null;
 
       const submission = await app.prisma.formSubmission.create({
-        data: { type: def.type, fullName, email, phone, payload: data as object, ip: req.ip },
+        data: { type: def.type, fullName, email, phone, payload: data as object, ip: req.clientIp || null },
       });
 
       // Notification au secrétariat + accusé de réception : en arrière-plan, sans jamais bloquer ni faire échouer la demande.

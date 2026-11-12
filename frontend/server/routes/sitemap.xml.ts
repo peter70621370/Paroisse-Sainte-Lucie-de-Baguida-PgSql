@@ -11,7 +11,7 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 export default defineEventHandler(async (event) => {
   const { siteUrl } = useRuntimeConfig().public;
 
-  const data = await $fetch<Sitemap>(`${apiBase()}/api/sitemap`).catch(() => ({ pages: [], homilies: [], events: [], albums: [] }) as Sitemap);
+  const data = await $fetch<Sitemap>(`${apiBase()}/api/sitemap`, { headers: relayHeaders(event) }).catch(() => ({ pages: [], homilies: [], events: [], albums: [] }) as Sitemap);
 
   const fixed = ['/', '/horaires', '/personnel', '/agenda', '/actualites', '/bulletins', '/homelies', '/galerie', '/direct', '/contact', '/dons', '/demarches/adhesion', '/demarches/catechisme', '/demarches/sacrement', '/demarches/intention-de-messe'];
   const urls: { loc: string; lastmod?: string }[] = [

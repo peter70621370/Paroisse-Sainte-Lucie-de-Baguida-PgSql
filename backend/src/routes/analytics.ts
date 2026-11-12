@@ -33,7 +33,7 @@ const analytics: FastifyPluginAsync = async (app) => {
     let referrer = '';
     try {
       const host = new URL(parsed.data.referrer || '').hostname.replace(/^www\./, '');
-      // Derrière un relais (Nuxt sur Render), l'en-tête Host est celui du réseau interne : on compare aussi à l'adresse publique.
+      // Derrière un relais (relais Nuxt, sans Nginx), l'en-tête Host est celui du réseau interne : on compare aussi à l'adresse publique.
       const own = [String(req.headers.host ?? '').split(':')[0]!, new URL(app.env.PUBLIC_URL).hostname].map((h) => h.replace(/^www\./, ''));
       if (host && !own.includes(host) && !/^localhost$/.test(host)) referrer = host.slice(0, 191);
     } catch { /* pas de référent */ }
@@ -41,7 +41,7 @@ const analytics: FastifyPluginAsync = async (app) => {
     const device = /mobi|android|iphone|ipad/i.test(ua) ? 'mobile' : 'desktop';
     const day = new Date().toISOString().slice(0, 10);
     rotate(day);
-    const fingerprint = createHash('sha256').update(`${salt}|${req.ip}|${ua}`).digest('hex');
+    const fingerprint = createHash('sha256').update(`${salt}|${req.clientIp}|${ua}`).digest('hex');
     const isNew = !seen.has(fingerprint);
     seen.add(fingerprint);
 

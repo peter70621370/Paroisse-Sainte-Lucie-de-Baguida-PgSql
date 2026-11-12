@@ -1,4 +1,5 @@
 import nodemailer, { type Transporter } from 'nodemailer';
+import { waitUntil } from '@vercel/functions';
 import type { FastifyBaseLogger } from 'fastify';
 import type { Env } from '../config/env.js';
 
@@ -39,12 +40,14 @@ export function createMailer(env: Env, log: FastifyBaseLogger): Mailer {
 
   return {
     outbox,
-    async send(mail) {
-      try {
-        await transport.sendMail({ from: env.MAIL_FROM, to: mail.to, subject: oneLine(mail.subject), text: mail.text, html: mail.html, replyTo: mail.replyTo, headers: mail.headers });
-      } catch (err) {
-        log.error({ err, to: mail.to }, 'Échec d\'envoi d\'e-mail');
-      }
+    send(mail) {
+      const sending = transport
+        .sendMail({ from: env.MAIL_FROM, to: mail.to, subject: oneLine(mail.subject), text: mail.text, html: mail.html, replyTo: mail.replyTo, headers: mail.headers })
+        .then(() => undefined, (err) => log.error({ err, to: mail.to }, 'Échec d\'envoi d\'e-mail'));
+      // Sur Vercel, la fonction est suspendue une fois la réponse envoyée : elle attend ici la fin de l'envoi.
+      // Ailleurs (Docker), sans effet.
+      waitUntil(sending);
+      return sending;
     },
   };
 }

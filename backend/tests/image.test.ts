@@ -5,7 +5,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import type { FastifyInstance } from 'fastify';
 import { loadEnv } from '../src/config/env.js';
-import { buildApp } from '../src/app.js';
+import { buildApp } from '../src/build-app.js';
 
 // Images adaptées à l'écran : la route ne doit servir QUE des WebP de la médiathèque, en largeurs prédéfinies.
 describe.skipIf(!process.env.RUN_DB_TESTS)('versions réduites des images', () => {

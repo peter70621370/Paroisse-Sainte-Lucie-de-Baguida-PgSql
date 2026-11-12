@@ -1,4 +1,4 @@
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { FastifyPluginAsync } from 'fastify';
 import sharp from 'sharp';
@@ -16,8 +16,9 @@ const query = z.object({
 });
 
 /**
- * Versions réduites à la demande d'une image de la médiathèque (pour les écrans de téléphone).
- * Créées une fois, puis servies depuis le disque avec un cache d'un an (les noms de fichiers sont uniques).
+ * Versions réduites à la demande d'une image de la médiathèque (pour les écrans de téléphone), avec un cache d'un an
+ * (les noms de fichiers sont uniques). Sur disque, chaque version est créée une fois puis relue ; avec Vercel Blob,
+ * c'est le cache de Vercel qui conserve la réponse (s-maxage).
  */
 const image: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
   const root = path.resolve(env.UPLOAD_DIR);
@@ -25,28 +26,22 @@ const image: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
   app.get('/image', async (req, reply) => {
     const { src, w } = query.parse(req.query);
     const rel = src.replace(/^\/uploads\//, '');
-    const original = path.join(root, rel);
     const cached = path.join(root, '.cache', String(w), rel);
-    if (!original.startsWith(root + path.sep)) throw new HttpError(400, 'Chemin invalide'); // ceinture et bretelles
+    if (!cached.startsWith(root + path.sep)) throw new HttpError(400, 'Chemin invalide'); // ceinture et bretelles
 
-    let data: Buffer;
-    try {
-      data = await readFile(cached);
-    } catch {
-      let source: Buffer;
-      try {
-        await stat(original);
-        source = await readFile(original);
-      } catch {
-        throw new HttpError(404, 'Image introuvable');
-      }
+    let data: Buffer | null = app.storage.blob ? null : await readFile(cached).catch(() => null);
+    if (!data) {
+      const source = await app.storage.read(rel);
+      if (!source) throw new HttpError(404, 'Image introuvable');
       data = await sharp(source).resize({ width: w, withoutEnlargement: true }).webp({ quality: 75 }).toBuffer();
-      await mkdir(path.dirname(cached), { recursive: true });
-      await writeFile(cached, data);
+      if (!app.storage.blob) {
+        await mkdir(path.dirname(cached), { recursive: true });
+        await writeFile(cached, data);
+      }
     }
     return reply
       .header('Content-Type', 'image/webp')
-      .header('Cache-Control', 'public, max-age=31536000, immutable')
+      .header('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable')
       .send(data);
   });
 };

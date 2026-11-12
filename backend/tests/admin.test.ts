@@ -6,7 +6,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import type { FastifyInstance } from 'fastify';
 import { loadEnv } from '../src/config/env.js';
-import { buildApp } from '../src/app.js';
+import { buildApp } from '../src/build-app.js';
 import { hashPassword } from '../src/auth/password.js';
 
 function multipart(filename: string, content: Buffer, contentType = 'application/octet-stream') {

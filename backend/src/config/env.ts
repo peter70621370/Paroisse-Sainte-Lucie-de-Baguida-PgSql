@@ -15,7 +15,13 @@ const schema = z.object({
   TRUST_PROXY: z.string().default('loopback,linklocal,uniquelocal'),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
   UPLOAD_DIR: z.string().default('./uploads'),
+  // Vercel Blob (déploiement sur Vercel) : défini, les fichiers y sont stockés au lieu du disque (UPLOAD_DIR ignoré).
+  BLOB_READ_WRITE_TOKEN: z.string().optional(),
+  // Taille maximale d'un fichier envoyé. Avec Vercel Blob, 4 Mo au plus (une requête Vercel est limitée à 4,5 Mo).
   MAX_UPLOAD_MB: z.coerce.number().positive().default(10),
+  // Secret partagé avec le site (NUXT_RELAY_SECRET) quand l'API est derrière son relais sur Internet (Vercel) :
+  // seul un appel portant ce secret peut indiquer l'adresse IP du visiteur (en-tête x-client-ip).
+  RELAY_SECRET: z.string().optional(),
   // E-mails (formulaires). Sans SMTP_HOST, aucun e-mail n'est envoyé (les demandes restent enregistrées).
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().default(587),

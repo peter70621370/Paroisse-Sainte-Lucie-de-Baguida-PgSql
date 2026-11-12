@@ -51,7 +51,7 @@ const adminMedia: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
     const file = await req.file();
     if (!file) throw new HttpError(400, 'Aucun fichier reçu');
     const buffer = await file.toBuffer(); // lève une erreur 413 si la taille maximale est dépassée
-    const stored = await storeUpload(env.UPLOAD_DIR, buffer, file.filename);
+    const stored = await storeUpload(app.storage, buffer, file.filename);
     const media = await app.prisma.media.create({
       data: { ...stored, uploadedById: req.user!.id },
     });
@@ -82,7 +82,7 @@ const adminMedia: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
       }
       throw e;
     }
-    await removeStoredFiles(env.UPLOAD_DIR, media.storagePath);
+    await removeStoredFiles(app.storage, media.storagePath);
     return { ok: true };
   });
 };

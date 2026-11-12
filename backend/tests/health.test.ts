@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadEnv } from '../src/config/env.js';
-import { buildApp } from '../src/app.js';
+import { buildApp } from '../src/build-app.js';
 
 describe('GET /api/health', () => {
   it('répond ok sans base de données', async () => {

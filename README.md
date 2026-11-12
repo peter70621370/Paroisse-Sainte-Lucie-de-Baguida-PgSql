@@ -48,43 +48,113 @@ Nginx expose le port 80 : `/` vers le frontend, `/api` vers le backend. Les migr
 Une sauvegarde PostgreSQL quotidienne est conservée 14 jours (volume `backups`).
 Le HTTPS (Let's Encrypt) sera ajouté à la mise en production sur le VPS.
 
-## Déploiement sur Render
+## Déploiement sur Vercel (offre gratuite)
 
-Deux fichiers décrivent le déploiement (site, API, base PostgreSQL) :
+Le site et l'API sont deux projets Vercel créés à partir du même dépôt GitHub. La base est **Neon** (PostgreSQL) et les
+fichiers (photos, bulletins PDF) sont dans **Vercel Blob** ; les deux s'ajoutent depuis le tableau de bord de Vercel.
 
-| Fichier | Usage | Coût |
+| Projet Vercel | Dossier (Root Directory) | Rôle |
 |---|---|---|
-| `render.yaml` (racine) | **Démonstration** | gratuit |
-| `deploiement/render.payant.yaml` | **Site réel** : fichiers et base conservés, e-mails, API privée | payant |
+| `sainte-lucie-api` | `backend` | API Fastify (une fonction Vercel), reliée à Neon et à Vercel Blob |
+| `sainte-lucie-site` | `frontend` | Site public et administration (Nuxt) ; relaie `/api` et `/uploads` vers l'API |
 
-### Démonstration gratuite
+Les visiteurs n'utilisent que l'adresse du site. Le site transmet l'adresse IP du visiteur à l'API avec un secret partagé
+(`RELAY_SECRET` / `NUXT_RELAY_SECRET`), sans quoi les limites anti-spam traiteraient tous les visiteurs comme une seule personne.
 
-1. Dans Render : **Blueprints › New Blueprint Instance**, autoriser l'accès au dépôt GitHub et le choisir.
-2. Renseigner `ADMIN_EMAIL` et `ADMIN_PASSWORD` (10 caractères minimum), puis valider. Chaque `git push` sur `main` redéploie.
-3. Site : `https://sainte-lucie-site.onrender.com`. Si Render attribue d'autres adresses (nom déjà pris), corriger
-   `PUBLIC_URL`, `NUXT_PUBLIC_SITE_URL` et `NUXT_API_INTERNAL` dans l'onglet **Environment** des services.
+### 1. Préparer le secret du relais
 
-Limites : la base est **supprimée par Render au bout d'environ un mois** ; les fichiers téléversés sont perdus à chaque redémarrage
-(les images et PDF du contenu d'exemple sont alors régénérés en une à deux minutes ; les textes ne bougent pas) ; les services s'endorment après
-15 minutes sans visite (premier affichage : une à deux minutes, parfois une erreur à recharger) ; pas d'e-mails ; dons **simulés**.
+Générer une valeur aléatoire (à garder pour les étapes 2 et 4) :
 
-### Site réel (payant)
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-Même démarche, en indiquant `deploiement/render.payant.yaml` comme chemin du Blueprint. Valeurs demandées :
+### 2. Créer le projet de l'API
 
-- `PUBLIC_URL` et `NUXT_PUBLIC_SITE_URL` : l'adresse publique du site, identique pour les deux, sans barre finale.
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD` : compte administrateur créé au premier démarrage.
-- SMTP, CinetPay, PayPal : peuvent rester vides au début (pas d'e-mails, aucun moyen de paiement proposé).
+1. Vercel › **Add New… › Project**, importer le dépôt GitHub.
+2. **Project Name** : `sainte-lucie-api`. **Root Directory** : `backend` (bouton *Edit*). **Framework Preset** : *Fastify* (détecté).
+3. **Environment Variables** :
 
-Nom de domaine : service `sainte-lucie-site` › **Settings › Custom Domains**, puis remplacer les deux adresses ci-dessus.
-Seul le site est exposé à Internet ; il relaie `/api` et `/uploads` vers l'API par le réseau privé.
-Nginx et le service de sauvegarde du compose de production ne sont pas utilisés sur Render.
+   | Nom | Valeur |
+   |---|---|
+   | `PUBLIC_URL` | `https://sainte-lucie-site.vercel.app` (adresse du site, étape 4) |
+   | `RELAY_SECRET` | le secret de l'étape 1 |
 
-À vérifier après le premier déploiement payant :
+4. **Deploy**. Ce premier déploiement **échoue** (aucune base encore) : c'est normal.
 
-- **Envoi d'un fichier dans la médiathèque.** L'API tourne avec un utilisateur non privilégié ; si l'envoi échoue (« permission denied » dans les journaux), le disque monté n'est pas inscriptible par cet utilisateur.
-- **Adresse des visiteurs.** Les limites anti-spam se fondent sur l'adresse IP lue dans `X-Forwarded-For` ; si les journaux de l'API montrent une adresse de Render au lieu de celle du visiteur, ajuster `TRUST_PROXY`.
-- **Sauvegardes.** Vérifier dans Render ce que l'offre choisie inclut pour la base (restauration) et pour le disque (instantanés).
+### 3. Ajouter la base Neon et Vercel Blob à l'API
+
+Dans le projet `sainte-lucie-api` › onglet **Storage** :
+
+1. **Create Database › Neon** : offre *Free*, région **Frankfurt (eu-central-1)**, puis **Connect**.
+   Vercel ajoute `DATABASE_URL` (connexion mutualisée, pour l'API) et `DATABASE_URL_UNPOOLED` (connexion directe, pour les migrations).
+2. **Create › Blob** : nom `sainte-lucie-fichiers`, accès **Public**, puis **Connect**. Vercel ajoute `BLOB_READ_WRITE_TOKEN`.
+3. Onglet **Deployments** › dernier déploiement › **⋯ › Redeploy**. Les tables sont créées pendant la construction
+   (`prisma migrate deploy`, script `vercel-build`).
+4. Vérifier : `https://sainte-lucie-api.vercel.app/api/health` doit répondre `{"status":"ok"}`.
+
+### 4. Créer le projet du site
+
+1. Vercel › **Add New… › Project**, importer **le même dépôt** une seconde fois.
+2. **Project Name** : `sainte-lucie-site`. **Root Directory** : `frontend`. **Framework Preset** : *Nuxt* (détecté).
+3. **Environment Variables** :
+
+   | Nom | Valeur |
+   |---|---|
+   | `NUXT_API_INTERNAL` | `https://sainte-lucie-api.vercel.app` (adresse de l'API, sans barre finale) |
+   | `NUXT_PUBLIC_SITE_URL` | `https://sainte-lucie-site.vercel.app` |
+   | `NUXT_RELAY_SECRET` | le même secret qu'à l'étape 1 |
+
+4. **Deploy**.
+
+Si Vercel attribue d'autres adresses (nom déjà pris), elles figurent dans **Settings › Domains** de chaque projet :
+corriger `PUBLIC_URL` (API), `NUXT_API_INTERNAL` et `NUXT_PUBLIC_SITE_URL` (site), puis **Redeploy** les deux projets.
+
+### 5. Créer le compte administrateur (et, si besoin, le contenu d'exemple)
+
+Depuis votre ordinateur (Node.js 22 ou plus), avec les valeurs copiées dans Vercel › **Storage** › base Neon ou magasin Blob ›
+onglet **.env.local** (bouton *Show secret*). Dans PowerShell, depuis le dossier `backend` :
+
+```powershell
+npm ci
+$env:DATABASE_URL = "<valeur de DATABASE_URL_UNPOOLED>"
+$env:ADMIN_EMAIL = "admin@paroissesaintelucie-baguida.org"
+$env:ADMIN_PASSWORD = "<mot de passe fort, 10 caractères minimum>"
+npm run seed
+```
+
+Contenu d'exemple (facultatif, retirable avec `npm run seed:demo -- --clear`) : dans la même fenêtre,
+
+```powershell
+$env:BLOB_READ_WRITE_TOKEN = "<valeur de BLOB_READ_WRITE_TOKEN>"
+npm run seed:demo
+```
+
+Connexion : `https://sainte-lucie-site.vercel.app/admin/login`. Chaque `git push` sur `main` redéploie les deux projets.
+
+### Ce qui change par rapport à Docker
+
+- **Fichiers** : stockés dans Vercel Blob dès que `BLOB_READ_WRITE_TOKEN` est défini (sinon sur le disque, comme en
+  développement). Les adresses `/uploads/…` restent valables et redirigent vers le fichier.
+- **Taille d'envoi** : **4 Mo** par fichier au plus (une requête Vercel est limitée à 4,5 Mo).
+- **E-mails et newsletter** : la fonction attend la fin des envois après avoir répondu, **5 minutes au plus** sur l'offre
+  gratuite. Une très longue liste d'abonnés peut donc ne pas être servie en entier (le compteur d'envois l'indique).
+- **Limites anti-spam et visiteurs uniques des statistiques** : comptés en mémoire, donc **par instance** de la fonction ;
+  plusieurs instances simultanées les rendent moins strictes (voir `docs/SECURITE.md`).
+- **Dons** : sans clés CinetPay / PayPal (`CINETPAY_*`, `PAYPAL_*` dans les variables de l'API), aucun moyen n'est proposé.
+  `PAYMENT_MODE=mock` simule les paiements : **jamais** sur le site public.
+- **E-mails** : renseigner `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`, `NOTIFY_EMAIL` dans l'API.
+
+### Limites des offres gratuites (à vérifier sur les pages de tarifs, elles changent)
+
+- **Vercel Hobby** : réservé à un usage non commercial ; fonctions de 5 minutes au plus ; premier appel plus lent après une
+  période sans visite (démarrage à froid).
+- **Neon Free** : 1 Go de données par projet ; la base se met en veille sans activité et se réveille en une seconde environ ;
+  au-delà de la limite de stockage, les écritures sont refusées.
+- **Vercel Blob (Hobby)** : 1 Go stocké, 10 Go téléchargés et 2 000 envois de fichiers par mois ; au-delà, Blob est bloqué
+  jusqu'au mois suivant (rien n'est facturé).
+- **Sauvegardes** : aucune sauvegarde automatique téléchargeable sur ces offres ; en faire régulièrement (`pg_dump` avec
+  `DATABASE_URL_UNPOOLED`).
 
 ## Commandes utiles (backend)
 

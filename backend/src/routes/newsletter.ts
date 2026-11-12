@@ -1,3 +1,4 @@
+import { waitUntil } from '@vercel/functions';
 import { randomBytes } from 'node:crypto';
 import type { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
@@ -161,7 +162,8 @@ const newsletter: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
   app.post('/admin/newsletters', { preHandler: guard, config: { rateLimit: { max: 5, timeWindow: '10 minutes' } } }, async (req, reply) => {
     const c = composeBody.parse(req.body);
     const n = await db.newsletter.create({ data: { ...c, createdById: req.user!.id } });
-    void deliver(app, env, n.id).catch((err) => app.log.error({ err, id: n.id }, 'Échec de l\'envoi de la newsletter'));
+    // Sur Vercel, la fonction reste active jusqu'à la fin de l'envoi (5 minutes au plus sur l'offre gratuite).
+    waitUntil(deliver(app, env, n.id).catch((err) => app.log.error({ err, id: n.id }, 'Échec de l\'envoi de la newsletter')));
     return reply.code(202).send({ item: { id: n.id, status: n.status } });
   });
 };

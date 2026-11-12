@@ -38,7 +38,7 @@ const authRoutes: FastifyPluginAsync<{ env: Env }> = async (app, { env }) => {
 
       const { token, expiresAt } = await createSession(app.prisma, user.id, env.SESSION_TTL_DAYS, {
         userAgent: req.headers['user-agent'],
-        ip: req.ip,
+        ip: req.clientIp || undefined,
       });
       await app.prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
