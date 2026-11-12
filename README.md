@@ -71,8 +71,10 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ### 2. Créer le projet de l'API
 
-1. Vercel › **Add New… › Project**, importer le dépôt GitHub.
-2. **Project Name** : `sainte-lucie-api`. **Root Directory** : `backend` (bouton *Edit*). **Framework Preset** : *Fastify* (détecté).
+1. Vercel › **Add New… › Project**, importer le dépôt GitHub (s'il n'apparaît pas : *Adjust GitHub App Permissions*).
+   Vercel détecte deux applications et propose de les regrouper (*Services*) : choisir **Import single project** sur la ligne **backend**.
+2. **Project Name** : `sainte-lucie-api`. **Root Directory** : `backend`. **Application Preset** : **Fastify** (Vercel signale
+   « Possible configuration mismatch » car il détecte *Node* : sans importance).
 3. **Environment Variables** :
 
    | Nom | Valeur |
@@ -80,7 +82,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    | `PUBLIC_URL` | `https://sainte-lucie-site.vercel.app` (adresse du site, étape 4) |
    | `RELAY_SECRET` | le secret de l'étape 1 |
 
-4. **Deploy**. Ce premier déploiement **échoue** (aucune base encore) : c'est normal.
+4. **Create Project**, ignorer l'intégration *Prisma Postgres* proposée, puis **Deploy**. Ce premier déploiement **échoue**
+   (`You must provide … DATABASE_URL`, aucune base encore) : c'est normal.
 
 ### 3. Ajouter la base Neon et Vercel Blob à l'API
 
@@ -88,15 +91,16 @@ Dans le projet `sainte-lucie-api` › onglet **Storage** :
 
 1. **Create Database › Neon** : offre *Free*, région **Frankfurt (eu-central-1)**, puis **Connect**.
    Vercel ajoute `DATABASE_URL` (connexion mutualisée, pour l'API) et `DATABASE_URL_UNPOOLED` (connexion directe, pour les migrations).
-2. **Create › Blob** : nom `sainte-lucie-fichiers`, accès **Public**, puis **Connect**. Vercel ajoute `BLOB_READ_WRITE_TOKEN`.
+2. **Create › Blob** : nom `sainte-lucie-fichiers`, région Frankfurt, accès **Public**, et **cocher « Add a read-write token env
+   var to this connection »** : sans cette case, Vercel n'ajoute pas `BLOB_READ_WRITE_TOKEN` et les fichiers ne sont pas enregistrés.
 3. Onglet **Deployments** › dernier déploiement › **⋯ › Redeploy**. Les tables sont créées pendant la construction
    (`prisma migrate deploy`, script `vercel-build`).
 4. Vérifier : `https://sainte-lucie-api.vercel.app/api/health` doit répondre `{"status":"ok"}`.
 
 ### 4. Créer le projet du site
 
-1. Vercel › **Add New… › Project**, importer **le même dépôt** une seconde fois.
-2. **Project Name** : `sainte-lucie-site`. **Root Directory** : `frontend`. **Framework Preset** : *Nuxt* (détecté).
+1. Vercel › **Add New… › Project**, importer **le même dépôt** une seconde fois, **Import single project** sur la ligne **frontend**.
+2. **Project Name** : `sainte-lucie-site` (le nom donne l'adresse : il doit correspondre à `PUBLIC_URL`). **Root Directory** : `frontend`. **Framework Preset** : *Nuxt* (détecté).
 3. **Environment Variables** :
 
    | Nom | Valeur |
@@ -113,9 +117,10 @@ corriger `PUBLIC_URL` (API), `NUXT_API_INTERNAL` et `NUXT_PUBLIC_SITE_URL` (site
 ### 5. Créer le compte administrateur (et, si besoin, le contenu d'exemple)
 
 Depuis votre ordinateur (Node.js 22 ou plus), avec les valeurs copiées dans Vercel › **Storage** › base Neon ou magasin Blob ›
-onglet **.env.local** (bouton *Show secret*). Dans PowerShell, depuis le dossier `backend` :
+onglet **.env.local** (bouton *Show secret*). Dans PowerShell (fenêtre normale, guillemets obligatoires autour du chemin et des valeurs) :
 
 ```powershell
+cd "D:\cheminers\Paroisse-Sainte-Lucie-de-Baguida-PgSqlackend"
 npm ci
 $env:DATABASE_URL = "<valeur de DATABASE_URL_UNPOOLED>"
 $env:ADMIN_EMAIL = "admin@paroissesaintelucie-baguida.org"
@@ -129,6 +134,9 @@ Contenu d'exemple (facultatif, retirable avec `npm run seed:demo -- --clear`) : 
 $env:BLOB_READ_WRITE_TOKEN = "<valeur de BLOB_READ_WRITE_TOKEN>"
 npm run seed:demo
 ```
+
+Le script doit afficher « Fichiers : Vercel Blob. » (il s'arrête si la base est distante et le jeton absent). Relancé, il
+recrée les fichiers manquants sans rien effacer. Ensuite : `Remove-Item Env:DATABASE_URL, Env:ADMIN_PASSWORD, Env:BLOB_READ_WRITE_TOKEN`.
 
 Connexion : `https://sainte-lucie-site.vercel.app/admin/login`. Chaque `git push` sur `main` redéploie les deux projets.
 
